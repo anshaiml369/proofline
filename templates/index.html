@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proofline</title>
+  <style>
+    :root {
+      --green: #22c55e;
+      --red: #ef4444;
+      --grey: #6b7280;
+      --ink: #111827;
+      --line: #e5e7eb;
+      --panel: #f3f4f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fff;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.4;
+    }
+    main { max-width: 600px; margin: 0 auto; padding: 32px 16px 48px; }
+    h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; }
+    .subtitle { color: var(--grey); font-size: 18px; margin: 4px 0 32px; }
+
+    #speak {
+      width: 100%;
+      height: 80px;
+      border: none;
+      border-radius: 14px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    #speak.recording { background: var(--red); animation: pulse 1s ease-in-out infinite; }
+    #speak:disabled { background: var(--grey); cursor: wait; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      50% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+    }
+    #hint { color: var(--grey); text-align: center; margin-top: 12px; min-height: 26px; }
+    #error {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 2px solid var(--red);
+      border-radius: 12px;
+      color: #991b1b;
+      background: #fef2f2;
+    }
+
+    #card { display: none; border: 2px solid var(--line); border-radius: 14px; padding: 20px; }
+    #summary { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+    .row {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      column-gap: 14px;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+    }
+    .dot { width: 18px; height: 18px; border-radius: 50%; margin-top: 24px; grid-row: 1 / span 3; }
+    .dot.pass { background: var(--green); }
+    .dot.flag { background: var(--red); }
+    .dot.info { background: var(--grey); }
+    .label { font-size: 15px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.05em; }
+    .value { font-size: 24px; font-weight: 600; }
+    .reason { font-size: 16px; color: var(--grey); }
+
+    .meta {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: var(--panel);
+      border-radius: 10px;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 16px;
+      line-height: 1.7;
+      word-break: break-all;
+    }
+    .meta a { color: var(--ink); }
+    .trust { margin-top: 10px; font-size: 15px; color: var(--grey); }
+
+    #again {
+      width: 100%;
+      height: 64px;
+      margin-top: 20px;
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Proofline</h1>
+    <p class="subtitle">Rider-owned delivery evidence</p>
+
+    <section id="recorder">
+      <button id="speak" type="button">Delivery Complete — Speak</button>
+      <p id="hint">Hold the button, speak one line, release.</p>
+    </section>
+
+    <div id="error" role="alert"></div>
+
+    <section id="card" aria-live="polite">
+      <p id="summary"></p>
+      <div id="items"></div>
+      <div class="meta">
+        <div>Time: <span id="m-time"></span></div>
+        <div>GPS: <span id="m-gps"></span></div>
+        <div>Record hash: <span id="m-hash"></span>… · <a id="m-audio" target="_blank" rel="noopener">Audio retained</a></div>
+      </div>
+      <p class="trust">Tamper-evident record. Proves the audio was not edited after recording. Does not prove the delivery happened.</p>
+      <button id="again" type="button">Record another</button>
+    </section>
+  </main>
+
+  <script>
+    const MAX_SECONDS = 10;
+    const MIN_MS = 700;
+    const IDLE_LABEL = 'Delivery Complete — Speak';
+    const IDLE_HINT = 'Hold the button, speak one line, release.';
+
+    const speakBtn = document.getElementById('speak');
+    const recorderEl = document.getElementById('recorder');
+    const hintEl = document.getElementById('hint');
+    const errorEl = document.getElementById('error');
+    const cardEl = document.getElementById('card');
+
+    let recorder = null;
+    let chunks = [];
+    let timer = null;
+    let startedAt = 0;
+    let held = false;
+    let gpsPromise = null;
+
+    speakBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      try { speakBtn.setPointerCapture(e.pointerId); } catch (_) {}
+      begin();
+    });
+    speakBtn.addEventListener('pointerup', end);
+    speakBtn.addEventListener('pointercancel', end);
+    speakBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.getElementById('again').addEventListener('click', reset);
+
+    function getGps() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          (p) => resolve({ lat: String(p.coords.latitude), lng: String(p.coords.longitude) }),
+          () => resolve(null),
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+        );
+      });
+    }
+
+    async function begin() {
+      if (held || speakBtn.disabled) return;
+      held = true;
+      hideError();
+      gpsPromise = getGps();
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (err) {
+        held = false;
+        showError('Microphone is blocked. Allow mic access for this site in the browser address bar, then try again.');
+        return;
+      }
+
+      // Released while the permission prompt was open: mic is ready now, ask for a fresh hold.
+      if (!held) {
+        stream.getTracks().forEach((t) => t.stop());
+        hintEl.textContent = 'Mic ready. Now hold the button while you speak.';
+        return;
+      }
+
+      chunks = [];
+      recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = upload;
+      recorder.start();
+      startedAt = Date.now();
+
+      speakBtn.classList.add('recording');
+      speakBtn.textContent = 'Recording… 0s';
+      hintEl.textContent = 'Release when done (max 10s).';
+      timer = setInterval(() => {
+        const s = Math.floor((Date.now() - startedAt) / 1000);
+        speakBtn.textContent = 'Recording… ' + s + 's';
+        if (s >= MAX_SECONDS) end();
+      }, 250);
+    }
+
+    function end() {
+      if (!held) return;
+      held = false;
+      if (!recorder || recorder.state !== 'recording') return;
+      clearInterval(timer);
+      recorder.stop();
+      recorder.stream.getTracks().forEach((t) => t.stop());
+      speakBtn.classList.remove('recording');
+      speakBtn.disabled = true;
+      speakBtn.textContent = 'Processing…';
+      hintEl.textContent = 'Transcribing and sealing the record.';
+    }
+
+    async function upload() {
+      if (Date.now() - startedAt < MIN_MS) {
+        resetButton();
+        showError('Too short. Hold the button the whole time you speak.');
+        return;
+      }
+
+      const type = recorder.mimeType || 'audio/webm';
+      const ext = type.includes('mp4') ? 'mp4' : type.includes('ogg') ? 'ogg' : 'webm';
+      const form = new FormData();
+      form.append('audio', new Blob(chunks, { type }), 'recording.' + ext);
+
+      const gps = await gpsPromise;
+      if (gps) {
+        form.append('gps_lat', gps.lat);
+        form.append('gps_lng', gps.lng);
+      }
+
+      try {
+        const res = await fetch('/process', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.error) {
+          resetButton();
+          showError('Could not create the record: ' + (data.error === 'parse_failed' ? 'the AI reply was not valid JSON.' : data.error));
+          return;
+        }
+        renderCard(data);
+      } catch (err) {
+        resetButton();
+        showError('Could not reach the server. Check your connection and try again.');
+      }
+    }
+
+    function renderCard(data) {
+      document.getElementById('summary').textContent = data.summary || 'Delivery record';
+
+      const itemsEl = document.getElementById('items');
+      itemsEl.replaceChildren();
+      (data.items || []).forEach((item) => {
+        const status = ['pass', 'flag', 'info'].includes(item.status) ? item.status : 'info';
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        const dot = document.createElement('span');
+        dot.className = 'dot ' + status;
+        dot.setAttribute('aria-label', status);
+
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = item.label || '';
+
+        const value = document.createElement('div');
+        value.className = 'value';
+        value.textContent = item.value || '';
+
+        const reason = document.createElement('div');
+        reason.className = 'reason';
+        reason.textContent = item.reason || '';
+
+        row.append(dot, label, value, reason);
+        itemsEl.appendChild(row);
+      });
+
+      document.getElementById('m-time').textContent = data.timestamp;
+      document.getElementById('m-gps').textContent = data.gps;
+      document.getElementById('m-hash').textContent = data.hash_short;
+      document.getElementById('m-audio').href = data.audio_url;
+
+      recorderEl.style.display = 'none';
+      cardEl.style.display = 'block';
+    }
+
+    function resetButton() {
+      speakBtn.disabled = false;
+      speakBtn.classList.remove('recording');
+      speakBtn.textContent = IDLE_LABEL;
+      hintEl.textContent = IDLE_HINT;
+    }
+
+    function reset() {
+      cardEl.style.display = 'none';
+      recorderEl.style.display = 'block';
+      hideError();
+      resetButton();
+    }
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+    }
+
+    function hideError() {
+      errorEl.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
