@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proofline Disputes</title>
+  <style>
+    :root {
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --grey: #6b7280;
+      --ink: #111827;
+      --line: #e5e7eb;
+      --panel: #f3f4f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fff;
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.4;
+    }
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 16px 48px; }
+    header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    h1 { font-size: 32px; font-weight: 800; }
+    .sub { color: var(--grey); }
+    .mock-tag {
+      display: inline-block; padding: 3px 10px; border-radius: 999px;
+      background: #fef3c7; color: #92400e; font-size: 13px; font-weight: 700; letter-spacing: 0.03em;
+    }
+
+    .metric { margin: 24px 0; padding: 20px 24px; border: 2px solid var(--line); border-radius: 14px; }
+    .metric-label { color: var(--grey); font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-value { font-size: 44px; font-weight: 800; margin: 4px 0; }
+    .metric-value small { font-size: 20px; font-weight: 600; color: var(--grey); }
+    .metric-note { color: var(--grey); font-size: 14px; margin-top: 6px; }
+
+    .table-wrap { overflow-x: auto; border: 2px solid var(--line); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th { text-align: left; font-size: 13px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 14px; background: var(--panel); }
+    td { padding: 14px; border-top: 1px solid var(--line); vertical-align: middle; }
+    tr.row { cursor: pointer; }
+    tr.row:hover td { background: #fafafa; }
+    tr.row:focus-visible { outline: 3px solid var(--ink); outline-offset: -3px; }
+    .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; }
+    .yes { color: #15803d; font-weight: 700; }
+    .no { color: #b91c1c; font-weight: 700; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 14px; font-weight: 700; color: #fff; }
+    .badge.high { background: var(--green); }
+    .badge.medium { background: var(--amber); }
+    .badge.low { background: var(--red); }
+    .strength { display: flex; align-items: center; gap: 10px; }
+    .bar { width: 90px; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
+    .bar span { display: block; height: 100%; }
+    .bar span.high { background: var(--green); }
+    .bar span.medium { background: var(--amber); }
+    .bar span.low { background: var(--red); }
+    .rec { font-weight: 700; }
+    .rec.favor_rider { color: #15803d; }
+    .rec.favor_customer { color: #b91c1c; }
+    .rec.inconclusive { color: #b45309; }
+
+    tr.detail { display: none; }
+    tr.detail.open { display: table-row; }
+    tr.detail td { background: #fcfcfd; }
+    .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .side { padding: 14px 16px; border-radius: 10px; background: var(--panel); }
+    .side h3 { font-size: 13px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .side .quote { font-size: 18px; }
+    .side .orig { color: var(--grey); font-size: 15px; margin-top: 6px; }
+    .facts { margin-top: 10px; font-size: 15px; color: var(--grey); }
+    .reason { margin-top: 12px; font-size: 16px; }
+    .footnote { color: var(--grey); font-size: 14px; margin-top: 14px; }
+    @media (max-width: 700px) { .sides { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Dispute review</h1>
+        <p class="sub">Voice evidence captured at the OTP handover, scored by fixed rules</p>
+      </div>
+      <span class="mock-tag">MOCK DATA · DEMO</span>
+    </header>
+
+    <section class="metric">
+      <div class="metric-label">Inconclusive disputes this week</div>
+      <div class="metric-value">12% <small>down from 68% baseline</small></div>
+      <div class="metric-note">Illustrative pilot target, not a measured result. The rows below are mock records scored live by the real dispute engine.</div>
+    </section>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th><th>Rider</th><th>OTP</th><th>GPS</th><th>Confidence</th><th>Evidence strength</th><th>Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          {% set s = r.score.evidence_strength %}
+          {% set band = 'high' if s >= 80 else ('medium' if s >= 50 else 'low') %}
+          <tr class="row" tabindex="0" aria-expanded="false" data-target="d{{ loop.index }}">
+            <td class="mono">{{ r.card.order_id }}</td>
+            <td class="mono">{{ r.card.rider_id }}</td>
+            <td class="{{ 'yes' if r.card.otp_confirmed else 'no' }}">{{ '✓ Confirmed' if r.card.otp_confirmed else '✗ No' }}</td>
+            <td class="{{ 'yes' if r.card.gps_matched else 'no' }}">{{ '✓ Matched' if r.card.gps_matched else '✗ No' }}</td>
+            <td><span class="badge {{ r.card.confidence }}">{{ r.card.confidence }}</span></td>
+            <td>
+              <div class="strength">
+                <strong>{{ s }}</strong>
+                <div class="bar"><span class="{{ band }}" style="width: {{ s }}%"></span></div>
+              </div>
+            </td>
+            <td class="rec {{ r.score.recommendation }}">{{ {'favor_rider': 'Favour rider', 'favor_customer': 'Favour customer', 'inconclusive': 'Inconclusive'}[r.score.recommendation] }}</td>
+          </tr>
+          <tr class="detail" id="d{{ loop.index }}">
+            <td colspan="7">
+              <div class="sides">
+                <div class="side">
+                  <h3>Rider said · {{ r.timestamp }}</h3>
+                  <p class="quote">“{{ r.card.spoken_context }}”</p>
+                  <p class="orig">Original: {{ r.transcript }}</p>
+                  <p class="facts">
+                    Handover: {{ r.card.handover_location.replace('_', ' ') }} ·
+                    Obstacle: {{ r.card.obstacle.replace('_', ' ') }} ·
+                    Status: {{ r.card.delivery_status.replace('_', ' ') }}
+                  </p>
+                </div>
+                <div class="side">
+                  <h3>Customer claimed</h3>
+                  <p class="quote">“{{ r.customer_claim }}”</p>
+                </div>
+              </div>
+              <p class="reason"><strong>Why {{ s }}:</strong> {{ r.score.reasoning }}</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="footnote">Click a row to compare the rider's spoken evidence with the customer's claim. The score is evidence strength, not a verdict: the platform makes the final call.</p>
+  </main>
+
+  <script>
+    document.querySelectorAll('tr.row').forEach((row) => {
+      const toggle = () => {
+        const detail = document.getElementById(row.dataset.target);
+        const open = detail.classList.toggle('open');
+        row.setAttribute('aria-expanded', open);
+      };
+      row.addEventListener('click', toggle);
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+  </script>
+</body>
+</html>

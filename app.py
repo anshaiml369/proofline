@@ -11,6 +11,7 @@ from flask import Flask, jsonify, render_template, request
 from openai import OpenAI
 
 from dispute_engine import score_dispute
+from mock_disputes import MOCK_DISPUTES
 
 load_dotenv()
 
@@ -200,6 +201,12 @@ def too_large(_):
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+    rows = [{**d, "score": score_dispute(d["card"], d["customer_claim"])} for d in MOCK_DISPUTES]
+    return render_template("dashboard.html", rows=rows)
 
 
 @app.route("/transcribe", methods=["POST"])
