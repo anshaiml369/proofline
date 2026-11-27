@@ -142,6 +142,10 @@
       font-size: 22px; font-weight: 800; color: var(--ink); cursor: pointer;
     }
     #confirmed-tile[hidden], #handover-step[hidden] { display: none; }
+    .offline-banner { background: #fef3c7; color: #78350f; border-radius: 12px; padding: 14px 16px; font-size: 17px; font-weight: 600; margin: 0 0 16px; }
+    .offline-banner.ok { background: var(--green-bg); color: #166534; }
+    .offline-banner[hidden] { display: none; }
+    .pending-line { text-align: center; font-size: 16px; color: var(--grey); margin-top: 20px; }
     .reset-link { display: block; text-align: center; margin-top: 28px; font-size: 16px; color: var(--grey); }
     .dash-link { display: block; text-align: center; margin-top: 16px; font-size: 18px; color: var(--ink); font-weight: 600; padding: 10px; }
   </style>
@@ -159,6 +163,8 @@
       <div id="confirmed-tile" class="status ok" hidden>✓ Customer confirmed</div>
       <div id="gps" class="status"></div>
     </div>
+
+    <div id="offline-banner" class="offline-banner" role="status" hidden></div>
 
     <section id="capture">
       <div id="handover-step">
@@ -211,6 +217,7 @@
       <a class="dash-link" href="/dashboard">View in platform dashboard →</a>
     </section>
 
+    <p id="pending-line" class="pending-line">Pending uploads: 0</p>
     <a id="reset-confirm" class="reset-link" href="#">Reset confirmation</a>
   </main>
 
@@ -473,37 +480,170 @@
       }
 
       const type = recorder.mimeType || 'audio/webm';
-      const ext = type.includes('mp4') ? 'mp4' : type.includes('ogg') ? 'ogg' : 'webm';
-      const form = new FormData();
-      form.append('audio', new Blob(chunks, { type }), 'recording.' + ext);
-      form.append('order_id', ctx.order_id);
-      form.append('rider_id', ctx.rider_id);
-      form.append('customer_confirmed', customerConfirmed);
-      form.append('customer_phone', phoneInput.value);
-      form.append('gps_matched', ctx.gps_matched);
-      if (deliveryPhoto) form.append('photo', deliveryPhoto, deliveryPhoto.name || 'photo.jpg');
-
       const gps = await gpsPromise;
-      if (gps) {
-        form.append('gps_lat', gps.lat);
-        form.append('gps_lng', gps.lng);
-      }
+      const rec = {
+        id: newId(),
+        order_id: ctx.order_id,
+        rider_id: ctx.rider_id,
+        customer_phone: phoneInput.value,
+        customer_confirmed: customerConfirmed,
+        gps_matched: ctx.gps_matched,
+        gps_lat: gps ? gps.lat : null,
+        gps_lng: gps ? gps.lng : null,
+        audio_blob: new Blob(chunks, { type }),
+        audio_ext: type.includes('mp4') ? 'mp4' : type.includes('ogg') ? 'ogg' : 'webm',
+        photo_blob: deliveryPhoto,
+        created_at: new Date().toISOString(),
+      };
 
+      if (!navigator.onLine) return saveOffline(rec);
+      let res;
       try {
-        const res = await fetch('/process', { method: 'POST', body: form });
-        const data = await res.json();
-        if (data.error) {
-          resetButton();
-          showError('Could not save the evidence. Please try again.');
-          console.error(data);
-          return;
-        }
-        render(data);
+        res = await postRecord(rec);
       } catch (err) {
+        return saveOffline(rec);  // network failure or timeout: keep the recording
+      }
+      let data;
+      try {
+        data = await res.json();
+      } catch (_) {
+        // Non-JSON reply (e.g. a proxy's 502/503 page) means the app never saw it: queue it.
+        if (res.status >= 500) return saveOffline(rec);
+        data = { error: 'bad_response' };
+      }
+      if (data.error) {
         resetButton();
-        showError('No connection to the server. Check your internet and try again.');
+        showError('Could not save the evidence. Please try again.');
+        console.error(data);
+        return;
+      }
+      render(data);
+    }
+
+    // ---- Offline queue (IndexedDB: voice_evidence / pending_submissions) ----
+    const UPLOAD_TIMEOUT_MS = 20000;
+    const RETRY_MS = 30000;
+    let draining = false, retryTimer = null, bannerTimer = null;
+
+    function newId() {
+      // crypto.randomUUID only exists on https/localhost; a phone on the LAN over http needs the fallback.
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+
+    function toFormData(rec) {
+      const form = new FormData();
+      form.append('audio', rec.audio_blob, 'recording.' + rec.audio_ext);
+      form.append('order_id', rec.order_id);
+      form.append('rider_id', rec.rider_id);
+      form.append('customer_confirmed', rec.customer_confirmed);
+      form.append('customer_phone', rec.customer_phone);
+      form.append('gps_matched', rec.gps_matched);
+      form.append('client_id', rec.id);
+      form.append('recorded_at_client', rec.created_at);
+      if (rec.photo_blob) form.append('photo', rec.photo_blob, rec.photo_blob.name || 'photo.jpg');
+      if (rec.gps_lat !== null) {
+        form.append('gps_lat', rec.gps_lat);
+        form.append('gps_lng', rec.gps_lng);
+      }
+      return form;
+    }
+
+    function postRecord(rec) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), UPLOAD_TIMEOUT_MS);
+      return fetch('/process', { method: 'POST', body: toFormData(rec), signal: ctrl.signal })
+        .finally(() => clearTimeout(t));
+    }
+
+    function openQueue() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open('voice_evidence', 1);
+        req.onupgradeneeded = () => req.result.createObjectStore('pending_submissions', { keyPath: 'id' });
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function queueOp(mode, fn) {
+      const db = await openQueue();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('pending_submissions', mode);
+        const req = fn(tx.objectStore('pending_submissions'));
+        tx.oncomplete = () => { db.close(); resolve(req && req.result); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+      });
+    }
+    const queueAdd = (rec) => queueOp('readwrite', (s) => s.put(rec));
+    const queueDelete = (id) => queueOp('readwrite', (s) => s.delete(id));
+    const queueAll = async () => ((await queueOp('readonly', (s) => s.getAll())) || [])
+      .sort((a, b) => a.created_at.localeCompare(b.created_at));
+
+    async function refreshPendingLine() {
+      let n = 0;
+      try { n = (await queueAll()).length; } catch (_) {}
+      $('pending-line').textContent = 'Pending uploads: ' + n;
+    }
+
+    function showBanner(text, kind) {
+      const el = $('offline-banner');
+      clearTimeout(bannerTimer);
+      el.textContent = text;
+      el.className = 'offline-banner' + (kind ? ' ' + kind : '');
+      el.hidden = false;
+      if (kind === 'ok') bannerTimer = setTimeout(() => { el.hidden = true; }, 6000);
+    }
+
+    async function saveOffline(rec) {
+      try {
+        await queueAdd(rec);
+      } catch (_) {
+        resetButton();
+        showError('No connection, and this phone could not save the recording. Please try again.');
+        return;
+      }
+      resetButton();
+      showBanner('Saved offline — will upload when connection returns.');
+      refreshPendingLine();
+    }
+
+    async function drainQueue() {
+      if (draining || !navigator.onLine) return;
+      draining = true;
+      let sent = 0, failed = false;
+      try {
+        for (const rec of await queueAll()) {
+          try {
+            const res = await postRecord(rec);
+            if (res.status < 500) {  // success, or a request error that a retry won't fix
+              await queueDelete(rec.id);
+              sent++;
+            } else {
+              failed = true;
+            }
+          } catch (_) {
+            failed = true;
+            break;  // still no connection: stop and retry later
+          }
+        }
+      } catch (_) {
+        failed = true;
+      }
+      draining = false;
+      refreshPendingLine();
+      if (sent) showBanner(`Uploaded ${sent} pending record(s).`, 'ok');
+      if (failed) {
+        clearTimeout(retryTimer);
+        retryTimer = setTimeout(drainQueue, RETRY_MS);
       }
     }
+
+    window.addEventListener('online', drainQueue);
+    refreshPendingLine();
+    drainQueue();
 
     function pretty(value) {
       if (!value || value === 'not_mentioned') return null;
