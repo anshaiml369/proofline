@@ -1,5 +1,7 @@
 import hashlib
+import hmac
 import json
+import secrets
 import os
 import urllib.request
 import uuid
@@ -41,7 +43,9 @@ WHISPER_HINT = (
 IST = timezone(timedelta(hours=5, minutes=30))
 # In-process only (no database): lets the dashboard show what the rider page just recorded. Cleared on restart.
 LIVE_RECORDS = deque(maxlen=20)
-CONFIRMATIONS = {}  # order_id -> True once the customer taps "Yes" on /confirm. In-memory, demo only.
+# In-memory, demo only (cleared on restart).
+CONFIRMATIONS = {}  # order_id -> {"session_id", "confirmed_at"} once the customer taps "Yes" on /confirm
+QR_NONCES = {}      # order_id -> one-time code embedded in the QR currently shown on the rider page
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
@@ -218,32 +222,54 @@ def index():
 def rider():
     order_id = (request.args.get("order_id") or "ORD123").strip()[:64]
     rider_id = (request.args.get("rider_id") or "RID456").strip()[:64]
-    confirm_url = request.host_url.rstrip("/") + url_for("confirm", order_id=order_id, rider_id=rider_id)
+    if order_id not in CONFIRMATIONS:
+        # Fresh one-time code per page load; an existing confirmation (and its code) is left alone.
+        QR_NONCES[order_id] = secrets.token_urlsafe(12)
+    nonce = QR_NONCES.get(order_id, "")
+    confirm_url = request.host_url.rstrip("/") + url_for("confirm", order_id=order_id, rider_id=rider_id, n=nonce)
     qr_svg = qrcode.make(
         confirm_url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10
     ).to_string(encoding="unicode")
-    return render_template("rider.html", qr_svg=qr_svg, confirm_url=confirm_url)
+    return render_template("rider.html", qr_svg=qr_svg, confirm_url=confirm_url, qr_nonce=nonce)
+
+
+def nonce_ok(order_id, nonce):
+    expected = QR_NONCES.get(order_id)
+    return bool(expected and nonce) and hmac.compare_digest(expected, nonce)
 
 
 @app.route("/confirm", methods=["GET", "POST"])
 def confirm():
-    """Customer-side page opened from the QR. One tap marks the order as received (in memory, demo only)."""
+    """Customer-side page opened from the QR. One tap with the QR's one-time code confirms receipt."""
     order_id = clean_id(request.values.get("order_id"))
-    if request.method == "POST" and order_id != "not_provided":
-        CONFIRMATIONS[order_id] = True
+    nonce = request.values.get("n") or ""
+    if not nonce_ok(order_id, nonce):
+        return render_template("confirm.html", order_id=order_id, expired=True)
+    if request.method == "POST":
+        if order_id not in CONFIRMATIONS:
+            CONFIRMATIONS[order_id] = {
+                "session_id": str(uuid.uuid4()),
+                "confirmed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            }
         return render_template("confirm.html", order_id=order_id, done=True)
-    return render_template("confirm.html", order_id=order_id, done=False)
+    return render_template("confirm.html", order_id=order_id, nonce=nonce, done=False)
 
 
 @app.route("/confirmation-status")
 def confirmation_status():
-    return jsonify({"confirmed": CONFIRMATIONS.get(clean_id(request.args.get("order_id")), False)})
+    order_id = clean_id(request.args.get("order_id"))
+    conf = CONFIRMATIONS.get(order_id)
+    # The session id goes only to the page holding the QR's one-time code, not to anyone who knows the order id.
+    session_id = conf["session_id"] if conf and nonce_ok(order_id, request.args.get("n") or "") else None
+    return jsonify({"confirmed": bool(conf), "session_id": session_id})
 
 
 @app.route("/confirmation-reset", methods=["POST"])
 def confirmation_reset():
     """Testing aid for the rider page's 'Reset confirmation' link."""
-    CONFIRMATIONS.pop(clean_id(request.form.get("order_id")), None)
+    order_id = clean_id(request.form.get("order_id"))
+    CONFIRMATIONS.pop(order_id, None)
+    QR_NONCES.pop(order_id, None)
     return jsonify({"confirmed": False})
 
 
@@ -324,6 +350,7 @@ def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched,
         with open(path, "rb") as f:
             audio_bytes = f.read()
         record_hash = hashlib.sha256(audio_bytes + sealed_fields.encode()).hexdigest()
+        audio_hash = hashlib.sha256(audio_bytes).hexdigest()  # raw audio only
         record = {
             "timestamp": server_timestamp,
             "gps": gps_string,
@@ -345,6 +372,9 @@ def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched,
     card = build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched)
     card["photo_captured"] = bool(photo_id)
     card["photo_id"] = photo_id
+    card["audio_hash"] = audio_hash
+    card["received_at"] = server_timestamp  # server clock, independent of the phone
+    card["recorded_at_client"] = (form.get("recorded_at_client") or "").strip()[:40] or None  # phone clock, display only
     card.update(card_extras or {})  # added before scoring so the reasoning can name the check used
     customer_claim = (form.get("customer_claim") or "").strip()[:200]
     dispute_score = score_dispute(card, customer_claim)
@@ -369,8 +399,14 @@ def process():
         return jsonify({"error": "no audio file"}), 400
     form = request.form
     order_id = clean_id(form.get("order_id"))
-    # The client flag only counts if the server saw the customer's tap on /confirm.
-    customer_confirmed = parse_bool(form.get("customer_confirmed")) and CONFIRMATIONS.get(order_id, False)
+    # Recording session: a wrong or forged session id is rejected before any audio is processed.
+    # No session id is allowed and recorded as "not verified" (scores as unconfirmed).
+    session_id = (form.get("session_id") or "").strip()[:64]
+    expected = (CONFIRMATIONS.get(order_id) or {}).get("session_id") or ""
+    session_verified = bool(session_id) and hmac.compare_digest(session_id, expected)
+    if session_id and not session_verified:
+        return jsonify({"error": "Recording session invalid or expired."}), 400
+    customer_confirmed = session_verified  # the session is the proof of the customer's tap
     payload, status = create_evidence(
         audio, form, order_id, clean_id(form.get("rider_id")),
         customer_confirmed,  # QR confirmation is the OTP signal for scoring
@@ -379,6 +415,8 @@ def process():
         card_extras={
             "customer_confirmed": customer_confirmed,
             "customer_phone": mask_phone(form.get("customer_phone")),
+            "session_verified": session_verified,
+            "recording_session_id": session_id or None,
         },
     )
     # A confirmation lasts for the order (re-records included) until reset or restart.

@@ -22,13 +22,22 @@
     }
     .done { margin-top: 32px; border-radius: 16px; padding: 24px 20px; background: #dcfce7; color: #166534; }
     .done .title { font-size: 26px; font-weight: 800; }
-    .done p { font-size: 18px; margin-top: 6px; }
+    .done p, .expired p { font-size: 18px; margin-top: 6px; }
+    .expired { margin-top: 32px; border-radius: 16px; padding: 24px 20px; background: #fef3c7; color: #78350f; }
+    .expired .title { font-size: 24px; font-weight: 800; }
   </style>
 </head>
 <body>
   <main>
     <p class="eyebrow">Proofline</p>
-    {% if done %}
+    {% if expired %}
+      <h1>This code has expired</h1>
+      <p class="order">{{ order_id }}</p>
+      <div class="expired" role="status">
+        <div class="title">Ask the rider to show the code again</div>
+        <p>Then scan the new code on the rider's phone.</p>
+      </div>
+    {% elif done %}
       <h1>Delivery confirmed</h1>
       <p class="order">{{ order_id }}</p>
       <div class="done" role="status">
@@ -41,6 +50,7 @@
       <p class="sub">Tap only if the package is in your hands.</p>
       <form method="post">
         <input type="hidden" name="order_id" value="{{ order_id }}">
+        <input type="hidden" name="n" value="{{ nonce }}">
         <button type="submit">✓ Yes, I received this</button>
       </form>
     {% endif %}

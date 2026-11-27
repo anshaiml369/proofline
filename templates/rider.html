@@ -135,6 +135,12 @@
     .strength span { font-size: 20px; color: var(--grey); font-weight: 600; }
     .reason { font-size: 17px; color: var(--grey); margin-top: 4px; }
     .trust { font-size: 16px; color: var(--grey); margin-top: 12px; }
+    .integrity { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; color: var(--grey); }
+    .integrity > div { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+    .integrity > div[hidden] { display: none; }
+    .integrity dd { color: #374151; text-align: right; }
+    .integrity dd.ok { color: #166534; font-weight: 700; }
+    .integrity .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
     #again {
       width: 100%; min-height: 64px; margin-top: 20px;
@@ -212,6 +218,12 @@
       <p class="strength">Evidence strength: <strong id="r-score"></strong><span>/100</span></p>
       <p class="reason" id="r-reason"></p>
       <p class="trust">Tamper-evident record · <span id="r-hash"></span>… Proves the audio wasn't edited later, not that the delivery happened.</p>
+      <dl class="integrity">
+        <div><dt>Received at</dt><dd id="i-received"></dd></div>
+        <div id="i-phone-row" hidden><dt>Recorded on phone</dt><dd id="i-phone"></dd></div>
+        <div><dt>Audio hash</dt><dd id="i-audio" class="mono"></dd></div>
+        <div><dt>Session</dt><dd id="i-session"></dd></div>
+      </dl>
 
       <button id="again" type="button">Record again</button>
       <a class="dash-link" href="/dashboard">View in platform dashboard →</a>
@@ -254,16 +266,21 @@
     // A confirmation lasts for this order_id for the session (re-records and reloads included).
     const phoneInput = $('phone-input');
     const CONFIRM_KEY = `confirmed_${ctx.order_id}`, PHONE_KEY = `phone_${ctx.order_id}`;
+    const SESSION_KEY = `session_${ctx.order_id}`;
+    const QR_NONCE = {{ qr_nonce | tojson }};
+    const statusUrl = () => '/confirmation-status?order_id=' + encodeURIComponent(ctx.order_id) + '&n=' + encodeURIComponent(QR_NONCE);
     const store = {
       get: (k) => { try { return sessionStorage.getItem(k); } catch (_) { return null; } },
       set: (k, v) => { try { sessionStorage.setItem(k, v); } catch (_) {} },
       del: (k) => { try { sessionStorage.removeItem(k); } catch (_) {} },
     };
-    let customerConfirmed = false, poll = null;
+    let customerConfirmed = false, poll = null, sessionId = null;
 
-    function showConfirmed() {
+    function showConfirmed(sid) {
       customerConfirmed = true;
+      if (sid) sessionId = sid;
       store.set(CONFIRM_KEY, 'true');
+      if (sessionId) store.set(SESSION_KEY, sessionId);
       store.set(PHONE_KEY, phoneInput.value);
       $('handover-step').hidden = true;
       $('confirmed-tile').hidden = false;
@@ -272,11 +289,14 @@
 
     if (store.get(CONFIRM_KEY) === 'true') {
       phoneInput.value = store.get(PHONE_KEY) || '';
-      showConfirmed();
+      showConfirmed(store.get(SESSION_KEY));
       // The server's memory is the source of truth (it resets on restart): fall back to the QR step if it forgot.
-      fetch('/confirmation-status?order_id=' + encodeURIComponent(ctx.order_id))
+      fetch(statusUrl())
         .then((r) => r.json())
-        .then((d) => { if (!d.confirmed) { store.del(CONFIRM_KEY); location.reload(); } })
+        .then((d) => {
+          if (!d.confirmed) { store.del(CONFIRM_KEY); store.del(SESSION_KEY); location.reload(); }
+          else if (d.session_id) showConfirmed(d.session_id);
+        })
         .catch(() => {});
     }
 
@@ -286,6 +306,7 @@
       body.append('order_id', ctx.order_id);
       try { await fetch('/confirmation-reset', { method: 'POST', body }); } catch (_) {}
       store.del(CONFIRM_KEY);
+      store.del(SESSION_KEY);
       store.del(PHONE_KEY);
       store.del(PHOTO_KEY);
       location.reload();
@@ -307,11 +328,11 @@
       if (poll || customerConfirmed) return;
       const check = async () => {
         try {
-          const res = await fetch('/confirmation-status?order_id=' + encodeURIComponent(ctx.order_id));
-          if ((await res.json()).confirmed) {
+          const d = await (await fetch(statusUrl())).json();
+          if (d.confirmed) {
             clearInterval(poll);
             poll = null;
-            showConfirmed();
+            showConfirmed(d.session_id);
           }
         } catch (_) { /* keep polling */ }
       };
@@ -487,6 +508,7 @@
         rider_id: ctx.rider_id,
         customer_phone: phoneInput.value,
         customer_confirmed: customerConfirmed,
+        session_id: sessionId,
         gps_matched: ctx.gps_matched,
         gps_lat: gps ? gps.lat : null,
         gps_lng: gps ? gps.lng : null,
@@ -544,6 +566,7 @@
       form.append('gps_matched', rec.gps_matched);
       form.append('client_id', rec.id);
       form.append('recorded_at_client', rec.created_at);
+      if (rec.session_id) form.append('session_id', rec.session_id);
       if (rec.photo_blob) form.append('photo', rec.photo_blob, rec.photo_blob.name || 'photo.jpg');
       if (rec.gps_lat !== null) {
         form.append('gps_lat', rec.gps_lat);
@@ -552,11 +575,23 @@
       return form;
     }
 
-    function postRecord(rec) {
+    function postOnce(rec) {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), UPLOAD_TIMEOUT_MS);
       return fetch('/process', { method: 'POST', body: toFormData(rec), signal: ctrl.signal })
         .finally(() => clearTimeout(t));
+    }
+
+    async function postRecord(rec) {
+      const res = await postOnce(rec);
+      if (res.status === 400 && rec.session_id) {
+        // Session expired (e.g. server restarted while the recording waited): keep the evidence,
+        // upload it as "not verified" instead of losing it, and drop the stale confirmation.
+        store.del(CONFIRM_KEY);
+        store.del(SESSION_KEY);
+        return postOnce({ ...rec, session_id: null });
+      }
+      return res;
     }
 
     function openQueue() {
@@ -658,6 +693,13 @@
       el.classList.toggle('missing', !text);
     }
 
+    let needsFreshQr = false;
+    function istTime(iso) {
+      const d = new Date(iso);
+      if (isNaN(d)) return '—';
+      return d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' IST';
+    }
+
     function render(data) {
       const card = data.evidence_card;
       const score = data.dispute_score;
@@ -689,6 +731,18 @@
       $('r-reason').textContent = score.reasoning;
       $('r-hash').textContent = data.record.hash_short;
 
+      // Integrity rows (Phase C).
+      $('i-received').textContent = istTime(card.received_at);
+      const phoneTime = card.recorded_at_client ? new Date(card.recorded_at_client) : null;
+      const gapMin = phoneTime ? Math.abs(new Date(card.received_at) - phoneTime) / 60000 : 0;
+      $('i-phone-row').hidden = !(phoneTime && gapMin > 2);
+      if (phoneTime) $('i-phone').textContent = istTime(card.recorded_at_client);
+      $('i-audio').textContent = (card.audio_hash || '').slice(0, 12) + '…';
+      $('i-session').textContent = card.session_verified ? 'verified' : 'not verified';
+      $('i-session').className = card.session_verified ? 'ok' : '';
+      // The session expired mid-flight: the next "Record again" reloads for a fresh QR.
+      if (customerConfirmed && !card.session_verified) needsFreshQr = true;
+
       $('capture').style.display = 'none';
       $('result').style.display = 'block';
       window.scrollTo({ top: 0 });
@@ -706,6 +760,7 @@
       $('result').style.display = 'none';
       $('capture').style.display = 'block';
       // Confirmation stays for this order; only the recording and the previous card are cleared.
+      if (needsFreshQr) { location.reload(); return; }
       chunks = [];
       hideError();
       resetButton();

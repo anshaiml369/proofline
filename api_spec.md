@@ -40,6 +40,8 @@ curl -X POST https://<host>/evidence \
     "customer_instruction": "not_mentioned",
     "spoken_context": "On the third floor, the gate was locked, customer's phone was off, handed it to the watchman, photo taken.",
     "confidence": "high",
+    "audio_hash": "<64 hex chars, SHA-256 of the raw audio>",
+    "received_at": "2026-11-27T04:41:09Z",
     "photo_captured": true,
     "photo_id": "3f2b7c1e-9a4d-4e8b-b0c2-5d6e7f8a9b10"
   },
@@ -113,16 +115,16 @@ The rider demo page uses three extra routes. `/evidence` is unchanged: a platfor
 
 | Route | What it does |
 |---|---|
-| `GET /rider?order_id=&rider_id=` | Rider page. Shows a QR that points to `/confirm` for this order. Once confirmed, the page skips the QR step for that order for the rest of the browser session. |
-| `GET /confirm?order_id=` · `POST /confirm` | Customer page opened from the QR. Tapping "Yes, I received this" marks the order confirmed (in memory). |
-| `GET /confirmation-status?order_id=` | `{"confirmed": true\|false}`. The rider page polls it every 2 s. |
+| `GET /rider?order_id=&rider_id=` | Rider page. Shows a QR that points to `/confirm?…&n=<one-time code>`. A new code is issued on each load until the order is confirmed. Once confirmed, the page skips the QR step for that order for the rest of the browser session. |
+| `GET /confirm?order_id=&n=` · `POST /confirm` | Customer page opened from the QR. Tapping "Yes, I received this" with the QR's one-time code confirms the order and creates a recording session. A missing or wrong code shows "This code has expired". |
+| `GET /confirmation-status?order_id=` | `{"confirmed": true\|false, "session_id": "…"\|null}`. The rider page polls it every 2 s. `session_id` is returned only with the QR's code (`&n=`), not to anyone who knows the order ID. |
 | `POST /confirmation-reset` (`order_id`) | Testing aid behind the rider page's "Reset confirmation" link. Clears the order's confirmation. |
 
-`POST /process` (the demo page's upload) takes `customer_confirmed` and `customer_phone` instead of `otp_confirmed`. The confirmation counts only if the server recorded the customer's tap, and it feeds the OTP +40 in scoring. A confirmation lasts for that order (re-records included) until it is reset or the server restarts. The card gains `customer_confirmed` and `customer_phone` (masked, e.g. `******3210`; the full number is not stored).
+`POST /process` (the demo page's upload) takes `session_id` and `customer_phone` instead of `otp_confirmed`. A wrong or expired `session_id` is rejected with 400 `Recording session invalid or expired.` before any audio is processed. No `session_id` is accepted and recorded as not verified. A verified session counts as the customer's confirmation and feeds the OTP +40 in scoring. A confirmation lasts for that order (re-records included) until it is reset or the server restarts. The card gains `customer_confirmed` and `customer_phone` (masked, e.g. `******3210`; the full number is not stored).
 
 ## Not in this hackathon build
 
 - **Authentication:** production needs a per-platform API key header. Right now anyone who can reach the URL can call it.
 - **Durable audio storage:** files are on local disk and are lost on redeploy. Production needs object storage.
-- **Customer confirmation:** `/confirm` has no login or one-time token, so anyone who knows an order ID can confirm it. Production needs a signed, single-use token in the QR.
+- **Customer confirmation:** the QR carries a one-time code, but codes and sessions live in server memory and are lost on restart. A recording queued offline across a restart uploads as not verified. Nothing stops a rider playing a pre-recorded clip into the microphone.
 - **Wispr:** the code path is ready, but its endpoint is unverified until a key is issued.
