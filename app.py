@@ -5,16 +5,18 @@ import secrets
 import os
 import urllib.request
 import uuid
-from collections import deque
 from datetime import datetime, timedelta, timezone
+from functools import wraps
+from urllib.parse import urlparse
 
 import httpx
 import qrcode
 import qrcode.image.svg
 from dotenv import load_dotenv
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from openai import OpenAI
 
+import db
 from dispute_engine import score_dispute
 from mock_disputes import MOCK_DISPUTES
 
@@ -41,14 +43,14 @@ WHISPER_HINT = (
 )
 
 IST = timezone(timedelta(hours=5, minutes=30))
-# In-process only (no database): lets the dashboard show what the rider page just recorded. Cleared on restart.
-LIVE_RECORDS = deque(maxlen=20)
-# In-memory, demo only (cleared on restart).
-CONFIRMATIONS = {}  # order_id -> {"session_id", "confirmed_at"} once the customer taps "Yes" on /confirm
-QR_NONCES = {}      # order_id -> one-time code embedded in the QR currently shown on the rider page
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+app.secret_key = os.getenv("FLASK_SECRET_KEY") or ""
+if not app.secret_key:
+    app.secret_key = secrets.token_hex(32)
+    print(" * FLASK_SECRET_KEY not set: using a temporary key, so logins reset on every restart.")
+db.init_db()
 os.makedirs(AUDIO_DIR, exist_ok=True)
 os.makedirs(PHOTO_DIR, exist_ok=True)
 
@@ -222,10 +224,10 @@ def index():
 def rider():
     order_id = (request.args.get("order_id") or "ORD123").strip()[:64]
     rider_id = (request.args.get("rider_id") or "RID456").strip()[:64]
-    if order_id not in CONFIRMATIONS:
+    if not db.get_confirmation(order_id):
         # Fresh one-time code per page load; an existing confirmation (and its code) is left alone.
-        QR_NONCES[order_id] = secrets.token_urlsafe(12)
-    nonce = QR_NONCES.get(order_id, "")
+        db.set_nonce(order_id, secrets.token_urlsafe(12))
+    nonce = db.get_nonce(order_id) or ""
     confirm_url = request.host_url.rstrip("/") + url_for("confirm", order_id=order_id, rider_id=rider_id, n=nonce)
     qr_svg = qrcode.make(
         confirm_url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10
@@ -234,7 +236,7 @@ def rider():
 
 
 def nonce_ok(order_id, nonce):
-    expected = QR_NONCES.get(order_id)
+    expected = db.get_nonce(order_id)
     return bool(expected and nonce) and hmac.compare_digest(expected, nonce)
 
 
@@ -246,11 +248,7 @@ def confirm():
     if not nonce_ok(order_id, nonce):
         return render_template("confirm.html", order_id=order_id, expired=True)
     if request.method == "POST":
-        if order_id not in CONFIRMATIONS:
-            CONFIRMATIONS[order_id] = {
-                "session_id": str(uuid.uuid4()),
-                "confirmed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            }
+        db.add_confirmation(order_id, str(uuid.uuid4()))  # first tap wins
         return render_template("confirm.html", order_id=order_id, done=True)
     return render_template("confirm.html", order_id=order_id, nonce=nonce, done=False)
 
@@ -258,7 +256,7 @@ def confirm():
 @app.route("/confirmation-status")
 def confirmation_status():
     order_id = clean_id(request.args.get("order_id"))
-    conf = CONFIRMATIONS.get(order_id)
+    conf = db.get_confirmation(order_id)
     # The session id goes only to the page holding the QR's one-time code, not to anyone who knows the order id.
     session_id = conf["session_id"] if conf and nonce_ok(order_id, request.args.get("n") or "") else None
     return jsonify({"confirmed": bool(conf), "session_id": session_id})
@@ -268,8 +266,7 @@ def confirmation_status():
 def confirmation_reset():
     """Testing aid for the rider page's 'Reset confirmation' link."""
     order_id = clean_id(request.form.get("order_id"))
-    CONFIRMATIONS.pop(order_id, None)
-    QR_NONCES.pop(order_id, None)
+    db.reset_confirmation(order_id)
     return jsonify({"confirmed": False})
 
 
@@ -282,19 +279,140 @@ def ist_time(moment):
     return moment.astimezone(IST).strftime("%d %b, %H:%M")
 
 
+def parse_utc(iso):
+    try:
+        return datetime.fromisoformat((iso or "").replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def ist_label(iso):
+    moment = parse_utc(iso)
+    return ist_time(moment) if moment else "—"
+
+
+# ---- login ----
+
+def login_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login", next=request.path))
+        return view(*args, **kwargs)
+    return wrapped
+
+
+def safe_next(target):
+    """Only same-site paths like /history (blocks redirects to other sites)."""
+    target = target or ""
+    parts = urlparse(target)
+    if target.startswith("/") and not target.startswith("//") and not parts.scheme and not parts.netloc:
+        return target
+    return url_for("dashboard")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    next_url = request.values.get("next") or ""
+    if request.method == "POST":
+        email = (request.form.get("email") or "").strip().lower()
+        user_id = db.verify_user(email, request.form.get("password") or "")
+        if user_id:
+            session.clear()
+            session["user_id"] = user_id
+            session["email"] = email
+            return redirect(safe_next(next_url))
+        return render_template("login.html", error="Email or password is incorrect.", email=email, next=next_url), 401
+    return render_template("login.html", next=next_url)
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        email = (request.form.get("email") or "").strip().lower()
+        password = request.form.get("password") or ""
+        error = None
+        if "@" not in email or "." not in email.split("@")[-1] or len(email) > 254:
+            error = "Enter a valid email address."
+        elif len(password) < 8:
+            error = "Use at least 8 characters for the password."
+        else:
+            user_id = db.create_user(email, password)
+            if not user_id:
+                error = "An account with this email already exists."
+            else:
+                session.clear()
+                session["user_id"] = user_id
+                session["email"] = email
+                return redirect(url_for("dashboard"))
+        return render_template("signup.html", error=error, email=email), 400
+    return render_template("signup.html")
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+# ---- platform views ----
+
+def db_rows():
+    rows = []
+    for d in db.list_deliveries():
+        stored = d["card_json"] or {}
+        rows.append({
+            "id": d["id"],
+            "card": stored.get("card", {}),
+            "score": stored.get("score", {}),
+            "transcript": stored.get("transcript", ""),
+            "customer_claim": stored.get("customer_claim", ""),
+            "time": ist_label(d["received_at"]),
+            "received_at": d["received_at"],
+            "audio_hash": d["audio_hash"] or "",
+            "live": True,
+            "export": {k: v for k, v in d.items() if k != "card_json"} | {"evidence": stored},
+        })
+    return rows
+
+
+def db_tiles(rows):
+    n = len(rows)
+    strengths = [r["score"].get("evidence_strength", 0) for r in rows]
+    inconclusive = sum(1 for r in rows if r["score"].get("recommendation") == "inconclusive")
+    return {
+        "deliveries": f"{n:,}",
+        "cards": f"{n:,}",
+        "cards_pct": "100%" if n else "0%",
+        "inconclusive": f"{round(100 * inconclusive / n)}%" if n else "0%",
+        "avg_strength": round(sum(strengths) / n) if n else 0,
+    }
+
+
+MOCK_TILES = {"deliveries": "1,247", "cards": "1,089", "cards_pct": "87%", "inconclusive": "12%", "avg_strength": 84}
+
+
 @app.route("/dashboard")
+@login_required
 def dashboard():
     now = datetime.now(timezone.utc)
-    live = [
-        {**r, "time": ist_time(datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00")))}
-        for r in LIVE_RECORDS
-    ]
+    live = db_rows()
     mock = [
         {**d, "score": score_dispute(d["card"], d["customer_claim"]), "live": False,
          "time": ist_time(now - timedelta(minutes=d["minutes_ago"]))}
         for d in MOCK_DISPUTES
     ]
-    return render_template("dashboard.html", rows=[*live, *mock], live_count=len(live))
+    tiles = db_tiles(live) if live else MOCK_TILES
+    return render_template(
+        "dashboard.html", rows=[*live, *mock], live_count=len(live),
+        tiles=tiles, tiles_from_db=bool(live), email=session.get("email"),
+    )
+
+
+@app.route("/history")
+@login_required
+def history():
+    return render_template("history.html", rows=db_rows(), email=session.get("email"))
 
 
 @app.route("/transcribe", methods=["POST"])
@@ -378,11 +496,37 @@ def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched,
     card.update(card_extras or {})  # added before scoring so the reasoning can name the check used
     customer_claim = (form.get("customer_claim") or "").strip()[:200]
     dispute_score = score_dispute(card, customer_claim)
-    LIVE_RECORDS.appendleft({
-        "card": card, "score": dispute_score, "transcript": transcript,
-        "customer_claim": customer_claim, "timestamp": record["timestamp"], "live": True,
+    evidence_id = db.insert_delivery({
+        "order_id": order_id,
+        "rider_id": rider_id,
+        "customer_phone_masked": card.get("customer_phone"),
+        "otp_confirmed": int(bool(card.get("otp_confirmed"))),
+        "gps_matched": int(bool(card.get("gps_matched"))),
+        "photo_captured": int(bool(card.get("photo_captured"))),
+        "photo_id": card.get("photo_id"),
+        "spoken_context": card.get("spoken_context"),
+        "handover_location": card.get("handover_location"),
+        "obstacle": card.get("obstacle"),
+        "customer_instruction": card.get("customer_instruction"),
+        "confidence": card.get("confidence"),
+        "evidence_strength": dispute_score.get("evidence_strength"),
+        "recommendation": dispute_score.get("recommendation"),
+        "stt_engine": engines["stt_engine"],
+        "extraction_engine": engines["extraction_engine"],
+        "audio_hash": audio_hash,
+        "recording_session_id": card.get("recording_session_id"),
+        "received_at": server_timestamp,
+        "customer_confirmed": None if "customer_confirmed" not in card else int(bool(card["customer_confirmed"])),
+        "session_verified": None if "session_verified" not in card else int(bool(card["session_verified"])),
+        "recorded_at_client": card.get("recorded_at_client"),
+        "client_id": (form.get("client_id") or "").strip()[:64] or None,
+        "card_json": json.dumps({
+            "card": card, "score": dispute_score, "transcript": transcript,
+            "customer_claim": customer_claim, "record": record, **engines,
+        }, ensure_ascii=False),
     })
     return {
+        "evidence_id": evidence_id,
         "evidence_card": card,
         "dispute_score": dispute_score,
         "customer_claim": customer_claim,
@@ -402,7 +546,7 @@ def process():
     # Recording session: a wrong or forged session id is rejected before any audio is processed.
     # No session id is allowed and recorded as "not verified" (scores as unconfirmed).
     session_id = (form.get("session_id") or "").strip()[:64]
-    expected = (CONFIRMATIONS.get(order_id) or {}).get("session_id") or ""
+    expected = (db.get_confirmation(order_id) or {}).get("session_id") or ""
     session_verified = bool(session_id) and hmac.compare_digest(session_id, expected)
     if session_id and not session_verified:
         return jsonify({"error": "Recording session invalid or expired."}), 400

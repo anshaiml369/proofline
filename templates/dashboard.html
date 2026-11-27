@@ -34,6 +34,16 @@
       background: #fef3c7; color: #92400e; font-size: 14px; font-weight: 700; letter-spacing: 0.03em;
     }
     .tag.live { background: #dbeafe; color: #1e40af; }
+    .tags { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .tag-note { font-size: 14px; color: var(--grey); }
+    .account { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .account .who { color: var(--grey); }
+    .account form { display: inline; }
+    .nav {
+      font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; background: #fff;
+      border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; min-height: 44px; cursor: pointer;
+      display: inline-flex; align-items: center;
+    }
 
     .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0; }
     .tile { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
@@ -106,29 +116,35 @@
         <h1>Dispute evidence</h1>
         <p class="sub">Voice evidence captured at the handover, scored by fixed rules</p>
       </div>
-      <div>
-        {% if live_count %}<span class="tag live">{{ live_count }} LIVE</span>{% endif %}
-        <span class="tag">DEMO DATA</span>
+      <div class="account">
+        <span class="who">{{ email }}</span>
+        <a class="nav" href="/history">History</a>
+        <form method="post" action="/logout"><button class="nav" type="submit">Log out</button></form>
       </div>
     </header>
+    <p class="tags">
+      {% if live_count %}<span class="tag live">{{ live_count }} LIVE</span>{% endif %}
+      <span class="tag">DEMO DATA</span>
+      <span class="tag-note">Tiles: {{ 'computed from live records' if tiles_from_db else 'demo data' }}</span>
+    </p>
 
     <section class="tiles">
       <div class="tile">
         <div class="label">Total deliveries logged</div>
-        <div class="value">1,247</div>
+        <div class="value">{{ tiles.deliveries }}</div>
       </div>
       <div class="tile">
         <div class="label">Evidence cards captured</div>
-        <div class="value">1,089 <small>87%</small></div>
+        <div class="value">{{ tiles.cards }} <small>{{ tiles.cards_pct }}</small></div>
       </div>
       <div class="tile highlight">
         <div class="label">Inconclusive disputes</div>
-        <div class="value">12%</div>
+        <div class="value">{{ tiles.inconclusive }}</div>
         <div class="note">baseline: 68%</div>
       </div>
       <div class="tile">
         <div class="label">Avg evidence strength</div>
-        <div class="value">84<small>/100</small></div>
+        <div class="value">{{ tiles.avg_strength }}<small>/100</small></div>
       </div>
     </section>
 

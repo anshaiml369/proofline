@@ -122,9 +122,15 @@ The rider demo page uses three extra routes. `/evidence` is unchanged: a platfor
 
 `POST /process` (the demo page's upload) takes `session_id` and `customer_phone` instead of `otp_confirmed`. A wrong or expired `session_id` is rejected with 400 `Recording session invalid or expired.` before any audio is processed. No `session_id` is accepted and recorded as not verified. A verified session counts as the customer's confirmation and feeds the OTP +40 in scoring. A confirmation lasts for that order (re-records included) until it is reset or the server restarts. The card gains `customer_confirmed` and `customer_phone` (masked, e.g. `******3210`; the full number is not stored).
 
+## Storage and logins
+
+Every evidence record from `/process` and `/evidence` is saved to SQLite (`evidence.db`, or the file named by `DATABASE_PATH`), and the response includes its `evidence_id`. A repeated `client_id` (an offline upload that went through twice) is stored once. Customer confirmations and the QR's one-time codes are stored there too, so they survive a restart.
+
+`/dashboard` and `/history` need a login (`/login`, `/signup`, `POST /logout`). `/rider`, `/confirm` and the API stay public. A demo account `demo@example.com` / `demo1234` is created on first run. Sessions are signed with `FLASK_SECRET_KEY`.
+
 ## Not in this hackathon build
 
 - **Authentication:** production needs a per-platform API key header. Right now anyone who can reach the URL can call it.
-- **Durable audio storage:** files are on local disk and are lost on redeploy. Production needs object storage.
+- **Durable storage:** audio, photos and `evidence.db` are on local disk and are lost on redeploy unless a persistent volume is attached (`DATABASE_PATH`). Production needs object storage and a managed database.
 - **Customer confirmation:** the QR carries a one-time code, but codes and sessions live in server memory and are lost on restart. A recording queued offline across a restart uploads as not verified. Nothing stops a rider playing a pre-recorded clip into the microphone.
 - **Wispr:** the code path is ready, but its endpoint is unverified until a key is issued.
