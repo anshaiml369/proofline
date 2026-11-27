@@ -18,6 +18,8 @@ PROMPT_PATH = os.path.join(BASE_DIR, "prompts", "extraction.txt")
 ALLOWED_EXT = {"webm", "ogg", "mp4", "m4a", "wav", "mp3"}
 PLACEHOLDER_KEYS = {"", "your_key_here"}
 SARVAM_URL = "https://api.sarvam.ai/speech-to-text"
+OPENROUTER_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = "openai/gpt-4o"
 AUDIO_MIME = {
     "webm": "audio/webm", "ogg": "audio/ogg", "mp4": "audio/mp4",
     "m4a": "audio/mp4", "wav": "audio/wav", "mp3": "audio/mpeg",
@@ -103,21 +105,45 @@ def transcribe_audio(path):
     return text, "whisper"
 
 
-def extract_structured(transcript):
-    with open(PROMPT_PATH, "r") as f:
-        prompt = f.read().replace("{transcript}", transcript)
-
-    response = openai_client().chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
+def chat_json(client, model, system_prompt, transcript):
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": transcript},
+        ],
         temperature=0,
+        max_tokens=800,
         response_format={"type": "json_object"},
+        timeout=30,
     )
-    raw = response.choices[0].message.content.strip()
+    return response.choices[0].message.content.strip()
+
+
+def extract_structured(transcript):
+    """Extraction: OpenRouter if keyed, else direct OpenAI. Adds extraction_engine to the result."""
+    with open(PROMPT_PATH, "r") as f:
+        system_prompt = f.read()
+
+    raw, engine = None, None
+    openrouter_key = env_key("OPENROUTER_API_KEY")
+    if openrouter_key:
+        try:
+            client = OpenAI(base_url=OPENROUTER_URL, api_key=openrouter_key)
+            raw = chat_json(client, OPENROUTER_MODEL, system_prompt, transcript)
+            engine = "openrouter"
+        except Exception as e:
+            app.logger.warning("OpenRouter failed (%s), falling back to OpenAI", e)
+    if raw is None:
+        raw = chat_json(openai_client(), "gpt-4o-mini", system_prompt, transcript)
+        engine = "openai"
+
     try:
-        return json.loads(raw)
+        result = json.loads(raw)
     except json.JSONDecodeError:
-        return {"error": "parse_failed", "raw": raw}
+        result = {"error": "parse_failed", "raw": raw}
+    result["extraction_engine"] = engine
+    return result
 
 
 def parse_gps(lat, lng):

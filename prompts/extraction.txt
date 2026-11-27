@@ -24,5 +24,3 @@ Output: {"items": [{"label": "Handover", "value": "Direct to customer", "status"
 Example 3:
 Input: "Customer phone off, watchman ne liya, gate pe chhod diya"
 Output: {"items": [{"label": "Customer", "value": "Phone off", "status": "flag", "reason": "Customer unreachable"}, {"label": "Handover", "value": "Left with watchman", "status": "flag", "reason": "Handed to third party"}, {"label": "Location", "value": "At gate", "status": "info", "reason": "Left at gate"}], "summary": "Customer unreachable, package left with watchman at gate"}
-
-Text: {transcript}
