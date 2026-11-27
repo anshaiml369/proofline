@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from openai import OpenAI
 
+from dispute_engine import score_dispute
+
 load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -271,7 +273,15 @@ def process():
         return jsonify({**extracted, **engines, "record": record, "transcript": transcript}), 500
 
     card = build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched)
-    return jsonify({"evidence_card": card, "record": record, "transcript": transcript, **engines})
+    customer_claim = (form.get("customer_claim") or "").strip()[:200]
+    return jsonify({
+        "evidence_card": card,
+        "dispute_score": score_dispute(card, customer_claim),
+        "customer_claim": customer_claim,
+        "record": record,
+        "transcript": transcript,
+        **engines,
+    })
 
 
 if __name__ == "__main__":
