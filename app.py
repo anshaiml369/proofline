@@ -5,6 +5,7 @@ import urllib.request
 import uuid
 from datetime import datetime, timezone
 
+import httpx
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from openai import OpenAI
@@ -16,6 +17,11 @@ AUDIO_DIR = os.path.join(BASE_DIR, "static", "audio")
 PROMPT_PATH = os.path.join(BASE_DIR, "prompts", "extraction.txt")
 ALLOWED_EXT = {"webm", "ogg", "mp4", "m4a", "wav", "mp3"}
 PLACEHOLDER_KEYS = {"", "your_key_here"}
+SARVAM_URL = "https://api.sarvam.ai/speech-to-text"
+AUDIO_MIME = {
+    "webm": "audio/webm", "ogg": "audio/ogg", "mp4": "audio/mp4",
+    "m4a": "audio/mp4", "wav": "audio/wav", "mp3": "audio/mpeg",
+}
 # Without this, Whisper hears Hinglish "teen floor" (3rd) as "18th floor".
 WHISPER_HINT = (
     "Hinglish delivery note in Roman script. Ek, do, teen, chaar, paanch floor. "
@@ -62,18 +68,39 @@ def transcribe_wispr(path, api_key):
         return json.loads(resp.read()).get("text", "")
 
 
+def transcribe_sarvam(path, api_key):
+    ext = path.rsplit(".", 1)[-1]
+    with open(path, "rb") as f:
+        resp = httpx.post(
+            SARVAM_URL,
+            headers={"api-subscription-key": api_key},
+            data={"model": "saaras:v3", "mode": "codemix", "language_code": "unknown"},
+            files={"file": (os.path.basename(path), f, AUDIO_MIME.get(ext, "application/octet-stream"))},
+            timeout=20,
+        )
+    resp.raise_for_status()
+    return resp.json()["transcript"]
+
+
 def transcribe_audio(path):
-    """STT: Wispr Flow if a key is configured, else OpenAI Whisper."""
+    """STT: Wispr if keyed, then Sarvam codemix if keyed, else Whisper. Returns (transcript, engine)."""
     wispr_key = env_key("WISPR_API_KEY")
     if wispr_key:
         try:
-            return transcribe_wispr(path, wispr_key)
+            return transcribe_wispr(path, wispr_key), "wispr"
         except Exception as e:
-            app.logger.warning("Wispr failed (%s), falling back to Whisper", e)
+            app.logger.warning("Wispr failed (%s), trying next engine", e)
+    sarvam_key = env_key("SARVAM_API_KEY")
+    if sarvam_key:
+        try:
+            return transcribe_sarvam(path, sarvam_key), "sarvam"
+        except Exception as e:
+            app.logger.warning("Sarvam failed (%s), falling back to Whisper", e)
     with open(path, "rb") as f:
-        return openai_client().audio.transcriptions.create(
+        text = openai_client().audio.transcriptions.create(
             model="whisper-1", file=f, prompt=WHISPER_HINT
         ).text
+    return text, "whisper"
 
 
 def extract_structured(transcript):
@@ -121,7 +148,8 @@ def transcribe():
     path = os.path.join(AUDIO_DIR, f"{uuid.uuid4().hex}.webm")
     try:
         audio.save(path)
-        return jsonify({"transcript": transcribe_audio(path)})
+        transcript, stt_engine = transcribe_audio(path)
+        return jsonify({"transcript": transcript, "stt_engine": stt_engine})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -167,13 +195,14 @@ def process():
             "audio_url": f"/static/audio/{filename}",
         }
 
-        transcript = transcribe_audio(path)
+        transcript, stt_engine = transcribe_audio(path)
         result = extract_structured(transcript)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
     result.update(trust)
     result["transcript"] = transcript
+    result["stt_engine"] = stt_engine
     return jsonify(result), (500 if "error" in result else 200)
 
 
