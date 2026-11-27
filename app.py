@@ -146,6 +146,40 @@ def extract_structured(transcript):
     return result
 
 
+VOICE_ENUMS = {
+    "delivery_status": ({"delivered", "failed", "partial", "not_mentioned"}, "not_mentioned"),
+    "handover_location": ({"door", "reception", "security", "neighbor", "other", "not_mentioned"}, "other"),
+    "obstacle": ({"none", "gate_locked", "customer_unavailable", "address_issue", "refused", "other", "not_mentioned"}, "other"),
+    "confidence": ({"high", "medium", "low"}, "low"),
+}
+
+
+def parse_bool(value):
+    return str(value).strip().lower() in {"true", "1", "yes", "on"}
+
+
+def clean_id(value):
+    value = (value or "").strip()[:64]
+    return value or "not_provided"
+
+
+def build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched):
+    """Fixed rules: platform fields come from the request; voice fields are clamped to allowed values."""
+    card = {
+        "order_id": order_id,
+        "rider_id": rider_id,
+        "otp_confirmed": otp_confirmed,
+        "gps_matched": gps_matched,
+    }
+    for field, (allowed, fallback) in VOICE_ENUMS.items():
+        value = str(extracted.get(field, "not_mentioned")).strip().lower()
+        card[field] = value if value in allowed else fallback
+    for field in ("customer_instruction", "spoken_context"):
+        value = str(extracted.get(field) or "not_mentioned").strip()[:500]
+        card[field] = value or "not_mentioned"
+    return card
+
+
 def parse_gps(lat, lng):
     try:
         lat_f, lng_f = float(lat), float(lng)
@@ -205,31 +239,39 @@ def process():
         path = os.path.join(AUDIO_DIR, filename)
         audio.save(path)
 
+        form = request.form
+        order_id = clean_id(form.get("order_id"))
+        rider_id = clean_id(form.get("rider_id"))
+        otp_confirmed = parse_bool(form.get("otp_confirmed"))
+        gps_matched = parse_bool(form.get("gps_matched"))
+
         # Trust layer is fixed on receipt, before any AI touches the audio.
         server_timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds") + "Z"
-        gps_string = parse_gps(request.form.get("gps_lat"), request.form.get("gps_lng"))
+        gps_string = parse_gps(form.get("gps_lat"), form.get("gps_lng"))
+        sealed_fields = f"{server_timestamp}|{gps_string}|{order_id}|{rider_id}|{otp_confirmed}|{gps_matched}"
         with open(path, "rb") as f:
             audio_bytes = f.read()
-        record_hash = hashlib.sha256(
-            audio_bytes + server_timestamp.encode() + gps_string.encode()
-        ).hexdigest()
-        trust = {
+        record_hash = hashlib.sha256(audio_bytes + sealed_fields.encode()).hexdigest()
+        record = {
             "timestamp": server_timestamp,
             "gps": gps_string,
             "hash": record_hash,
             "hash_short": record_hash[:12],
+            "sealed_fields": sealed_fields,
             "audio_url": f"/static/audio/{filename}",
         }
 
         transcript, stt_engine = transcribe_audio(path)
-        result = extract_structured(transcript)
+        extracted = extract_structured(transcript)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    result.update(trust)
-    result["transcript"] = transcript
-    result["stt_engine"] = stt_engine
-    return jsonify(result), (500 if "error" in result else 200)
+    engines = {"stt_engine": stt_engine, "extraction_engine": extracted.pop("extraction_engine", None)}
+    if "error" in extracted:
+        return jsonify({**extracted, **engines, "record": record, "transcript": transcript}), 500
+
+    card = build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched)
+    return jsonify({"evidence_card": card, "record": record, "transcript": transcript, **engines})
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@
     :root {
       --green: #22c55e;
       --red: #ef4444;
+      --amber: #f59e0b;
       --grey: #6b7280;
       --ink: #111827;
       --line: #e5e7eb;
@@ -23,7 +24,23 @@
     }
     main { max-width: 600px; margin: 0 auto; padding: 32px 16px 48px; }
     h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; }
-    .subtitle { color: var(--grey); font-size: 18px; margin: 4px 0 32px; }
+    .subtitle { color: var(--grey); font-size: 18px; margin: 4px 0 24px; }
+
+    .platform {
+      border: 2px dashed var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    .platform-title { font-size: 13px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+    .platform label { display: flex; flex-direction: column; gap: 4px; color: var(--grey); font-size: 14px; }
+    .platform label.check { flex-direction: row; align-items: center; gap: 8px; color: var(--ink); font-size: 16px; }
+    .platform input[type=text], .platform select {
+      font-size: 16px; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; color: var(--ink); background: #fff;
+    }
+    .platform input[type=checkbox] { width: 20px; height: 20px; }
 
     #speak {
       width: 100%;
@@ -58,21 +75,35 @@
     }
 
     #card { display: none; border: 2px solid var(--line); border-radius: 14px; padding: 20px; }
-    #summary { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-    .row {
-      display: grid;
-      grid-template-columns: 18px 1fr;
-      column-gap: 14px;
-      padding: 12px 0;
-      border-top: 1px solid var(--line);
-    }
-    .dot { width: 18px; height: 18px; border-radius: 50%; margin-top: 24px; grid-row: 1 / span 3; }
-    .dot.pass { background: var(--green); }
-    .dot.flag { background: var(--red); }
-    .dot.info { background: var(--grey); }
-    .label { font-size: 15px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.05em; }
-    .value { font-size: 24px; font-weight: 600; }
-    .reason { font-size: 16px; color: var(--grey); }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .ids { font-size: 15px; color: var(--grey); }
+    .ids strong { display: block; font-size: 22px; color: var(--ink); }
+    .badge { padding: 4px 12px; border-radius: 999px; font-size: 15px; font-weight: 700; white-space: nowrap; color: #fff; }
+    .badge.high { background: var(--green); }
+    .badge.medium { background: var(--amber); }
+    .badge.low { background: var(--red); }
+
+    .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+    .check-tile { border-radius: 10px; padding: 10px 12px; font-weight: 700; font-size: 18px; }
+    .check-tile.yes { background: #dcfce7; color: #166534; }
+    .check-tile.no { background: #fee2e2; color: #991b1b; }
+
+    .field { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+    .field .k { color: var(--grey); font-size: 16px; }
+    .field .v { font-size: 20px; font-weight: 600; text-align: right; }
+    .field .v.missing { color: var(--grey); font-weight: 400; font-style: italic; }
+    .context { margin-top: 6px; padding: 12px 14px; border-left: 4px solid var(--ink); background: var(--panel); border-radius: 0 10px 10px 0; font-size: 18px; }
+    .context-label { color: var(--grey); font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 12px; }
+
+    #score { display: none; margin-top: 16px; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--line); }
+    .score-top { display: flex; align-items: baseline; gap: 12px; }
+    .score-num { font-size: 40px; font-weight: 800; }
+    .score-num.high { color: #15803d; }
+    .score-num.medium { color: #b45309; }
+    .score-num.low { color: #b91c1c; }
+    .score-rec { font-size: 20px; font-weight: 700; }
+    .score-why { color: var(--grey); font-size: 16px; margin-top: 4px; }
+    .score-note { color: var(--grey); font-size: 14px; margin-top: 8px; }
 
     .meta {
       margin-top: 16px;
@@ -80,7 +111,7 @@
       background: var(--panel);
       border-radius: 10px;
       font-family: ui-monospace, Menlo, Consolas, monospace;
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.7;
       word-break: break-all;
     }
@@ -104,9 +135,26 @@
 <body>
   <main>
     <h1>Proofline</h1>
-    <p class="subtitle">Rider-owned delivery evidence</p>
+    <p class="subtitle">Voice evidence at the OTP handover</p>
 
     <section id="recorder">
+      <div class="platform">
+        <div class="platform-title">Simulated platform data (sent by Zomato / Swiggy in production)</div>
+        <div class="platform-grid">
+          <label>Order ID <input type="text" id="order_id"></label>
+          <label>Rider ID <input type="text" id="rider_id" value="R-1042"></label>
+          <label class="check"><input type="checkbox" id="otp_confirmed" checked> OTP confirmed</label>
+          <label class="check"><input type="checkbox" id="gps_matched" checked> GPS matched</label>
+          <label style="grid-column: 1 / -1">Customer claim
+            <select id="customer_claim">
+              <option value="">No dispute raised</option>
+              <option value="not delivered" selected>Not delivered</option>
+              <option value="wrong item">Wrong item</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
       <button id="speak" type="button">Delivery Complete — Speak</button>
       <p id="hint">Hold the button, speak one line, release.</p>
     </section>
@@ -114,8 +162,33 @@
     <div id="error" role="alert"></div>
 
     <section id="card" aria-live="polite">
-      <p id="summary"></p>
-      <div id="items"></div>
+      <div class="card-head">
+        <div class="ids">Order<strong id="c-order"></strong>Rider <span id="c-rider"></span></div>
+        <span id="c-confidence" class="badge"></span>
+      </div>
+
+      <div class="checks">
+        <div id="c-otp" class="check-tile"></div>
+        <div id="c-gpsm" class="check-tile"></div>
+      </div>
+
+      <div class="field"><span class="k">Delivery status</span><span id="c-status" class="v"></span></div>
+      <div class="field"><span class="k">Handover location</span><span id="c-location" class="v"></span></div>
+      <div class="field"><span class="k">Obstacle</span><span id="c-obstacle" class="v"></span></div>
+      <div class="field"><span class="k">Customer instruction</span><span id="c-instruction" class="v"></span></div>
+
+      <p class="context-label">Spoken context</p>
+      <p id="c-context" class="context"></p>
+
+      <div id="score">
+        <div class="score-top">
+          <span id="s-num" class="score-num"></span>
+          <span id="s-rec" class="score-rec"></span>
+        </div>
+        <p id="s-why" class="score-why"></p>
+        <p class="score-note">Rule-based evidence score. The platform makes the final call.</p>
+      </div>
+
       <div class="meta">
         <div>Time: <span id="m-time"></span></div>
         <div>GPS: <span id="m-gps"></span></div>
@@ -131,12 +204,18 @@
     const MIN_MS = 700;
     const IDLE_LABEL = 'Delivery Complete — Speak';
     const IDLE_HINT = 'Hold the button, speak one line, release.';
+    const RECOMMENDATION_TEXT = {
+      favor_rider: 'Favour rider',
+      favor_customer: 'Favour customer',
+      inconclusive: 'Inconclusive',
+    };
 
-    const speakBtn = document.getElementById('speak');
-    const recorderEl = document.getElementById('recorder');
-    const hintEl = document.getElementById('hint');
-    const errorEl = document.getElementById('error');
-    const cardEl = document.getElementById('card');
+    const $ = (id) => document.getElementById(id);
+    const speakBtn = $('speak');
+    const recorderEl = $('recorder');
+    const hintEl = $('hint');
+    const errorEl = $('error');
+    const cardEl = $('card');
 
     let recorder = null;
     let chunks = [];
@@ -144,6 +223,8 @@
     let startedAt = 0;
     let held = false;
     let gpsPromise = null;
+
+    newOrderId();
 
     speakBtn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
@@ -153,7 +234,11 @@
     speakBtn.addEventListener('pointerup', end);
     speakBtn.addEventListener('pointercancel', end);
     speakBtn.addEventListener('contextmenu', (e) => e.preventDefault());
-    document.getElementById('again').addEventListener('click', reset);
+    $('again').addEventListener('click', reset);
+
+    function newOrderId() {
+      $('order_id').value = 'ZMT-' + Math.floor(100000 + Math.random() * 900000);
+    }
 
     function getGps() {
       return new Promise((resolve) => {
@@ -229,6 +314,11 @@
       const ext = type.includes('mp4') ? 'mp4' : type.includes('ogg') ? 'ogg' : 'webm';
       const form = new FormData();
       form.append('audio', new Blob(chunks, { type }), 'recording.' + ext);
+      form.append('order_id', $('order_id').value);
+      form.append('rider_id', $('rider_id').value);
+      form.append('otp_confirmed', $('otp_confirmed').checked);
+      form.append('gps_matched', $('gps_matched').checked);
+      form.append('customer_claim', $('customer_claim').value);
 
       const gps = await gpsPromise;
       if (gps) {
@@ -251,40 +341,59 @@
       }
     }
 
+    function pretty(value) {
+      if (!value || value === 'not_mentioned') return null;
+      const s = String(value).replace(/_/g, ' ');
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function setField(id, value) {
+      const el = $(id);
+      const text = pretty(value);
+      el.textContent = text || 'Not mentioned';
+      el.classList.toggle('missing', !text);
+    }
+
+    function setCheck(id, ok, label) {
+      const el = $(id);
+      el.textContent = (ok ? '✓ ' : '✗ ') + label;
+      el.className = 'check-tile ' + (ok ? 'yes' : 'no');
+    }
+
     function renderCard(data) {
-      document.getElementById('summary').textContent = data.summary || 'Delivery record';
+      const card = data.evidence_card;
+      const record = data.record;
 
-      const itemsEl = document.getElementById('items');
-      itemsEl.replaceChildren();
-      (data.items || []).forEach((item) => {
-        const status = ['pass', 'flag', 'info'].includes(item.status) ? item.status : 'info';
-        const row = document.createElement('div');
-        row.className = 'row';
+      $('c-order').textContent = card.order_id;
+      $('c-rider').textContent = card.rider_id;
+      const conf = $('c-confidence');
+      conf.textContent = 'Confidence: ' + card.confidence;
+      conf.className = 'badge ' + card.confidence;
 
-        const dot = document.createElement('span');
-        dot.className = 'dot ' + status;
-        dot.setAttribute('aria-label', status);
+      setCheck('c-otp', card.otp_confirmed, card.otp_confirmed ? 'OTP confirmed' : 'OTP not confirmed');
+      setCheck('c-gpsm', card.gps_matched, card.gps_matched ? 'GPS matched' : 'GPS not matched');
 
-        const label = document.createElement('div');
-        label.className = 'label';
-        label.textContent = item.label || '';
+      setField('c-status', card.delivery_status);
+      setField('c-location', card.handover_location);
+      setField('c-obstacle', card.obstacle);
+      $('c-instruction').textContent = card.customer_instruction === 'not_mentioned' ? 'Not mentioned' : card.customer_instruction;
+      $('c-instruction').classList.toggle('missing', card.customer_instruction === 'not_mentioned');
+      $('c-context').textContent = card.spoken_context;
 
-        const value = document.createElement('div');
-        value.className = 'value';
-        value.textContent = item.value || '';
+      const score = data.dispute_score;
+      $('score').style.display = score ? 'block' : 'none';
+      if (score) {
+        const band = score.evidence_strength >= 80 ? 'high' : score.evidence_strength >= 50 ? 'medium' : 'low';
+        $('s-num').textContent = score.evidence_strength;
+        $('s-num').className = 'score-num ' + band;
+        $('s-rec').textContent = RECOMMENDATION_TEXT[score.recommendation] || score.recommendation;
+        $('s-why').textContent = score.reasoning;
+      }
 
-        const reason = document.createElement('div');
-        reason.className = 'reason';
-        reason.textContent = item.reason || '';
-
-        row.append(dot, label, value, reason);
-        itemsEl.appendChild(row);
-      });
-
-      document.getElementById('m-time').textContent = data.timestamp;
-      document.getElementById('m-gps').textContent = data.gps;
-      document.getElementById('m-hash').textContent = data.hash_short;
-      document.getElementById('m-audio').href = data.audio_url;
+      $('m-time').textContent = record.timestamp;
+      $('m-gps').textContent = record.gps;
+      $('m-hash').textContent = record.hash_short;
+      $('m-audio').href = record.audio_url;
 
       recorderEl.style.display = 'none';
       cardEl.style.display = 'block';
@@ -302,6 +411,7 @@
       recorderEl.style.display = 'block';
       hideError();
       resetButton();
+      newOrderId();
     }
 
     function showError(msg) {
