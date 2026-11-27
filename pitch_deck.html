@@ -121,6 +121,20 @@
     .ask .amount { font-size: 40pt; font-weight: 800; letter-spacing: -.02em; margin-top: 3mm; line-height: 1.05; }
     .ask .card p { font-size: 12.5pt; }
   </style>
+  <style>
+    .arg { font-size: 15pt; line-height: 1.45; font-weight: 600; color: var(--ink); padding: 5mm 7mm; border-left: 2mm solid var(--green); background: var(--soft); border-radius: 0 4mm 4mm 0; }
+    .txt { font-size: 12pt; line-height: 1.55; color: #334155; }
+    .txt b { color: var(--ink); }
+    .tl { list-style: none; display: grid; gap: 3.5mm; }
+    .tl li { font-size: 12pt; line-height: 1.5; color: #334155; padding-left: 7mm; position: relative; }
+    .tl li::before { content: ""; position: absolute; left: 0; top: 2.3mm; width: 3mm; height: 3mm; border-radius: 50%; background: var(--green); }
+    .tl b { color: var(--ink); }
+    .stack { display: flex; flex-direction: column; justify-content: center; gap: 7mm; }
+    .txt, .tl li { font-size: 13pt; }
+    .card p { font-size: 12.5pt; }
+    .foot span { max-width: 230mm; }
+    .title .oneline { font-size: 15pt; color: #e2e8f0; margin-top: 8mm; max-width: 200mm; line-height: 1.45; }
+  </style>
 </head>
 <body>
 
@@ -131,185 +145,177 @@
         <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
         <h1>Proofline</h1>
       </div>
-      <p class="tagline">Voice evidence at the OTP handover</p>
+      <p class="tagline">Voice Evidence at the OTP Handover</p>
+      <p class="oneline">Reducing the share of delivery disputes that default to “refund and absorb.”</p>
       <div class="bar"></div>
-      <p class="byline">[Your Name] · India Runs on Voice · Nov 2026</p>
+      <p class="byline">[Founder Name] · Founder · India Runs on Voice · Nov 2026</p>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>1 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>1 / 8</b></div>
   </section>
 
   <!-- 2 · Problem -->
   <section class="slide">
     <p class="kicker">The problem</p>
-    <h2>Platforms settle delivery disputes with no evidence from the doorstep</h2>
-    <div class="body">
+    <h2>When a customer says “not delivered”, the platform cannot tell who is right</h2>
+    <div class="body stack">
+      <p class="arg">So it refunds the customer and lets the rider keep working. The platform absorbs the cost, and nobody learns what actually happened at the door.</p>
       <div class="grid2">
-        <div class="card">
-          <div class="stat">50–70%</div>
-          <p>of disputed cases: Zomato refunds the customer <b>and</b> lets the delivery partner keep working, because it cannot tell who is right.</p>
-          <p class="quote-src">Deepinder Goyal, Zomato CEO, on Raj Shamani's podcast (Outlook Business) <span class="tag s">SOURCED</span></p>
+        <div class="txt">
+          <p><b>How often.</b> Public reporting and platform statements indicate that a significant share of contested delivery disputes default to refunding the customer while the rider continues working. <span class="tag u">UNVERIFIED</span></p>
+          <p style="margin-top: 4mm;"><b>Why.</b> The OTP proves a code was entered. It does not record how the handover went: who took the parcel, where, and what went wrong.</p>
         </div>
-        <div class="card">
-          <div class="stat">~5,000 <small>/ month</small></div>
-          <p>delivery partners removed by Zomato for repeated fraud, such as marking orders delivered without handing them over.</p>
-          <p class="quote-src">Same podcast (StartupTalky, NewsX) <span class="tag s">SOURCED</span></p>
+        <div class="txt">
+          <p><b>What is missing.</b> No spoken record exists at the door. The rider's account is lost the moment they ride to the next order.</p>
+          <p style="margin-top: 4mm;"><b>Who pays, and who buys.</b> The platform's trust and safety team. It funds the refunds and decides the disputes, so it is the buyer.</p>
         </div>
       </div>
-      <p class="problem-line">Every "not delivered" claim forces a choice: refund a possible fraudster, or punish a possibly honest rider. Usually with <b>no record of what happened at the door</b>. The OTP proves a code was entered, not how the handover went.</p>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>2 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>2 / 8</b></div>
   </section>
 
-  <!-- 3 · Who has it -->
+  <!-- 3 · Who it is for -->
   <section class="slide">
-    <p class="kicker">Who has the pain</p>
-    <h2>Three parties at every disputed handover</h2>
-    <div class="body">
+    <p class="kicker">Who it is for</p>
+    <h2>The rider creates the evidence. The platform pays for it.</h2>
+    <div class="body stack">
       <div class="grid3">
         <div class="card">
-          <p class="role">User</p>
-          <h3>The rider</h3>
-          <p>Hands over at doors, gates, receptions and security desks. When a claim goes against them, they have no way to show their side, and repeated claims can cost them the job.</p>
+          <p class="role">Data source</p>
+          <h3>Riders</h3>
+          <p>Millions of last-mile riders <span class="tag u">UNVERIFIED</span> hand over at doors, gates, receptions and security desks. They know what happened; today they have no way to record it.</p>
         </div>
         <div class="card accent">
           <p class="role">Buyer</p>
           <h3>Platform dispute team</h3>
-          <p>Pays refunds by default because it can't tell who is right. Wants evidence it can act on, scored the same way every time, with the final call still theirs.</p>
+          <p>Trust and safety decides every contested order. It wants evidence it can act on, scored the same way every time, with the final call still its own.</p>
         </div>
         <div class="card">
-          <p class="role">Where</p>
-          <h3>Every dark-store cluster in urban India</h3>
-          <p>Quick-commerce and food delivery hand over orders in dense apartment blocks and offices, where "left with the guard" is a normal outcome a form can't record.</p>
+          <p class="role">Where pilots start</p>
+          <h3>Dark-store clusters</h3>
+          <p>Dense, repeat routes from one store: the same riders, the same buildings, and enough disputes to measure in weeks.</p>
         </div>
       </div>
+      <p class="arg">Market: every last-mile delivery in urban India. Each handover is a moment where a dispute can start.</p>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>3 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>3 / 8</b></div>
   </section>
 
-  <!-- 4 · What we built -->
+  <!-- 4 · Solution -->
   <section class="slide">
-    <p class="kicker">What we built</p>
-    <h2>Hold one button, say one line, get a scored evidence card</h2>
+    <p class="kicker">The solution</p>
+    <h2>Five signals, one evidence card, one rule-based score</h2>
     <div class="body">
       <div class="built">
         <div class="shot">
           <strong>Evidence card screenshot</strong>
           Rider page · 375px<br>(placeholder)
         </div>
-        <div>
-          <p class="section-label">Five signals per handover</p>
-          <div class="chips">
-            <span class="chip">Phone</span><span class="chip">QR confirmation</span><span class="chip">GPS</span><span class="chip">Photo</span><span class="chip">Spoken context</span>
-          </div>
-          <ul class="points">
-            <li><b>Hinglish in, structure out.</b> Sarvam codemix speech-to-text; the LLM only extracts fields: status, handover location, obstacle, instruction, confidence.</li>
-            <li><b>Fixed rules score it 0–100</b> and recommend favour rider, inconclusive or favour customer. The platform makes the final call.</li>
-            <li><b>Tamper-evident.</b> SHA-256 of the audio plus server time. It proves the record wasn't edited later, not that the delivery happened.</li>
-            <li><b>Built for the doorstep.</b> Works offline and uploads later; a dashboard and history for the dispute team; one API call for platforms.</li>
+        <div class="stack">
+          <ul class="tl">
+            <li><b>Phone:</b> the customer's number, entered by the rider.</li>
+            <li><b>QR confirmation:</b> the customer scans and taps “Yes, I received this”.</li>
+            <li><b>GPS:</b> whether the rider was at the drop point.</li>
+            <li><b>Optional photo:</b> stored with the record.</li>
+            <li><b>Spoken context:</b> one line in Hindi, English or both, turned into fields: where, to whom, what went wrong.</li>
           </ul>
+          <p class="txt">Fixed rules score the card <b>0–100</b> and recommend favour rider, inconclusive or favour customer. The AI only transcribes and extracts; it never decides. The platform makes the final call.</p>
+          <p class="arg">The platform reviews evidence, not memories.</p>
         </div>
       </div>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>4 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>4 / 8</b></div>
   </section>
 
   <!-- 5 · Why voice -->
   <section class="slide">
     <p class="kicker">Why voice</p>
-    <h2>At the door, the rider's hands are full and the story doesn't fit a form</h2>
-    <div class="body">
+    <h2>At the door, speaking is the only input that fits</h2>
+    <div class="body stack">
       <div class="grid3">
         <div class="card">
           <h3>Hands on the parcel</h3>
-          <p>Hold one button and speak. No typing on a phone while holding an order, a helmet and a bag.</p>
+          <p>The rider is holding the order, a bag and a phone. Hold one button and speak; no typing.</p>
         </div>
         <div class="card">
-          <h3>Faster than a form</h3>
-          <p>One spoken line replaces menus and text boxes, in the mix of Hindi and English the rider already speaks.</p>
+          <h3>Faster than typing</h3>
+          <p>Speaking one line is about 3× faster than typing it on a phone. <span class="tag u">UNVERIFIED</span></p>
         </div>
         <div class="card accent">
           <h3>Says what a form can't</h3>
-          <p>Edge cases are where disputes come from: locked gates, absent customers, handovers to a guard or neighbour.</p>
+          <p>A form captures a checkbox. Voice captures the reason.</p>
         </div>
       </div>
-      <p class="big-quote" style="margin-top: 10mm;">Gate locked, left at reception.</p>
-      <p class="lede">A dropdown can say "delivered". Only the rider's words say how.</p>
+      <p class="arg">A form records “delivered ✓”. Voice records “gate locked, left at reception”: the sentence that decides the dispute.</p>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>5 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>5 / 8</b></div>
   </section>
 
-  <!-- 6 · Competitors + wedge -->
+  <!-- 6 · Dependencies -->
   <section class="slide">
-    <p class="kicker">Alternatives</p>
-    <h2>Others store a photo or a raw clip. We store evidence.</h2>
-    <div class="body">
+    <p class="kicker">Dependencies</p>
+    <h2>Three outside services, each with a fallback</h2>
+    <div class="body stack">
       <table>
-        <thead><tr><th>Alternative</th><th>What it does</th><th>Why it isn't the same</th></tr></thead>
+        <thead><tr><th>Dependency</th><th>What it does</th><th>If it gets costly or fails</th></tr></thead>
         <tbody>
-          <tr><td>Platform OTP + photo</td><td>Confirms a code was entered; some orders need a photo</td><td>Records <i>that</i> a handover happened, not <i>how</i>. No spoken context for edge cases.</td></tr>
-          <tr><td>Route4Me</td><td>Fleet routing; voice recording as a proof task on done and failed stops</td><td>Built for company fleets. Raw audio only: no codemix transcription, no structured fields, no dispute score.</td></tr>
-          <tr><td>Onfleet</td><td>Photo, signature and notes proof of delivery</td><td>Typed or photo proof, English-first, no dispute scoring.</td></tr>
-          <tr><td>ERRA, RouteProof <span class="tag u">UNVERIFIED</span></td><td>Named in research notes; no public product pages found</td><td>Confirm they exist and what they do before naming them on stage.</td></tr>
+          <tr><td>Sarvam AI</td><td>Speech-to-text in codemix mode: keeps Hinglish as spoken</td><td>Falls back to OpenAI Whisper automatically</td></tr>
+          <tr><td>OpenRouter</td><td>Extracts structured fields from the transcript</td><td>Falls back to OpenAI directly</td></tr>
+          <tr><td>Platform OTP / GPS APIs</td><td>Sends confirmation and location with each voice note</td><td>Our own QR confirmation and phone GPS work without them</td></tr>
         </tbody>
       </table>
-      <p class="wedge"><b>Our wedge:</b> spoken context at the OTP handover, turned into a structured, <b>rule-scored</b>, <b>tamper-evident</b> record a dispute team can act on.</p>
+      <p class="txt"><b>If every AI service stops:</b> the audio is already saved on our server, and its SHA-256 hash and the server's timestamp are computed before any AI call. Today the scored card still needs the transcript. Next step: store the hashed audio record even when transcription fails, so no handover is lost. <span class="tag t">TARGET</span></p>
+      <p class="arg">The AI layer is replaceable. The evidence (audio, hash, server time) is ours.</p>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>6 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>6 / 8</b></div>
   </section>
 
-  <!-- 7 · Dependencies + launch plan -->
+  <!-- 7 · Launch plan -->
   <section class="slide">
-    <p class="kicker">Dependencies and launch</p>
-    <h2>Small pilot first, then middleware, then platforms</h2>
-    <div class="body">
-      <p class="section-label">What we depend on</p>
-      <div class="deps">
-        <div class="dep"><b>Sarvam AI</b>saaras:v3 codemix speech-to-text</div>
-        <div class="dep"><b>OpenRouter</b>Field extraction (OpenAI as fallback)</div>
-        <div class="dep"><b>Platform OTP + GPS APIs</b>Sent with each note via <code>POST /evidence</code></div>
-      </div>
-      <p class="section-label" style="margin-top: 9mm;">Launch plan</p>
+    <p class="kicker">Launch plan</p>
+    <h2>Prove it on 20 deliveries, then scale through middleware</h2>
+    <div class="body stack">
       <div class="steps">
         <div class="step card">
           <div class="n">1</div>
-          <h3>Pilot: 2 riders</h3>
-          <p>Dadar / CSMT, Mumbai. Real handovers, real edge cases; tune the hand-set scoring rules.</p>
+          <h3>2 riders, Dadar / CSMT</h3>
+          <p>20 real deliveries <span class="tag t">TARGET</span>. Measure the dispute resolution rate: the share of disputes the evidence settles either way.</p>
         </div>
         <div class="step card">
           <div class="n">2</div>
-          <h3>3PL: Shadowfax / UrbanPiper</h3>
-          <p>Middleware already sits between platforms and riders, so a pilot is faster. <span class="tag u">UNVERIFIED</span> which platforms each integrates with.</p>
+          <h3>One 3PL</h3>
+          <p>Shadowfax or UrbanPiper, which already integrate with Zomato / Swiggy <span class="tag u">UNVERIFIED</span>. Middleware gets us to many riders without a platform deal.</p>
         </div>
         <div class="step card">
           <div class="n">3</div>
-          <h3>Direct platform API</h3>
-          <p>Highest value, longest sales cycle. One endpoint: order, rider, OTP, GPS and the voice note in; card and score out.</p>
+          <h3>Direct platform pilot</h3>
+          <p>Go to a platform with our own pilot data. One API call: order, rider, OTP, GPS and voice note in; card and score out.</p>
         </div>
       </div>
+      <p class="arg">Each phase earns the next one with data, not promises.</p>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>7 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>7 / 8</b></div>
   </section>
 
   <!-- 8 · The ask -->
   <section class="slide ask">
     <p class="kicker">The ask</p>
     <h2>Help us put Proofline at real doors</h2>
-    <div class="body">
+    <div class="body stack">
       <div class="grid2">
         <div class="card accent">
           <p class="role">Hackathon</p>
-          <div class="amount">One intro</div>
-          <p>To one 3PL or dark-store operator willing to run a pilot.</p>
+          <div class="amount">One pilot intro</div>
+          <p>To one 3PL or dark-store operator willing to run a pilot with our riders.</p>
         </div>
         <div class="card">
           <p class="role">Investors</p>
           <div class="amount">₹50L pre-seed</div>
-          <p>For a 500-delivery pilot in one dark-store cluster.</p>
+          <p>For a 500-delivery pilot and one backend engineer.</p>
         </div>
       </div>
-      <p class="problem-line">We'll measure the share of disputes the evidence resolves (favour rider or favour customer) against today's refund-by-default baseline. <span class="tag t">TARGET</span> outcomes are set during the pilot, not claimed now.</p>
+      <p class="arg">What you get: a measured answer to “how many disputes can doorstep evidence settle?” Today the answer is a refund by default.</p>
     </div>
-    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>8 / 8</b></div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md. Unverified claims are not presented as facts.</span><b>8 / 8</b></div>
   </section>
 
 </body>
