@@ -218,7 +218,6 @@ def index():
 def rider():
     order_id = (request.args.get("order_id") or "ORD123").strip()[:64]
     rider_id = (request.args.get("rider_id") or "RID456").strip()[:64]
-    CONFIRMATIONS.pop(order_id, None)  # fresh handover each time the rider page opens
     confirm_url = request.host_url.rstrip("/") + url_for("confirm", order_id=order_id, rider_id=rider_id)
     qr_svg = qrcode.make(
         confirm_url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10
@@ -239,6 +238,13 @@ def confirm():
 @app.route("/confirmation-status")
 def confirmation_status():
     return jsonify({"confirmed": CONFIRMATIONS.get(clean_id(request.args.get("order_id")), False)})
+
+
+@app.route("/confirmation-reset", methods=["POST"])
+def confirmation_reset():
+    """Testing aid for the rider page's 'Reset confirmation' link."""
+    CONFIRMATIONS.pop(clean_id(request.form.get("order_id")), None)
+    return jsonify({"confirmed": False})
 
 
 def mask_phone(raw):
@@ -375,8 +381,7 @@ def process():
             "customer_phone": mask_phone(form.get("customer_phone")),
         },
     )
-    if status == 200:
-        CONFIRMATIONS.pop(order_id, None)  # one confirmation per record
+    # A confirmation lasts for the order (re-records included) until reset or restart.
     return jsonify(payload), status
 
 

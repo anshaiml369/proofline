@@ -141,6 +141,8 @@
       border: 3px solid var(--ink); border-radius: 16px; background: #fff;
       font-size: 22px; font-weight: 800; color: var(--ink); cursor: pointer;
     }
+    #confirmed-tile[hidden], #handover-step[hidden] { display: none; }
+    .reset-link { display: block; text-align: center; margin-top: 28px; font-size: 16px; color: var(--grey); }
     .dash-link { display: block; text-align: center; margin-top: 16px; font-size: 18px; color: var(--ink); font-weight: 600; padding: 10px; }
   </style>
 </head>
@@ -153,11 +155,13 @@
       <p class="rider">Rider <span id="rider"></span></p>
     </header>
 
-    <div class="status-row single">
+    <div class="status-row single" id="status-row">
+      <div id="confirmed-tile" class="status ok" hidden>✓ Customer confirmed</div>
       <div id="gps" class="status"></div>
     </div>
 
     <section id="capture">
+      <div id="handover-step">
       <label for="phone-input" class="field-label">Customer phone</label>
       <input id="phone-input" type="tel" maxlength="10" inputmode="numeric" autocomplete="off" placeholder="10-digit mobile">
       <p id="phone-state" class="otp-state no">Enter the number to show the confirmation code</p>
@@ -168,6 +172,7 @@
         <p class="qr-note">Customer scans this code to confirm receipt.</p>
         <p id="confirm-state" class="otp-state no">Waiting for customer confirmation...</p>
       </section>
+      </div>
 
       <button id="record" type="button">🎤 Speak to record</button>
       <p id="hint">Hold the button, say one line, let go.</p>
@@ -205,6 +210,8 @@
       <button id="again" type="button">Record again</button>
       <a class="dash-link" href="/dashboard">View in platform dashboard →</a>
     </section>
+
+    <a id="reset-confirm" class="reset-link" href="#">Reset confirmation</a>
   </main>
 
   <script>
@@ -237,10 +244,48 @@
     setStatus('gps', ctx.gps_matched, 'GPS');
 
     // Customer phone -> QR -> customer taps "Yes" on their device -> rider page polls the server.
+    // A confirmation lasts for this order_id for the session (re-records and reloads included).
     const phoneInput = $('phone-input');
+    const CONFIRM_KEY = `confirmed_${ctx.order_id}`, PHONE_KEY = `phone_${ctx.order_id}`;
+    const store = {
+      get: (k) => { try { return sessionStorage.getItem(k); } catch (_) { return null; } },
+      set: (k, v) => { try { sessionStorage.setItem(k, v); } catch (_) {} },
+      del: (k) => { try { sessionStorage.removeItem(k); } catch (_) {} },
+    };
     let customerConfirmed = false, poll = null;
+
+    function showConfirmed() {
+      customerConfirmed = true;
+      store.set(CONFIRM_KEY, 'true');
+      store.set(PHONE_KEY, phoneInput.value);
+      $('handover-step').hidden = true;
+      $('confirmed-tile').hidden = false;
+      $('status-row').classList.remove('single');
+    }
+
+    if (store.get(CONFIRM_KEY) === 'true') {
+      phoneInput.value = store.get(PHONE_KEY) || '';
+      showConfirmed();
+      // The server's memory is the source of truth (it resets on restart): fall back to the QR step if it forgot.
+      fetch('/confirmation-status?order_id=' + encodeURIComponent(ctx.order_id))
+        .then((r) => r.json())
+        .then((d) => { if (!d.confirmed) { store.del(CONFIRM_KEY); location.reload(); } })
+        .catch(() => {});
+    }
+
+    $('reset-confirm').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const body = new FormData();
+      body.append('order_id', ctx.order_id);
+      try { await fetch('/confirmation-reset', { method: 'POST', body }); } catch (_) {}
+      store.del(CONFIRM_KEY);
+      store.del(PHONE_KEY);
+      location.reload();
+    });
+
     phoneInput.addEventListener('input', () => {
       phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+      store.set(PHONE_KEY, phoneInput.value);
       const ok = phoneInput.value.length === 10;
       $('phone-state').textContent = ok ? '✓ Number entered' : 'Enter the number to show the confirmation code';
       $('phone-state').className = 'otp-state ' + (ok ? 'ok' : 'no');
@@ -256,11 +301,9 @@
         try {
           const res = await fetch('/confirmation-status?order_id=' + encodeURIComponent(ctx.order_id));
           if ((await res.json()).confirmed) {
-            customerConfirmed = true;
             clearInterval(poll);
             poll = null;
-            $('confirm-state').textContent = '✓ Customer confirmed';
-            $('confirm-state').className = 'otp-state ok';
+            showConfirmed();
           }
         } catch (_) { /* keep polling */ }
       };
@@ -488,11 +531,8 @@
     function reset() {
       $('result').style.display = 'none';
       $('capture').style.display = 'block';
-      // The server uses each confirmation for one record, so a new record needs a new scan.
-      customerConfirmed = false;
-      $('confirm-state').textContent = 'Waiting for customer confirmation...';
-      $('confirm-state').className = 'otp-state no';
-      if (phoneInput.value.length === 10) startPolling();
+      // Confirmation stays for this order; only the recording and the previous card are cleared.
+      chunks = [];
       hideError();
       resetButton();
     }

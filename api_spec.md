@@ -113,11 +113,12 @@ The rider demo page uses three extra routes. `/evidence` is unchanged: a platfor
 
 | Route | What it does |
 |---|---|
-| `GET /rider?order_id=&rider_id=` | Rider page. Shows a QR that points to `/confirm` for this order. Opening it clears any earlier confirmation for the order. |
+| `GET /rider?order_id=&rider_id=` | Rider page. Shows a QR that points to `/confirm` for this order. Once confirmed, the page skips the QR step for that order for the rest of the browser session. |
 | `GET /confirm?order_id=` · `POST /confirm` | Customer page opened from the QR. Tapping "Yes, I received this" marks the order confirmed (in memory). |
 | `GET /confirmation-status?order_id=` | `{"confirmed": true\|false}`. The rider page polls it every 2 s. |
+| `POST /confirmation-reset` (`order_id`) | Testing aid behind the rider page's "Reset confirmation" link. Clears the order's confirmation. |
 
-`POST /process` (the demo page's upload) takes `customer_confirmed` and `customer_phone` instead of `otp_confirmed`. The confirmation counts only if the server recorded the customer's tap, and it feeds the OTP +40 in scoring. Each confirmation is used for one record. The card gains `customer_confirmed` and `customer_phone` (masked, e.g. `******3210`; the full number is not stored).
+`POST /process` (the demo page's upload) takes `customer_confirmed` and `customer_phone` instead of `otp_confirmed`. The confirmation counts only if the server recorded the customer's tap, and it feeds the OTP +40 in scoring. A confirmation lasts for that order (re-records included) until it is reset or the server restarts. The card gains `customer_confirmed` and `customer_phone` (masked, e.g. `******3210`; the full number is not stored).
 
 ## Not in this hackathon build
 
