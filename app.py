@@ -18,6 +18,8 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 AUDIO_DIR = os.path.join(BASE_DIR, "static", "audio")
+PHOTO_DIR = os.path.join(BASE_DIR, "photos")  # outside static/: not publicly served
+PHOTO_EXT = {"jpg", "jpeg", "png", "webp", "heic"}
 PROMPT_PATH = os.path.join(BASE_DIR, "prompts", "extraction.txt")
 ALLOWED_EXT = {"webm", "ogg", "mp4", "m4a", "wav", "mp3"}
 PLACEHOLDER_KEYS = {"", "your_key_here"}
@@ -41,6 +43,7 @@ LIVE_RECORDS = deque(maxlen=20)
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 os.makedirs(AUDIO_DIR, exist_ok=True)
+os.makedirs(PHOTO_DIR, exist_ok=True)
 
 
 def env_key(name):
@@ -257,9 +260,20 @@ def extract():
         return jsonify({"error": str(e)}), 500
 
 
-def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched):
+def save_photo(photo):
+    """Optional delivery photo. Saved as-is; no vision model runs on it. Returns photo_id or None."""
+    if not photo or not photo.filename or not (photo.mimetype or "").startswith("image/"):
+        return None
+    ext = photo.filename.rsplit(".", 1)[-1].lower()
+    photo_id = str(uuid.uuid4())
+    photo.save(os.path.join(PHOTO_DIR, f"{photo_id}.{ext if ext in PHOTO_EXT else 'jpg'}"))
+    return photo_id
+
+
+def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched, photo=None):
     """Shared by /process (demo page) and /evidence (platform API). Returns (payload, status)."""
     try:
+        photo_id = save_photo(photo)
         ext = (audio.filename or "").rsplit(".", 1)[-1].lower()
         if ext not in ALLOWED_EXT:
             ext = "webm"
@@ -293,6 +307,8 @@ def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched)
         return {**extracted, **engines, "record": record, "transcript": transcript}, 502
 
     card = build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched)
+    card["photo_captured"] = bool(photo_id)
+    card["photo_id"] = photo_id
     customer_claim = (form.get("customer_claim") or "").strip()[:200]
     dispute_score = score_dispute(card, customer_claim)
     LIVE_RECORDS.appendleft({
@@ -319,6 +335,7 @@ def process():
         audio, form,
         clean_id(form.get("order_id")), clean_id(form.get("rider_id")),
         parse_bool(form.get("otp_confirmed")), parse_bool(form.get("gps_matched")),
+        photo=request.files.get("photo"),
     )
     return jsonify(payload), status
 
@@ -351,7 +368,8 @@ def evidence():
     if problems:
         return jsonify({"error": "invalid_request", "fields": problems}), 400
 
-    payload, status = create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched)
+    payload, status = create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched,
+                                      photo=request.files.get("photo"))
     return jsonify(payload), status
 
 

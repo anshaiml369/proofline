@@ -15,6 +15,7 @@ One endpoint. The platform sends what it already knows plus the rider's voice no
 | `audio` | file | yes | Rider's spoken note. WAV or MP3 (WebM, OGG, MP4/M4A also accepted). Keep it to ≤ 10 s; hard limits are 10 MB per file and 30 s for speech-to-text. |
 | `customer_claim` | string | no | e.g. `not delivered`, `wrong item`. Used only for the recommendation. |
 | `gps_lat`, `gps_lng` | string | no | Raw coordinates to seal into the record. Shown as `unavailable` if absent or invalid. |
+| `photo` | file | no | Optional delivery photo (any `image/*`). Stored as-is; no vision model runs on it and it does not change the score. Not part of the hash. |
 
 ```bash
 curl -X POST https://<host>/evidence \
@@ -38,7 +39,9 @@ curl -X POST https://<host>/evidence \
     "obstacle": "customer_unavailable",
     "customer_instruction": "not_mentioned",
     "spoken_context": "On the third floor, the gate was locked, customer's phone was off, handed it to the watchman, photo taken.",
-    "confidence": "high"
+    "confidence": "high",
+    "photo_captured": true,
+    "photo_id": "3f2b7c1e-9a4d-4e8b-b0c2-5d6e7f8a9b10"
   },
   "dispute_score": {
     "evidence_strength": 79,
@@ -71,6 +74,7 @@ curl -X POST https://<host>/evidence \
 | `recommendation` | `favor_rider` · `favor_customer` · `inconclusive` |
 | `stt_engine` | `wispr` · `sarvam` · `whisper` (whichever produced the transcript) |
 | `extraction_engine` | `openrouter` · `openai` |
+| `photo_captured` / `photo_id` | `true` + UUID if a photo was sent, else `false` + `null` |
 
 ## Who decides what ("trust but verify")
 
