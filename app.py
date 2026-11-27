@@ -3,7 +3,8 @@ import json
 import os
 import urllib.request
 import uuid
-from datetime import datetime, timezone
+from collections import deque
+from datetime import datetime, timedelta, timezone
 
 import httpx
 from dotenv import load_dotenv
@@ -32,6 +33,10 @@ WHISPER_HINT = (
     "Hinglish delivery note in Roman script. Ek, do, teen, chaar, paanch floor. "
     "Gate locked, watchman ne liya, reception pe chhoda, photo liya, customer ko diya."
 )
+
+IST = timezone(timedelta(hours=5, minutes=30))
+# In-process only (no database): lets the dashboard show what the rider page just recorded. Cleared on restart.
+LIVE_RECORDS = deque(maxlen=20)
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
@@ -208,10 +213,15 @@ def rider():
     return render_template("rider.html")
 
 
+def ist_time(iso_utc):
+    return datetime.fromisoformat(iso_utc.replace("Z", "+00:00")).astimezone(IST).strftime("%d %b, %H:%M")
+
+
 @app.route("/dashboard")
 def dashboard():
-    rows = [{**d, "score": score_dispute(d["card"], d["customer_claim"])} for d in MOCK_DISPUTES]
-    return render_template("dashboard.html", rows=rows)
+    mock = [{**d, "score": score_dispute(d["card"], d["customer_claim"]), "live": False} for d in MOCK_DISPUTES]
+    rows = [{**r, "time": ist_time(r["timestamp"])} for r in [*LIVE_RECORDS, *mock]]
+    return render_template("dashboard.html", rows=rows, live_count=len(LIVE_RECORDS))
 
 
 @app.route("/transcribe", methods=["POST"])
@@ -276,9 +286,14 @@ def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched)
 
     card = build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched)
     customer_claim = (form.get("customer_claim") or "").strip()[:200]
+    dispute_score = score_dispute(card, customer_claim)
+    LIVE_RECORDS.appendleft({
+        "card": card, "score": dispute_score, "transcript": transcript,
+        "customer_claim": customer_claim, "timestamp": record["timestamp"], "live": True,
+    })
     return {
         "evidence_card": card,
-        "dispute_score": score_dispute(card, customer_claim),
+        "dispute_score": dispute_score,
         "customer_claim": customer_claim,
         "record": record,
         "transcript": transcript,
