@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proofline pitch deck</title>
+  <!--
+    Print to PDF: Chrome → Ctrl/Cmd+P → Save as PDF → Layout: Landscape →
+    Margins: None → More settings: Background graphics ON.
+  -->
+  <style>
+    @page { size: A4 landscape; margin: 0; }
+    :root {
+      --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --soft: #f1f5f9;
+      --green: #16a34a; --green-dark: #15803d; --green-bg: #dcfce7;
+      --amber-bg: #fef3c7; --amber-ink: #92400e;
+      --blue-bg: #dbeafe; --blue-ink: #1e40af;
+      --night: #0f172a; --night-card: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink); background: #cbd5e1; font-variant-numeric: tabular-nums;
+    }
+
+    .slide {
+      width: 297mm; height: 210mm; margin: 10mm auto; background: #fff; overflow: hidden;
+      display: flex; flex-direction: column; padding: 16mm 18mm 0; position: relative;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, .18);
+      page-break-after: always; break-after: page;
+    }
+    @media print {
+      body { background: #fff; }
+      .slide { margin: 0; box-shadow: none; }
+    }
+
+    .kicker { font-size: 10pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--green-dark); }
+    h2 { font-size: 26pt; line-height: 1.15; font-weight: 700; margin-top: 3mm; max-width: 230mm; letter-spacing: -.01em; }
+    .lede { font-size: 13pt; color: var(--muted); margin-top: 3mm; max-width: 220mm; line-height: 1.45; }
+    .body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 6mm 0; }
+
+    .foot {
+      display: flex; justify-content: space-between; align-items: center; gap: 8mm;
+      height: 12mm; border-top: 1px solid var(--line); font-size: 8.5pt; color: var(--muted);
+    }
+    .foot b { color: var(--ink); font-weight: 600; }
+
+    .tag { display: inline-block; font-size: 7.5pt; font-weight: 700; letter-spacing: .06em; padding: .6mm 2mm; border-radius: 999px; vertical-align: middle; white-space: nowrap; }
+    .tag.s { background: var(--green-bg); color: var(--green-dark); }
+    .tag.u { background: var(--amber-bg); color: var(--amber-ink); }
+    .tag.t { background: var(--blue-bg); color: var(--blue-ink); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7mm; }
+    .card { border: 1.5px solid var(--line); border-radius: 5mm; padding: 7mm; background: #fff; }
+    .card h3 { font-size: 14pt; font-weight: 700; }
+    .card p { font-size: 11.5pt; line-height: 1.5; color: #334155; margin-top: 2.5mm; }
+    .card .role { font-size: 9pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .card.accent { border-color: var(--green); background: #f0fdf4; }
+
+    /* 1 · Title */
+    .title { background: var(--night); color: #f8fafc; }
+    .title .foot { border-top-color: #334155; color: #94a3b8; }
+    .title .foot b { color: #f8fafc; }
+    .title .body { justify-content: center; }
+    .title .mark { display: flex; align-items: center; gap: 5mm; }
+    .title .dot { width: 14mm; height: 14mm; border-radius: 50%; background: var(--green); display: grid; place-items: center; }
+    .title .dot svg { width: 7mm; height: 7mm; }
+    .title h1 { font-size: 54pt; font-weight: 800; letter-spacing: -.02em; }
+    .title .tagline { font-size: 22pt; color: #cbd5e1; margin-top: 6mm; font-weight: 500; }
+    .title .byline { font-size: 12pt; color: #94a3b8; margin-top: 14mm; }
+    .title .bar { width: 40mm; height: 2mm; background: var(--green); border-radius: 999px; margin-top: 10mm; }
+
+    /* 2 · Problem */
+    .stat { font-size: 46pt; font-weight: 800; letter-spacing: -.02em; line-height: 1; color: var(--ink); }
+    .stat small { font-size: 18pt; color: var(--muted); font-weight: 600; }
+    .quote-src { font-size: 9.5pt; color: var(--muted); margin-top: 3mm; }
+    .problem-line { margin-top: 7mm; font-size: 14pt; line-height: 1.45; padding: 5mm 7mm; border-left: 2mm solid var(--green); background: var(--soft); border-radius: 0 4mm 4mm 0; }
+
+    /* 4 · What we built */
+    .built { display: grid; grid-template-columns: 92mm 1fr; gap: 10mm; align-items: stretch; }
+    .shot {
+      border: 2px dashed #94a3b8; border-radius: 6mm; background: var(--soft); min-height: 112mm;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+      color: var(--muted); font-size: 11pt; padding: 8mm;
+    }
+    .shot strong { color: var(--ink); font-size: 12pt; display: block; margin-bottom: 2mm; }
+    .chips { display: flex; flex-wrap: wrap; gap: 3mm; margin-top: 4mm; }
+    .chip { font-size: 12pt; font-weight: 600; padding: 2.5mm 5mm; border-radius: 999px; background: var(--green); color: #fff; }
+    .points { list-style: none; margin-top: 8mm; display: grid; gap: 4mm; }
+    .points li { font-size: 12pt; line-height: 1.45; padding-left: 7mm; position: relative; color: #334155; }
+    .points li::before { content: ""; position: absolute; left: 0; top: 2.2mm; width: 3mm; height: 3mm; border-radius: 50%; background: var(--green); }
+    .points b { color: var(--ink); }
+
+    /* 5 · Why voice */
+    .big-quote { font-size: 28pt; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; }
+    .big-quote::before { content: "\201C"; color: var(--green); }
+    .big-quote::after { content: "\201D"; color: var(--green); }
+
+    /* 6 · Competitors */
+    table { width: 100%; border-collapse: collapse; font-size: 10.5pt; }
+    th { text-align: left; font-size: 8.5pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 2.5mm 3mm; border-bottom: 1.5px solid var(--line); }
+    td { padding: 3mm; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.4; color: #334155; }
+    td:first-child { font-weight: 700; color: var(--ink); width: 52mm; }
+    tr.us td { background: #f0fdf4; }
+    .wedge { margin-top: 6mm; padding: 5mm 7mm; border-radius: 4mm; background: var(--night); color: #f8fafc; font-size: 13pt; line-height: 1.45; }
+    .wedge b { color: #86efac; }
+
+    /* 7 · Launch */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; margin-top: 4mm; }
+    .step { position: relative; }
+    .step .n { width: 10mm; height: 10mm; border-radius: 50%; background: var(--green); color: #fff; font-weight: 800; display: grid; place-items: center; font-size: 12pt; }
+    .step h3 { margin-top: 3mm; }
+    .deps { display: flex; gap: 4mm; flex-wrap: wrap; margin-top: 3mm; }
+    .dep { border: 1.5px solid var(--line); border-radius: 4mm; padding: 3.5mm 5mm; font-size: 11pt; line-height: 1.4; flex: 1; min-width: 70mm; }
+    .dep b { display: block; font-size: 12pt; }
+    .section-label { font-size: 9pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+    /* 8 · Ask */
+    .ask .amount { font-size: 40pt; font-weight: 800; letter-spacing: -.02em; margin-top: 3mm; line-height: 1.05; }
+    .ask .card p { font-size: 12.5pt; }
+  </style>
+</head>
+<body>
+
+  <!-- 1 · Title -->
+  <section class="slide title">
+    <div class="body">
+      <div class="mark">
+        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+        <h1>Proofline</h1>
+      </div>
+      <p class="tagline">Voice evidence at the OTP handover</p>
+      <div class="bar"></div>
+      <p class="byline">[Your Name] · India Runs on Voice · Nov 2026</p>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>1 / 8</b></div>
+  </section>
+
+  <!-- 2 · Problem -->
+  <section class="slide">
+    <p class="kicker">The problem</p>
+    <h2>Platforms settle delivery disputes with no evidence from the doorstep</h2>
+    <div class="body">
+      <div class="grid2">
+        <div class="card">
+          <div class="stat">50–70%</div>
+          <p>of disputed cases: Zomato refunds the customer <b>and</b> lets the delivery partner keep working, because it cannot tell who is right.</p>
+          <p class="quote-src">Deepinder Goyal, Zomato CEO, on Raj Shamani's podcast (Outlook Business) <span class="tag s">SOURCED</span></p>
+        </div>
+        <div class="card">
+          <div class="stat">~5,000 <small>/ month</small></div>
+          <p>delivery partners removed by Zomato for repeated fraud, such as marking orders delivered without handing them over.</p>
+          <p class="quote-src">Same podcast (StartupTalky, NewsX) <span class="tag s">SOURCED</span></p>
+        </div>
+      </div>
+      <p class="problem-line">Every "not delivered" claim forces a choice: refund a possible fraudster, or punish a possibly honest rider. Usually with <b>no record of what happened at the door</b>. The OTP proves a code was entered, not how the handover went.</p>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>2 / 8</b></div>
+  </section>
+
+  <!-- 3 · Who has it -->
+  <section class="slide">
+    <p class="kicker">Who has the pain</p>
+    <h2>Three parties at every disputed handover</h2>
+    <div class="body">
+      <div class="grid3">
+        <div class="card">
+          <p class="role">User</p>
+          <h3>The rider</h3>
+          <p>Hands over at doors, gates, receptions and security desks. When a claim goes against them, they have no way to show their side, and repeated claims can cost them the job.</p>
+        </div>
+        <div class="card accent">
+          <p class="role">Buyer</p>
+          <h3>Platform dispute team</h3>
+          <p>Pays refunds by default because it can't tell who is right. Wants evidence it can act on, scored the same way every time, with the final call still theirs.</p>
+        </div>
+        <div class="card">
+          <p class="role">Where</p>
+          <h3>Every dark-store cluster in urban India</h3>
+          <p>Quick-commerce and food delivery hand over orders in dense apartment blocks and offices, where "left with the guard" is a normal outcome a form can't record.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>3 / 8</b></div>
+  </section>
+
+  <!-- 4 · What we built -->
+  <section class="slide">
+    <p class="kicker">What we built</p>
+    <h2>Hold one button, say one line, get a scored evidence card</h2>
+    <div class="body">
+      <div class="built">
+        <div class="shot">
+          <strong>Evidence card screenshot</strong>
+          Rider page · 375px<br>(placeholder)
+        </div>
+        <div>
+          <p class="section-label">Five signals per handover</p>
+          <div class="chips">
+            <span class="chip">Phone</span><span class="chip">QR confirmation</span><span class="chip">GPS</span><span class="chip">Photo</span><span class="chip">Spoken context</span>
+          </div>
+          <ul class="points">
+            <li><b>Hinglish in, structure out.</b> Sarvam codemix speech-to-text; the LLM only extracts fields: status, handover location, obstacle, instruction, confidence.</li>
+            <li><b>Fixed rules score it 0–100</b> and recommend favour rider, inconclusive or favour customer. The platform makes the final call.</li>
+            <li><b>Tamper-evident.</b> SHA-256 of the audio plus server time. It proves the record wasn't edited later, not that the delivery happened.</li>
+            <li><b>Built for the doorstep.</b> Works offline and uploads later; a dashboard and history for the dispute team; one API call for platforms.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>4 / 8</b></div>
+  </section>
+
+  <!-- 5 · Why voice -->
+  <section class="slide">
+    <p class="kicker">Why voice</p>
+    <h2>At the door, the rider's hands are full and the story doesn't fit a form</h2>
+    <div class="body">
+      <div class="grid3">
+        <div class="card">
+          <h3>Hands on the parcel</h3>
+          <p>Hold one button and speak. No typing on a phone while holding an order, a helmet and a bag.</p>
+        </div>
+        <div class="card">
+          <h3>Faster than a form</h3>
+          <p>One spoken line replaces menus and text boxes, in the mix of Hindi and English the rider already speaks.</p>
+        </div>
+        <div class="card accent">
+          <h3>Says what a form can't</h3>
+          <p>Edge cases are where disputes come from: locked gates, absent customers, handovers to a guard or neighbour.</p>
+        </div>
+      </div>
+      <p class="big-quote" style="margin-top: 10mm;">Gate locked, left at reception.</p>
+      <p class="lede">A dropdown can say "delivered". Only the rider's words say how.</p>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>5 / 8</b></div>
+  </section>
+
+  <!-- 6 · Competitors + wedge -->
+  <section class="slide">
+    <p class="kicker">Alternatives</p>
+    <h2>Others store a photo or a raw clip. We store evidence.</h2>
+    <div class="body">
+      <table>
+        <thead><tr><th>Alternative</th><th>What it does</th><th>Why it isn't the same</th></tr></thead>
+        <tbody>
+          <tr><td>Platform OTP + photo</td><td>Confirms a code was entered; some orders need a photo</td><td>Records <i>that</i> a handover happened, not <i>how</i>. No spoken context for edge cases.</td></tr>
+          <tr><td>Route4Me</td><td>Fleet routing; voice recording as a proof task on done and failed stops</td><td>Built for company fleets. Raw audio only: no codemix transcription, no structured fields, no dispute score.</td></tr>
+          <tr><td>Onfleet</td><td>Photo, signature and notes proof of delivery</td><td>Typed or photo proof, English-first, no dispute scoring.</td></tr>
+          <tr><td>ERRA, RouteProof <span class="tag u">UNVERIFIED</span></td><td>Named in research notes; no public product pages found</td><td>Confirm they exist and what they do before naming them on stage.</td></tr>
+        </tbody>
+      </table>
+      <p class="wedge"><b>Our wedge:</b> spoken context at the OTP handover, turned into a structured, <b>rule-scored</b>, <b>tamper-evident</b> record a dispute team can act on.</p>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>6 / 8</b></div>
+  </section>
+
+  <!-- 7 · Dependencies + launch plan -->
+  <section class="slide">
+    <p class="kicker">Dependencies and launch</p>
+    <h2>Small pilot first, then middleware, then platforms</h2>
+    <div class="body">
+      <p class="section-label">What we depend on</p>
+      <div class="deps">
+        <div class="dep"><b>Sarvam AI</b>saaras:v3 codemix speech-to-text</div>
+        <div class="dep"><b>OpenRouter</b>Field extraction (OpenAI as fallback)</div>
+        <div class="dep"><b>Platform OTP + GPS APIs</b>Sent with each note via <code>POST /evidence</code></div>
+      </div>
+      <p class="section-label" style="margin-top: 9mm;">Launch plan</p>
+      <div class="steps">
+        <div class="step card">
+          <div class="n">1</div>
+          <h3>Pilot: 2 riders</h3>
+          <p>Dadar / CSMT, Mumbai. Real handovers, real edge cases; tune the hand-set scoring rules.</p>
+        </div>
+        <div class="step card">
+          <div class="n">2</div>
+          <h3>3PL: Shadowfax / UrbanPiper</h3>
+          <p>Middleware already sits between platforms and riders, so a pilot is faster. <span class="tag u">UNVERIFIED</span> which platforms each integrates with.</p>
+        </div>
+        <div class="step card">
+          <div class="n">3</div>
+          <h3>Direct platform API</h3>
+          <p>Highest value, longest sales cycle. One endpoint: order, rider, OTP, GPS and the voice note in; card and score out.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>7 / 8</b></div>
+  </section>
+
+  <!-- 8 · The ask -->
+  <section class="slide ask">
+    <p class="kicker">The ask</p>
+    <h2>Help us put Proofline at real doors</h2>
+    <div class="body">
+      <div class="grid2">
+        <div class="card accent">
+          <p class="role">Hackathon</p>
+          <div class="amount">One intro</div>
+          <p>To one 3PL or dark-store operator willing to run a pilot.</p>
+        </div>
+        <div class="card">
+          <p class="role">Investors</p>
+          <div class="amount">₹50L pre-seed</div>
+          <p>For a 500-delivery pilot in one dark-store cluster.</p>
+        </div>
+      </div>
+      <p class="problem-line">We'll measure the share of disputes the evidence resolves (favour rider or favour customer) against today's refund-by-default baseline. <span class="tag t">TARGET</span> outcomes are set during the pilot, not claimed now.</p>
+    </div>
+    <div class="foot"><span>Source labels: [SOURCED] / [UNVERIFIED] / [TARGET] — see pitch_metrics.md.</span><b>8 / 8</b></div>
+  </section>
+
+</body>
+</html>
