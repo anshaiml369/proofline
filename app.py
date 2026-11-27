@@ -234,12 +234,8 @@ def extract():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/process", methods=["POST"])
-def process():
-    audio = request.files.get("audio")
-    if not audio:
-        return jsonify({"error": "no audio file"}), 400
-
+def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched):
+    """Shared by /process (demo page) and /evidence (platform API). Returns (payload, status)."""
     try:
         ext = (audio.filename or "").rsplit(".", 1)[-1].lower()
         if ext not in ALLOWED_EXT:
@@ -247,12 +243,6 @@ def process():
         filename = f"{uuid.uuid4().hex}.{ext}"
         path = os.path.join(AUDIO_DIR, filename)
         audio.save(path)
-
-        form = request.form
-        order_id = clean_id(form.get("order_id"))
-        rider_id = clean_id(form.get("rider_id"))
-        otp_confirmed = parse_bool(form.get("otp_confirmed"))
-        gps_matched = parse_bool(form.get("gps_matched"))
 
         # Trust layer is fixed on receipt, before any AI touches the audio.
         server_timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds") + "Z"
@@ -273,22 +263,68 @@ def process():
         transcript, stt_engine = transcribe_audio(path)
         extracted = extract_structured(transcript)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return {"error": str(e)}, 500
 
     engines = {"stt_engine": stt_engine, "extraction_engine": extracted.pop("extraction_engine", None)}
     if "error" in extracted:
-        return jsonify({**extracted, **engines, "record": record, "transcript": transcript}), 500
+        return {**extracted, **engines, "record": record, "transcript": transcript}, 502
 
     card = build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched)
     customer_claim = (form.get("customer_claim") or "").strip()[:200]
-    return jsonify({
+    return {
         "evidence_card": card,
         "dispute_score": score_dispute(card, customer_claim),
         "customer_claim": customer_claim,
         "record": record,
         "transcript": transcript,
         **engines,
-    })
+    }, 200
+
+
+@app.route("/process", methods=["POST"])
+def process():
+    audio = request.files.get("audio")
+    if not audio:
+        return jsonify({"error": "no audio file"}), 400
+    form = request.form
+    payload, status = create_evidence(
+        audio, form,
+        clean_id(form.get("order_id")), clean_id(form.get("rider_id")),
+        parse_bool(form.get("otp_confirmed")), parse_bool(form.get("gps_matched")),
+    )
+    return jsonify(payload), status
+
+
+def strict_bool(value):
+    value = (value or "").strip().lower()
+    return {"true": True, "1": True, "false": False, "0": False}.get(value)
+
+
+@app.route("/evidence", methods=["POST"])
+def evidence():
+    form = request.form
+    audio = request.files.get("audio")
+    order_id = (form.get("order_id") or "").strip()[:64]
+    rider_id = (form.get("rider_id") or "").strip()[:64]
+    otp_confirmed = strict_bool(form.get("otp_confirmed"))
+    gps_matched = strict_bool(form.get("gps_matched"))
+
+    problems = []
+    if not audio or not audio.filename:
+        problems.append("audio")
+    if not order_id:
+        problems.append("order_id")
+    if not rider_id:
+        problems.append("rider_id")
+    if otp_confirmed is None:
+        problems.append("otp_confirmed (must be true or false)")
+    if gps_matched is None:
+        problems.append("gps_matched (must be true or false)")
+    if problems:
+        return jsonify({"error": "invalid_request", "fields": problems}), 400
+
+    payload, status = create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched)
+    return jsonify(payload), status
 
 
 if __name__ == "__main__":
