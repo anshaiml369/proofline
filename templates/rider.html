@@ -205,6 +205,9 @@
       <span id="chip-photo" class="chip">— Photo</span>
     </div>
 
+    {% if keys_missing %}
+    <div id="keys-banner" class="offline-banner" role="status">API keys not configured. Recording, transcription and help are off. Add keys to <code>.env</code> and restart.</div>
+    {% endif %}
     <div id="offline-banner" class="offline-banner" role="status" hidden></div>
 
     <section id="capture">
@@ -595,7 +598,7 @@
       }
       if (data.error) {
         resetButton();
-        showError('Could not save the evidence. Please try again.');
+        showError(data.keys_missing ? data.error : 'Could not save the evidence. Please try again.');
         console.error(data);
         return;
       }

@@ -63,6 +63,26 @@ def env_key(name):
     return None if value in PLACEHOLDER_KEYS else value
 
 
+def missing_keys():
+    """Features with no usable key: speech-to-text needs Sarvam or OpenAI; extraction and help need OpenRouter or OpenAI."""
+    has_openai = bool(env_key("OPENAI_API_KEY"))
+    missing = []
+    if not (env_key("SARVAM_API_KEY") or has_openai):
+        missing.append("speech-to-text")
+    if not (env_key("OPENROUTER_API_KEY") or has_openai):
+        missing.append("extraction")
+    return missing
+
+
+def keys_not_set_response():
+    """503 with a clear message when the server has no API keys, so keyless runs fail gracefully."""
+    missing = missing_keys()
+    if not missing:
+        return None
+    return jsonify({"error": "API keys not configured: key not set for " + ", ".join(missing) + ".",
+                    "keys_missing": missing}), 503
+
+
 def openai_client():
     key = env_key("OPENAI_API_KEY")
     if not key:
@@ -235,7 +255,7 @@ def rider():
     qr_svg = qrcode.make(
         confirm_url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10
     ).to_string(encoding="unicode")
-    return render_template("rider.html", qr_svg=qr_svg, confirm_url=confirm_url, qr_nonce=nonce)
+    return render_template("rider.html", qr_svg=qr_svg, confirm_url=confirm_url, qr_nonce=nonce, keys_missing=missing_keys())
 
 
 def nonce_ok(order_id, nonce):
@@ -541,6 +561,8 @@ def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched,
 
 @app.route("/process", methods=["POST"])
 def process():
+    if (blocked := keys_not_set_response()):
+        return blocked
     audio = request.files.get("audio")
     if not audio:
         return jsonify({"error": "no audio file"}), 400
@@ -577,6 +599,8 @@ def strict_bool(value):
 
 @app.route("/evidence", methods=["POST"])
 def evidence():
+    if (blocked := keys_not_set_response()):
+        return blocked
     form = request.form
     audio = request.files.get("audio")
     order_id = (form.get("order_id") or "").strip()[:64]
@@ -655,6 +679,8 @@ def tidy_help_answer(text):
 
 @app.route("/help", methods=["POST"])
 def help_answer():
+    if (blocked := keys_not_set_response()):
+        return blocked
     question = str((request.get_json(silent=True) or {}).get("question") or "").strip()[:300]
     if not question:
         return jsonify({"error": "Ask a question first."}), 400
@@ -670,6 +696,8 @@ def help_answer():
 
 @app.route("/help/stt", methods=["POST"])
 def help_stt():
+    if (blocked := keys_not_set_response()):
+        return blocked
     audio = request.files.get("audio")
     if not audio or not audio.filename:
         return jsonify({"error": "no audio file"}), 400

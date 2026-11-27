@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+evidence.db
+evidence.db-*
+photos/
+static/audio/*
+!static/audio/.gitkeep
+__pycache__/
+*.pyc
+.git/
+.DS_Store

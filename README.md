@@ -78,6 +78,21 @@ voice note ─▶ speech-to-text ─▶ structured extraction ─▶ rule score 
 
 A Wispr Flow STT hook exists, but its endpoint is a placeholder. Leave `WISPR_API_KEY` empty.
 
+## Run with Docker
+
+You need Docker with Compose 2.24 or newer. From the project folder:
+
+```bash
+docker compose up
+```
+
+Then open http://localhost:5050. Port 5050 is used on the host because macOS uses port 5000 for AirPlay; inside the container the app runs on 5000.
+
+- **Keys are optional.** If a `.env` file exists, Compose loads it. If it doesn't, the app still starts.
+- **Without keys:** the app shows "key not set" messages. The UI and routing work; only STT/extraction calls fail gracefully. The rider page shows an "API keys not configured" banner, and recording, `/evidence` and help return a clear 503 error instead of crashing.
+- **No secrets in the image.** `.dockerignore` keeps `.env`, the database, photos and recordings out of it.
+- **Data is not kept.** The SQLite database lives inside the container, so records are lost when you run `docker compose down`.
+
 ## Run locally
 
 You need Python 3.11.
