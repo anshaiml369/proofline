@@ -20,44 +20,37 @@ def classify_claim(customer_claim):
 
 
 def evidence_strength(card):
-    """Returns (score 0-100, band, reasoning citing the deciding signal)."""
+    """Additive score: OTP +40, GPS match +30, confidence not low +20, named handover location +10."""
     otp = card.get("otp_confirmed") is True
     gps = card.get("gps_matched") is True
-    spoken = card.get("spoken_context") not in (None, "", "not_mentioned")
+    confident = card.get("confidence", "low") != "low"
     location = card.get("handover_location")
     location_known = location in KNOWN_LOCATIONS
-    confidence = card.get("confidence", "low")
-    obstacle = card.get("obstacle")
 
-    if not otp or not spoken:
-        score = 20 + (15 if gps else 0) + (14 if spoken else 0)
-        reason = "OTP was not confirmed at handover." if not otp else "Rider gave no spoken account of the handover."
-        return score, "low", reason
+    score = (40 if otp else 0) + (30 if gps else 0) + (20 if confident else 0) + (10 if location_known else 0)
 
-    if gps and location_known and confidence != "low" and obstacle != "customer_unavailable":
-        score = 80 + (10 if confidence == "high" else 0) + (10 if obstacle == "none" else 0)
-        reason = f"OTP confirmed, GPS matched, and the rider clearly described a handover at {location}."
-        return score, "high", reason
-
-    score = 50 + (10 if gps else 0) + (10 if location_known else 0) + (9 if confidence == "high" else 0)
-    if obstacle == "customer_unavailable":
-        reason = "OTP confirmed, but the rider reports the customer was unavailable at handover."
-    elif confidence == "low":
-        reason = "OTP confirmed, but the spoken handover description is unclear."
-    elif not gps:
-        reason = "OTP confirmed, but GPS did not match the drop location."
+    parts = [
+        "OTP confirmed" if otp else "OTP not confirmed",
+        "GPS matched" if gps else "GPS did not match",
+        f"{card.get('confidence', 'low')}-confidence spoken account",
+    ]
+    reason = ", ".join(parts[:2]) + ", " + parts[2]
+    if location_known:
+        reason += f" of a handover at {location}."
     elif location == "other":
-        reason = "OTP confirmed, but the package was handed to an unusual place or person."
+        reason += " of a handover at an unusual place."
     else:
-        reason = "OTP confirmed, but the rider did not say where the package was handed over."
-    return score, "medium", reason
+        reason += " with no clear handover location."
+    return min(score, 100), reason[0].upper() + reason[1:]
 
 
 def score_dispute(card, customer_claim=""):
-    strength, band, reason = evidence_strength(card)
+    strength, reason = evidence_strength(card)
+    band = "high" if strength >= 80 else "medium" if strength >= 50 else "low"
     claim_type = classify_claim(customer_claim)
     status = card.get("delivery_status")
 
+    # Safeguards: the rider's own words, or a claim a handover record can't address, override the score.
     if status == "failed":
         recommendation = "favor_customer" if claim_type == "non_delivery" else "inconclusive"
         reason = "The rider's own record says the delivery failed."

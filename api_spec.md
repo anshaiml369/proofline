@@ -82,7 +82,9 @@ curl -X POST https://<host>/evidence \
 | **Fixed rules** (`dispute_engine.py`) | `evidence_strength` and `recommendation` |
 | **The platform** (always) | The final dispute decision |
 
-**Scoring bands:** 80–100 when OTP is confirmed, GPS matched, a known handover location is named, confidence isn't low and the customer was available. 50–79 when OTP is confirmed but something is weaker. 0–49 when there's no OTP or no spoken account. A `wrong item`-type claim is always `inconclusive`, because a handover record can't show what was inside the package.
+**Scoring:** `evidence_strength` = OTP confirmed **+40**, GPS matched **+30**, confidence not `low` **+20**, a named handover location (door, reception, security, neighbor) **+10**, capped at 100. Recommendation: **≥ 80** `favor_rider`, **50–79** `inconclusive`, **< 50** `favor_customer`.
+
+**Safeguards override the score:** if the rider says the delivery `failed` and the claim is a non-delivery claim, the recommendation is `favor_customer`. A `partial` handover is `inconclusive`. A `wrong item`-type claim is always `inconclusive`, because a handover record can't show what was inside the package.
 
 ## Verifying a record
 
