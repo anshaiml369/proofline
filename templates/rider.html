@@ -280,6 +280,7 @@
       try { await fetch('/confirmation-reset', { method: 'POST', body }); } catch (_) {}
       store.del(CONFIRM_KEY);
       store.del(PHONE_KEY);
+      store.del(PHOTO_KEY);
       location.reload();
     });
 
@@ -317,9 +318,42 @@
     $('photo-input').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       e.target.value = '';
-      if (file) setPhoto(await shrink(file));
+      if (file) {
+        const small = await shrink(file);
+        setPhoto(small);
+        persistPhoto(small);
+      }
     });
-    $('photo-remove').addEventListener('click', () => setPhoto(null));
+    $('photo-remove').addEventListener('click', () => { setPhoto(null); store.del(PHOTO_KEY); });
+
+    // Phone and photo persist per order_id for the session (re-records and reloads included).
+    const PHOTO_KEY = `photo_${ctx.order_id}`;
+    const MAX_STORED = 2 * 1024 * 1024;  // data-URL budget; sessionStorage is ~5 MB per site
+    const toDataUrl = (blob) => new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+    async function fromDataUrl(url) {
+      const blob = await (await fetch(url)).blob();
+      return new File([blob], 'photo.jpg', { type: blob.type || 'image/jpeg' });
+    }
+    async function persistPhoto(file) {
+      try {
+        let url = await toDataUrl(file);
+        if (url.length > MAX_STORED) url = await toDataUrl(await shrink(file, 800));
+        store.set(PHOTO_KEY, url);  // quota errors are swallowed: the photo still uploads, it just isn't remembered
+      } catch (_) {}
+    }
+
+    const savedPhone = store.get(PHONE_KEY);
+    if (savedPhone && !customerConfirmed) {
+      phoneInput.value = savedPhone;
+      phoneInput.dispatchEvent(new Event('input'));
+    }
+    const savedPhoto = store.get(PHOTO_KEY);
+    if (savedPhoto) fromDataUrl(savedPhoto).then(setPhoto).catch(() => store.del(PHOTO_KEY));
 
     function setPhoto(file) {
       deliveryPhoto = file;
