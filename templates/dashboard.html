@@ -3,108 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
   <title>Proofline Dashboard</title>
+  {% include "_dark_style.html" %}
   <style>
-    :root {
-      --green: #16a34a;
-      --green-tint: #f0fdf4;
-      --yellow: #ca8a04;
-      --yellow-tint: #fefce8;
-      --red: #dc2626;
-      --red-tint: #fef2f2;
-      --grey: #6b7280;
-      --ink: #111827;
-      --line: #e5e7eb;
-      --panel: #f3f4f6;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #fafafa;
-      color: var(--ink);
-      font-size: 16px;
-      line-height: 1.4;
-    }
-    main { max-width: 1280px; margin: 0 auto; padding: 28px 24px 40px; }
-    header { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-    h1 { font-size: 30px; font-weight: 800; }
-    .sub { color: var(--grey); font-size: 16px; }
-    .tag {
-      display: inline-block; padding: 4px 12px; border-radius: 999px;
-      background: #fef3c7; color: #92400e; font-size: 14px; font-weight: 700; letter-spacing: 0.03em;
-    }
-    .tag.live { background: #dbeafe; color: #1e40af; }
-    .tags { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .tag-note { font-size: 14px; color: var(--grey); }
-    .account { display: flex; align-items: center; gap: 12px; font-size: 14px; }
-    .account .who { color: var(--grey); }
-    .account form { display: inline; }
-    .nav {
-      font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; background: #fff;
-      border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; min-height: 44px; cursor: pointer;
-      display: inline-flex; align-items: center;
-    }
-
-    .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0; }
-    .tile { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
-    .tile .label { font-size: 14px; color: var(--grey); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-    .tile .value { font-size: 38px; font-weight: 800; margin-top: 6px; letter-spacing: -0.5px; }
-    .tile .value small { font-size: 18px; color: var(--grey); font-weight: 600; letter-spacing: 0; }
-    .tile .note { font-size: 14px; color: var(--grey); margin-top: 2px; }
-    .tile.highlight { border: 2px solid var(--green); }
+    .tags { margin-top: 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .tag { display: inline-block; padding: 4px 12px; border-radius: 999px; background: rgba(234,179,8,.15); color: #fde047; font-size: 12px; font-weight: 600; letter-spacing: .06em; }
+    .tag.live { background: rgba(59,130,246,.18); color: #93c5fd; }
+    .tag-note { font-size: 14px; color: var(--muted); }
+    .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
+    .tile { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; box-shadow: var(--shadow); }
+    .tile .label { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .tile .value { font-size: 48px; font-weight: 700; line-height: 1.1; margin-top: 8px; letter-spacing: -1px; }
+    .tile .value small { font-size: 16px; color: var(--muted); font-weight: 500; letter-spacing: 0; }
+    .tile .note { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .tile.highlight { border-color: var(--green-dark); }
     .tile.highlight .value { color: var(--green); }
-
-    .table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 980px; }
-    th {
-      text-align: left; font-size: 14px; color: var(--grey); font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.04em; padding: 14px; border-bottom: 1px solid var(--line);
-    }
-    td { padding: 14px; font-size: 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-    tr.rec-favor_rider > td { background: var(--green-tint); }
-    tr.rec-inconclusive > td { background: var(--yellow-tint); }
-    tr.rec-favor_customer > td { background: var(--red-tint); }
-    tr.rec-favor_rider > td:first-child { box-shadow: inset 5px 0 0 var(--green); }
-    tr.rec-inconclusive > td:first-child { box-shadow: inset 5px 0 0 var(--yellow); }
-    tr.rec-favor_customer > td:first-child { box-shadow: inset 5px 0 0 var(--red); }
-    .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; }
-    .yes { color: #15803d; font-weight: 700; }
-    .no { color: #b91c1c; font-weight: 700; }
-    .conf { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 14px; font-weight: 700; color: #fff; }
-    .conf.high { background: var(--green); }
-    .conf.medium { background: var(--yellow); }
-    .conf.low { background: var(--red); }
-    .strength { display: flex; align-items: center; gap: 10px; }
-    .strength strong { font-size: 20px; min-width: 36px; }
-    .bar { width: 80px; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
-    .bar span { display: block; height: 100%; }
-    .rec-favor_rider .bar span { background: var(--green); }
-    .rec-inconclusive .bar span { background: var(--yellow); }
-    .rec-favor_customer .bar span { background: var(--red); }
-    .rec { font-weight: 800; }
-    .rec-favor_rider .rec { color: #15803d; }
-    .rec-inconclusive .rec { color: #a16207; }
-    .rec-favor_customer .rec { color: #b91c1c; }
-    .view {
-      font-size: 14px; font-weight: 700; padding: 8px 12px; border-radius: 8px;
-      border: 1px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; white-space: nowrap;
-    }
-    .view[aria-expanded="true"] { background: var(--ink); color: #fff; }
-
-    tr.detail { display: none; }
-    tr.detail.open { display: table-row; }
-    tr.detail > td { background: #fff; padding: 18px 20px; }
-    .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .side { background: var(--panel); border-radius: 12px; padding: 16px 18px; }
-    .side h3 { font-size: 14px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
-    .side .quote { font-size: 18px; font-weight: 500; }
-    .side .orig { font-size: 15px; color: var(--grey); margin-top: 6px; }
-    .side .facts { font-size: 15px; color: var(--grey); margin-top: 8px; }
-    .why { margin-top: 12px; font-size: 16px; }
-    footer { margin-top: 18px; font-size: 14px; color: var(--grey); max-width: 900px; }
+    .yes { color: var(--green); font-weight: 600; }
+    .no { color: var(--red); font-weight: 600; }
+    .conf { text-transform: capitalize; }
+    .conf.high { color: #86efac; } .conf.medium { color: #fde047; } .conf.low { color: #fca5a5; }
+    .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .facts { font-size: 14px; color: #64748b; margin-top: 8px; }
     @media (max-width: 900px) {
       .tiles { grid-template-columns: repeat(2, 1fr); }
       .sides { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .tiles { gap: 8px; }
+      .tile { padding: 16px; }
+      .tile .value { font-size: 36px; }
     }
   </style>
 </head>
@@ -113,6 +41,7 @@
   <main>
     <header>
       <div>
+        <p class="eyebrow">Proofline</p>
         <h1>Dispute evidence</h1>
         <p class="sub">Voice evidence captured at the handover, scored by fixed rules</p>
       </div>
@@ -130,11 +59,11 @@
 
     <section class="tiles">
       <div class="tile">
-        <div class="label">Total deliveries logged</div>
+        <div class="label">Deliveries logged</div>
         <div class="value">{{ tiles.deliveries }}</div>
       </div>
       <div class="tile">
-        <div class="label">Evidence cards captured</div>
+        <div class="label">Evidence cards</div>
         <div class="value">{{ tiles.cards }} <small>{{ tiles.cards_pct }}</small></div>
       </div>
       <div class="tile highlight">
@@ -153,47 +82,50 @@
         <thead>
           <tr>
             <th>Order ID</th><th>Rider</th><th>Time (IST)</th><th>Confirmed</th><th>GPS</th>
-            <th>Confidence</th><th>Evidence strength</th><th>Recommendation</th><th>Action</th>
+            <th>Confidence</th><th>Evidence strength</th><th>Recommendation</th><th><span class="sr">Action</span></th>
           </tr>
         </thead>
         <tbody>
           {% for r in rows %}
           {% set s = r.score.evidence_strength %}
-          <tr class="rec-{{ r.score.recommendation }}">
-            <td class="mono">{{ r.card.order_id }} {% if r.live %}<span class="tag live">LIVE</span>{% endif %}</td>
-            <td class="mono">{{ r.card.rider_id }}</td>
-            <td>{{ r.time }}</td>
-            <td class="{{ 'yes' if r.card.otp_confirmed else 'no' }}">{{ '✓' if r.card.otp_confirmed else '✗' }}</td>
-            <td class="{{ 'yes' if r.card.gps_matched else 'no' }}">{{ '✓' if r.card.gps_matched else '✗' }}</td>
-            <td><span class="conf {{ r.card.confidence }}">{{ r.card.confidence }}</span></td>
-            <td>
+          {% set rec = r.score.recommendation %}
+          <tr class="row {{ rec }}">
+            <td data-label="Order ID" class="mono">{{ r.card.order_id }} {% if r.live %}<span class="tag live">LIVE</span>{% endif %}</td>
+            <td data-label="Rider" class="mono">{{ r.card.rider_id }}</td>
+            <td data-label="Time (IST)">{{ r.time }}</td>
+            <td data-label="Confirmed" class="{{ 'yes' if r.card.otp_confirmed else 'no' }}">{{ '✓ Yes' if r.card.otp_confirmed else '✗ No' }}</td>
+            <td data-label="GPS" class="{{ 'yes' if r.card.gps_matched else 'no' }}">{{ '✓ Yes' if r.card.gps_matched else '✗ No' }}</td>
+            <td data-label="Confidence"><span class="conf {{ r.card.confidence }}">{{ r.card.confidence }}</span></td>
+            <td data-label="Evidence strength">
               <div class="strength">
                 <strong>{{ s }}</strong>
-                <div class="bar"><span style="width: {{ s }}%"></span></div>
+                <div class="bar" aria-hidden="true"><span style="width: {{ s }}%"></span></div>
               </div>
             </td>
-            <td class="rec">{{ rec_label[r.score.recommendation] }}</td>
-            <td><button class="view" type="button" aria-expanded="false" aria-controls="d{{ loop.index }}">View evidence</button></td>
+            <td data-label="Recommendation"><span class="pill {{ rec }}">{{ rec_label[rec] }}</span></td>
+            <td class="action"><button class="ghost view" type="button" aria-expanded="false" aria-controls="d{{ loop.index }}">View evidence</button></td>
           </tr>
           <tr class="detail" id="d{{ loop.index }}">
             <td colspan="9">
-              <div class="sides">
-                <div class="side">
-                  <h3>Rider said</h3>
-                  <p class="quote">“{{ r.card.spoken_context }}”</p>
-                  <p class="orig">Original: {{ r.transcript }}</p>
-                  <p class="facts">
-                    Handover: {{ r.card.handover_location.replace('_', ' ') }} ·
-                    Obstacle: {{ r.card.obstacle.replace('_', ' ') }} ·
-                    Status: {{ r.card.delivery_status.replace('_', ' ') }}
-                  </p>
+              <div class="lcard">
+                <div class="sides">
+                  <div>
+                    <h3>Rider said</h3>
+                    <p class="quote">“{{ r.card.spoken_context }}”</p>
+                    <p class="orig">Original: {{ r.transcript }}</p>
+                    <p class="facts">
+                      Handover: {{ r.card.handover_location.replace('_', ' ') }} ·
+                      Obstacle: {{ r.card.obstacle.replace('_', ' ') }} ·
+                      Status: {{ r.card.delivery_status.replace('_', ' ') }}
+                    </p>
+                  </div>
+                  <div>
+                    <h3>Customer says</h3>
+                    <p class="quote">{% if r.customer_claim %}“{{ r.customer_claim }}”{% else %}No dispute raised yet{% endif %}</p>
+                  </div>
                 </div>
-                <div class="side">
-                  <h3>Customer says</h3>
-                  <p class="quote">{% if r.customer_claim %}“{{ r.customer_claim }}”{% else %}No dispute raised yet{% endif %}</p>
-                </div>
+                <p class="why"><strong>Why {{ s }}:</strong> {{ r.score.reasoning }}</p>
               </div>
-              <p class="why"><strong>Why {{ s }}:</strong> {{ r.score.reasoning }}</p>
             </td>
           </tr>
           {% endfor %}
@@ -202,7 +134,7 @@
     </div>
 
     <footer>
-      Baseline: Zomato's CEO has said that in about 50–70% of disputed cases the customer is refunded and the rider kept on (Raj Shamani podcast); 68% is an illustrative point in that range.
+      Baseline: Zomato's CEO has said that in about 50–70% of disputed cases the customer is refunded and the rider kept; 68% is an illustrative point in that range.
       Tiles and rows are demo data for illustration, except rows marked LIVE, which were just recorded on the rider page. Scores come from fixed rules; the platform makes the final call.
     </footer>
   </main>

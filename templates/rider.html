@@ -4,232 +4,227 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
-  <title>Delivery Confirmation</title>
+  <title>Delivery confirmation</title>
   <style>
     :root {
-      --green: #16a34a;
-      --green-bg: #dcfce7;
-      --yellow: #ca8a04;
-      --yellow-bg: #fef9c3;
-      --red: #dc2626;
-      --red-bg: #fee2e2;
-      --grey: #6b7280;
-      --ink: #111827;
-      --line: #e5e7eb;
-      --panel: #f3f4f6;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --bg: #fff; --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --soft: #f1f5f9;
+      --green: #16a34a; --green-dark: #15803d; --green-bg: #dcfce7; --green-ink: #166534;
+      --amber: #ca8a04; --amber-bg: #fef9c3; --amber-ink: #854d0e;
+      --red: #dc2626; --red-bg: #fee2e2; --red-ink: #991b1b;
+      --r-card: 16px; --r-btn: 24px;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #fff;
-      color: var(--ink);
-      font-size: 18px;
-      line-height: 1.4;
-    }
+    body { font-family: var(--font); background: var(--bg); color: var(--ink); font-size: 16px; line-height: 1.45; font-variant-numeric: tabular-nums; }
+    :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
     main {
-      max-width: 480px;
-      margin: 0 auto;
-      min-height: 100vh;
-      min-height: 100dvh;
-      padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
-      display: flex;
-      flex-direction: column;
+      max-width: 480px; margin: 0 auto; min-height: 100vh; min-height: 100dvh;
+      padding: 24px 16px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column;
     }
 
-    .eyebrow { font-size: 16px; color: var(--grey); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-    h1 { font-size: 26px; font-weight: 800; margin-top: 2px; }
-    .order { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; margin-top: 10px; word-break: break-all; }
-    .rider { font-size: 16px; color: var(--grey); }
+    .eyebrow { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    h1 { font-size: 22px; font-weight: 600; margin-top: 4px; }
+    .meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 14px; color: var(--muted); }
+    .order { display: inline-block; max-width: 100%; padding: 4px 12px; border-radius: 999px; background: var(--soft); color: var(--ink); font-weight: 600; font-size: 15px; word-break: break-all; }
 
-    .status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0 22px; }
-    .status { border-radius: 12px; padding: 12px 14px; font-size: 20px; font-weight: 700; }
-    .status.ok { background: var(--green-bg); color: #166534; }
-    .status.no { background: var(--panel); color: var(--grey); }
-    .status-row.single { grid-template-columns: 1fr; }
+    .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 24px; }
+    .chip {
+      display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 36px; padding: 0 8px;
+      border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap;
+      border: 1.5px solid var(--line); color: var(--muted); background: #fff; transition: background .2s, color .2s, border-color .2s;
+    }
+    .chip.ok { background: var(--green); border-color: var(--green); color: #fff; }
 
-    .field-label { display: block; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    #qr-block { margin: 4px 0 18px; text-align: center; }
-    #qr-block[hidden] { display: none; }
-    #qr-block .field-label { text-align: left; margin-top: 4px; }
-    .qr { display: inline-block; background: #fff; padding: 8px; border: 2px solid var(--line); border-radius: 14px; }
-    .qr svg { width: 220px; height: 220px; display: block; }
-    .qr-note { font-size: 17px; color: var(--grey); margin-top: 8px; }
-    #confirm-state { font-size: 20px; }
+    .field-label { display: block; font-size: 15px; font-weight: 600; margin-bottom: 8px; }
     #phone-input {
-      width: 100%; min-height: 56px; padding: 8px 16px;
-      border: 2px solid var(--line); border-radius: 14px;
-      font-size: 28px; font-weight: 800; letter-spacing: 0.4em; color: var(--ink); background: #fff;
+      width: 100%; height: 56px; padding: 0 16px; border: 1.5px solid var(--line); border-radius: var(--r-card);
+      font-family: var(--font); font-size: 18px; font-weight: 600; letter-spacing: .08em; color: var(--ink); background: #fff;
     }
-    #phone-input:focus { outline: none; border-color: var(--ink); }
-    .otp-state { font-size: 17px; margin: 8px 0 16px; font-weight: 600; }
-    .otp-state.ok { color: #166534; }
-    .otp-state.no { color: var(--grey); font-weight: 400; }
+    #phone-input::placeholder { letter-spacing: 0; font-weight: 400; color: #94a3b8; }
+    #phone-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,.2); }
+    .otp-state { font-size: 14px; margin: 8px 0 16px; }
+    .otp-state.ok { color: var(--green-ink); font-weight: 600; }
+    .otp-state.no { color: var(--muted); }
 
-    .secondary {
-      width: 100%; min-height: 56px; margin-top: 12px;
-      border: none; border-radius: 14px; background: var(--panel);
-      color: var(--ink); font-size: 18px; font-weight: 700; cursor: pointer;
-    }
-    .photo-preview { position: relative; display: inline-block; margin-top: 12px; }
-    .photo-preview[hidden] { display: none; }
-    .photo-preview img, .thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; display: block; }
-    .photo-remove {
-      position: absolute; top: -10px; right: -10px; width: 32px; height: 32px;
-      border: none; border-radius: 50%; background: var(--ink); color: #fff; font-size: 16px; cursor: pointer;
-    }
-    .foot { font-size: 16px; color: var(--grey); margin-top: 16px; }
+    #qr-block { margin: 0 0 24px; padding: 16px; border: 1.5px solid var(--line); border-radius: var(--r-card); text-align: center; box-shadow: var(--shadow); }
+    #qr-block[hidden], #handover-step[hidden] { display: none; }
+    #qr-block .field-label { text-align: left; }
+    .qr { display: inline-block; padding: 8px; background: #fff; border-radius: 12px; }
+    .qr svg { width: 220px; height: 220px; display: block; }
+    .qr-note { font-size: 14px; color: var(--muted); margin-top: 8px; }
+    #confirm-state { margin-bottom: 0; }
 
-    #capture { margin-top: auto; padding-top: 12px; }
+    #capture { margin-top: auto; padding-top: 8px; }
     #record {
-      width: 100%;
-      min-height: 140px;
-      border: none;
-      border-radius: 20px;
-      background: var(--green);
-      color: #fff;
-      font-size: 26px;
-      font-weight: 800;
-      cursor: pointer;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      -webkit-tap-highlight-color: transparent;
+      width: 100%; min-height: 140px; border: none; border-radius: 28px; background: var(--green); color: #fff;
+      font-family: var(--font); font-size: 22px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow);
+      transition: background .15s, box-shadow .15s;
+      touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
     }
-    #record.recording { background: var(--red); animation: pulse 1s ease-in-out infinite; }
-    #record:disabled { background: var(--grey); }
+    #record:active { box-shadow: inset 0 4px 12px rgba(0,0,0,.25); }
+    #record.recording { background: var(--red); box-shadow: inset 0 4px 12px rgba(0,0,0,.25); animation: pulse 1s ease-in-out infinite; }
+    #record:disabled { background: #94a3b8; box-shadow: none; }
     @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55); }
-      50% { box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
+      0%, 100% { box-shadow: inset 0 4px 12px rgba(0,0,0,.25), 0 0 0 0 rgba(220,38,38,.5); }
+      50% { box-shadow: inset 0 4px 12px rgba(0,0,0,.25), 0 0 0 14px rgba(220,38,38,0); }
     }
     .spinner {
-      display: inline-block; width: 26px; height: 26px; margin-right: 10px; vertical-align: -5px;
-      border: 4px solid rgba(255, 255, 255, 0.4); border-top-color: #fff; border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      display: inline-block; width: 22px; height: 22px; margin-right: 10px; vertical-align: -4px;
+      border: 3px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #hint { text-align: center; color: var(--grey); font-size: 18px; margin-top: 14px; min-height: 26px; }
-    #hint.live { color: var(--red); font-weight: 700; font-size: 20px; }
-    #error {
-      display: none; margin-top: 14px; padding: 14px 16px; border-radius: 12px;
-      background: var(--red-bg); color: #991b1b; font-size: 17px;
-    }
+    #hint { text-align: center; color: var(--muted); font-size: 15px; margin-top: 12px; min-height: 22px; }
+    #hint.live { color: var(--red); font-weight: 600; }
 
+    .secondary {
+      width: 100%; min-height: 48px; margin-top: 16px; padding: 0 16px; border: 1.5px solid var(--line); border-radius: var(--r-btn);
+      background: #fff; color: var(--ink); font-family: var(--font); font-size: 16px; font-weight: 600; cursor: pointer;
+    }
+    .secondary:hover { background: var(--soft); }
+    .photo-preview { position: relative; display: inline-block; margin-top: 16px; }
+    .photo-preview[hidden] { display: none; }
+    .photo-preview img, .thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; display: block; }
+    .photo-remove {
+      position: absolute; top: -10px; right: -10px; width: 32px; height: 32px; border: none; border-radius: 50%;
+      background: var(--ink); color: #fff; font-size: 14px; cursor: pointer;
+    }
+    #error { display: none; margin-top: 16px; padding: 12px 16px; border-radius: 12px; background: var(--red-bg); color: var(--red-ink); font-size: 15px; }
+    .foot { font-size: 13px; color: var(--muted); margin-top: 16px; text-align: center; }
+
+    /* Evidence card */
     #result { display: none; }
-    .banner { border-radius: 16px; padding: 16px 18px; }
-    .banner .title { font-size: 26px; font-weight: 800; }
-    .banner .sub { font-size: 17px; margin-top: 2px; }
-    .banner.favor_rider { background: var(--green-bg); color: #166534; }
-    .banner.inconclusive { background: var(--yellow-bg); color: #854d0e; }
-    .banner.favor_customer { background: var(--red-bg); color: #991b1b; }
-
-    .rows { margin-top: 14px; }
-    .row { padding: 12px 0; border-bottom: 1px solid var(--line); }
-    .row .k { font-size: 16px; color: var(--grey); }
-    .row .v { font-size: 21px; font-weight: 700; margin-top: 2px; }
-    .row .v.missing { color: var(--grey); font-weight: 400; font-style: italic; }
-    .row .v.quote { font-weight: 500; font-size: 19px; }
-
-    .strength { margin-top: 18px; font-size: 30px; font-weight: 800; }
-    .strength span { font-size: 20px; color: var(--grey); font-weight: 600; }
-    .reason { font-size: 17px; color: var(--grey); margin-top: 4px; }
-    .trust { font-size: 16px; color: var(--grey); margin-top: 12px; }
-    .integrity { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; color: var(--grey); }
-    .integrity > div { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+    .card {
+      border: 1.5px solid var(--line); border-radius: 20px; padding: 24px 16px 16px; box-shadow: var(--shadow); background: #fff;
+      animation: rise 200ms ease-out;
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .card-top h2 { font-size: 18px; font-weight: 600; }
+    .pill { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .favor_rider .pill { background: var(--green-bg); color: var(--green-ink); }
+    .inconclusive .pill { background: var(--amber-bg); color: var(--amber-ink); }
+    .favor_customer .pill { background: var(--red-bg); color: var(--red-ink); }
+    .card-sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+    .score { margin-top: 16px; display: flex; align-items: baseline; gap: 4px; }
+    .score strong { font-size: 48px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+    .score span { font-size: 16px; color: var(--muted); }
+    .score-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-top: 16px; }
+    .bar { height: 6px; background: var(--soft); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+    .bar span { display: block; height: 100%; width: 0; border-radius: 999px; transition: width .4s ease-out; }
+    .favor_rider .bar span { background: var(--green); }
+    .inconclusive .bar span { background: var(--amber); }
+    .favor_customer .bar span { background: var(--red); }
+    .reason { font-size: 14px; color: var(--muted); margin-top: 8px; }
+    .quote { margin-top: 16px; padding: 16px; border-radius: 12px; background: var(--soft); font-size: 16px; line-height: 1.5; }
+    .quote::before { content: "\201C"; }
+    .quote::after { content: "\201D"; }
+    .quote.missing { color: var(--muted); font-style: italic; }
+    .quote.missing::before, .quote.missing::after { content: none; }
+    .rows { margin-top: 8px; }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .row:last-child { border-bottom: none; }
+    .row .k { font-size: 14px; color: var(--muted); }
+    .row .v { font-size: 16px; font-weight: 600; text-align: right; }
+    .row .v.missing { color: var(--muted); font-weight: 400; }
+    .row .v .thumb { width: 56px; height: 56px; }
+    .integrity { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+    .integrity > div { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; }
     .integrity > div[hidden] { display: none; }
-    .integrity dd { color: #374151; text-align: right; }
-    .integrity dd.ok { color: #166534; font-weight: 700; }
+    .integrity dd { color: #334155; text-align: right; }
+    .integrity dd.ok { color: var(--green-ink); font-weight: 600; }
     .integrity .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
-
+    .trust { font-size: 13px; color: var(--muted); margin-top: 12px; }
     #again {
-      width: 100%; min-height: 64px; margin-top: 20px;
-      border: 3px solid var(--ink); border-radius: 16px; background: #fff;
-      font-size: 22px; font-weight: 800; color: var(--ink); cursor: pointer;
+      width: 100%; min-height: 56px; margin-top: 24px; border: 1.5px solid var(--ink); border-radius: var(--r-btn);
+      background: #fff; color: var(--ink); font-family: var(--font); font-size: 18px; font-weight: 600; cursor: pointer;
     }
-    #confirmed-tile[hidden], #handover-step[hidden] { display: none; }
-    .offline-banner { background: #fef3c7; color: #78350f; border-radius: 12px; padding: 14px 16px; font-size: 17px; font-weight: 600; margin: 0 0 16px; }
-    .offline-banner.ok { background: var(--green-bg); color: #166534; }
-    .offline-banner[hidden] { display: none; }
-    .pending-line { text-align: center; font-size: 16px; color: var(--grey); margin-top: 20px; }
-    .reset-link { display: block; text-align: center; margin-top: 28px; font-size: 16px; color: var(--grey); }
+    #again:hover { background: var(--soft); }
+    .dash-link { display: block; text-align: center; margin-top: 8px; padding: 12px; font-size: 15px; font-weight: 600; color: var(--green-dark); text-decoration: none; }
 
-    /* Speech help: small link + bottom sheet */
+    .offline-banner { background: #fef3c7; color: #78350f; border-radius: 12px; padding: 12px 16px; font-size: 15px; font-weight: 600; margin: 0 0 16px; }
+    .offline-banner.ok { background: var(--green-bg); color: var(--green-ink); }
+    .offline-banner[hidden] { display: none; }
+    .pending-line { text-align: center; font-size: 14px; color: var(--muted); margin-top: 24px; }
     .help-link {
-      display: block; margin: 16px auto 0; min-height: 48px; padding: 0 16px; border: none; background: none;
-      font-size: 17px; font-weight: 600; color: #15803d; cursor: pointer;
+      display: block; margin: 8px auto 0; min-height: 48px; padding: 0 16px; border: none; background: none; border-radius: var(--r-btn);
+      font-family: var(--font); font-size: 16px; font-weight: 600; color: var(--green-dark); cursor: pointer;
     }
-    .sheet-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 20; }
+    .reset-link { display: block; width: max-content; margin: 8px auto 0; padding: 8px; text-align: center; font-size: 14px; color: var(--muted); }
+
+    /* Speech help bottom sheet */
+    .sheet-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 20; }
     .sheet-backdrop[hidden], .sheet[hidden] { display: none; }
     .sheet {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; height: 60vh; max-width: 560px; margin: 0 auto;
-      background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
-      display: flex; flex-direction: column; padding: 8px 16px 16px;
+      background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,.15);
+      display: flex; flex-direction: column; padding: 8px 16px calc(16px + env(safe-area-inset-bottom));
       animation: sheet-up 200ms ease-out; touch-action: pan-y;
     }
     @keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-    .sheet-handle { padding: 8px 0 12px; cursor: grab; touch-action: none; }
+    .sheet-handle { padding: 8px 0 16px; cursor: grab; touch-action: none; }
     .sheet-handle span { display: block; width: 44px; height: 5px; border-radius: 999px; background: #cbd5e1; margin: 0 auto; }
     .sheet-close {
       position: absolute; top: 8px; right: 8px; width: 48px; height: 48px; border: none; background: none;
-      font-size: 20px; color: var(--grey); cursor: pointer; border-radius: 50%;
+      font-size: 18px; color: var(--muted); cursor: pointer; border-radius: 50%;
     }
-    .sheet-sub { font-size: 16px; color: var(--grey); padding-right: 48px; }
-    .help-log { flex: 1; overflow-y: auto; margin: 12px 0; display: flex; flex-direction: column; gap: 10px; }
-    .help-msg { font-size: 17px; line-height: 1.45; padding: 10px 14px; border-radius: 14px; max-width: 90%; }
-    .help-msg.q { align-self: flex-end; background: var(--panel); }
+    .sheet-sub { font-size: 16px; font-weight: 600; padding-right: 48px; }
+    .help-log { flex: 1; overflow-y: auto; margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
+    .help-msg { font-size: 16px; line-height: 1.5; padding: 8px 16px; border-radius: 16px; max-width: 90%; }
+    .help-msg.q { align-self: flex-end; background: var(--soft); }
     .help-msg.a { align-self: flex-start; background: var(--green-bg); color: #14532d; }
-    .help-msg.pending { color: var(--grey); background: none; padding-left: 0; }
-    .help-msg.err { align-self: flex-start; background: var(--red-bg); color: #991b1b; }
+    .help-msg.pending { color: var(--muted); background: none; padding-left: 0; }
+    .help-msg.err { align-self: flex-start; background: var(--red-bg); color: var(--red-ink); }
     .help-row { display: flex; gap: 8px; }
     .help-row input {
-      flex: 1; min-width: 0; height: 52px; padding: 0 14px; font-size: 17px;
-      border: 1.5px solid var(--line); border-radius: 14px; color: var(--ink);
+      flex: 1; min-width: 0; height: 52px; padding: 0 16px; font-family: var(--font); font-size: 16px;
+      border: 1.5px solid var(--line); border-radius: var(--r-card); color: var(--ink);
     }
-    .help-row input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2); }
-    .help-mic, .help-send { height: 52px; min-width: 52px; border-radius: 14px; font-size: 17px; font-weight: 700; cursor: pointer; }
-    .help-mic { border: 1.5px solid var(--line); background: #fff; }
+    .help-row input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,.2); }
+    .help-mic, .help-send { height: 52px; min-width: 52px; border-radius: var(--r-btn); font-family: var(--font); font-size: 16px; font-weight: 600; cursor: pointer; }
+    .help-mic { display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid var(--line); background: #fff; color: var(--ink); }
+    .help-mic svg { width: 22px; height: 22px; }
     .help-mic.listening { background: var(--red); border-color: var(--red); color: #fff; }
-    .help-send { border: none; background: var(--green); color: #fff; padding: 0 16px; }
-    .help-send:disabled, .help-mic:disabled { opacity: 0.5; }
-    .help-link:focus-visible, .sheet-close:focus-visible, .help-mic:focus-visible, .help-send:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-    .dash-link { display: block; text-align: center; margin-top: 16px; font-size: 18px; color: var(--ink); font-weight: 600; padding: 10px; }
+    .help-send { border: none; background: var(--green-dark); color: #fff; padding: 0 16px; }
+    .help-send:disabled, .help-mic:disabled { opacity: .5; }
   </style>
 </head>
 <body>
   <main>
     <header>
       <p class="eyebrow">Proofline</p>
-      <h1>Delivery Confirmation</h1>
-      <p class="order" id="order"></p>
-      <p class="rider">Rider <span id="rider"></span></p>
+      <h1>Delivery confirmation</h1>
+      <p class="meta"><span class="order" id="order"></span><span>Rider <span id="rider"></span></span></p>
     </header>
 
-    <div class="status-row single" id="status-row">
-      <div id="confirmed-tile" class="status ok" hidden>✓ Customer confirmed</div>
-      <div id="gps" class="status"></div>
+    <div class="chips" id="status-row" aria-label="Evidence checklist">
+      <span id="chip-phone" class="chip">— Phone</span>
+      <span id="chip-qr" class="chip">— QR</span>
+      <span id="chip-gps" class="chip">— GPS</span>
+      <span id="chip-photo" class="chip">— Photo</span>
     </div>
 
     <div id="offline-banner" class="offline-banner" role="status" hidden></div>
 
     <section id="capture">
       <div id="handover-step">
-      <label for="phone-input" class="field-label">Customer phone</label>
-      <input id="phone-input" type="tel" maxlength="10" inputmode="numeric" autocomplete="off" placeholder="10-digit mobile">
-      <p id="phone-state" class="otp-state no">Enter the number to show the confirmation code</p>
+        <label for="phone-input" class="field-label">Customer phone</label>
+        <input id="phone-input" type="tel" maxlength="10" inputmode="numeric" autocomplete="off" placeholder="10-digit mobile">
+        <p id="phone-state" class="otp-state no">Enter the number to show the confirmation code</p>
 
-      <section id="qr-block" hidden>
-        <h2 class="field-label">Customer confirmation</h2>
-        <a class="qr" href="{{ confirm_url }}" target="_blank" rel="noopener" aria-label="Customer confirmation QR code">{{ qr_svg | safe }}</a>
-        <p class="qr-note">Customer scans this code to confirm receipt.</p>
-        <p id="confirm-state" class="otp-state no">Waiting for customer confirmation...</p>
-      </section>
+        <section id="qr-block" hidden>
+          <h2 class="field-label">Customer confirmation</h2>
+          <a class="qr" href="{{ confirm_url }}" target="_blank" rel="noopener" aria-label="Customer confirmation QR code">{{ qr_svg | safe }}</a>
+          <p class="qr-note">Customer scans this code to confirm receipt.</p>
+          <p id="confirm-state" class="otp-state no">Waiting for customer confirmation…</p>
+        </section>
       </div>
 
-      <button id="record" type="button">🎤 Speak to record</button>
+      <button id="record" type="button">Speak to record</button>
       <p id="hint">Hold the button, say one line, let go.</p>
 
-      <button id="photo-btn" type="button" class="secondary">📷 Add delivery photo (optional)</button>
+      <button id="photo-btn" type="button" class="secondary">Add delivery photo (optional)</button>
       <input type="file" accept="image/*" capture="environment" id="photo-input" hidden>
       <div id="photo-preview" class="photo-preview" hidden>
         <img id="photo-thumb" alt="Delivery photo">
@@ -240,30 +235,37 @@
     </section>
 
     <section id="result" aria-live="polite">
-      <div id="banner" class="banner">
-        <div class="title">✓ Evidence captured</div>
-        <div class="sub" id="banner-sub"></div>
-      </div>
+      <div id="banner" class="card">
+        <div class="card-top">
+          <h2>Evidence captured</h2>
+          <span id="rec-pill" class="pill"></span>
+        </div>
+        <p class="card-sub" id="banner-sub"></p>
 
-      <div class="rows">
-        <div class="row"><div class="k">Handed over at</div><div class="v" id="r-location"></div></div>
-        <div class="row"><div class="k">Obstacle</div><div class="v" id="r-obstacle"></div></div>
-        <div class="row"><div class="k">Customer instruction</div><div class="v" id="r-instruction"></div></div>
-        <div class="row"><div class="k">What you said</div><div class="v quote" id="r-context"></div></div>
-        <div class="row"><div class="k">Customer confirmed</div><div class="v" id="r-confirmed"></div></div>
-        <div class="row"><div class="k">Phone</div><div class="v" id="r-phone"></div></div>
-        <div class="row"><div class="k">Photo</div><div class="v" id="r-photo"></div></div>
-      </div>
+        <p class="score-label">Evidence strength</p>
+        <p class="score"><strong id="r-score"></strong><span>/100</span></p>
+        <div class="bar" aria-hidden="true"><span id="r-bar"></span></div>
+        <p class="reason" id="r-reason"></p>
 
-      <p class="strength">Evidence strength: <strong id="r-score"></strong><span>/100</span></p>
-      <p class="reason" id="r-reason"></p>
-      <p class="trust">Tamper-evident record · <span id="r-hash"></span>… Proves the audio wasn't edited later, not that the delivery happened.</p>
-      <dl class="integrity">
-        <div><dt>Received at</dt><dd id="i-received"></dd></div>
-        <div id="i-phone-row" hidden><dt>Recorded on phone</dt><dd id="i-phone"></dd></div>
-        <div><dt>Audio hash</dt><dd id="i-audio" class="mono"></dd></div>
-        <div><dt>Session</dt><dd id="i-session"></dd></div>
-      </dl>
+        <p class="quote" id="r-context"></p>
+
+        <div class="rows">
+          <div class="row"><span class="k">Handed over at</span><span class="v" id="r-location"></span></div>
+          <div class="row"><span class="k">Obstacle</span><span class="v" id="r-obstacle"></span></div>
+          <div class="row"><span class="k">Customer instruction</span><span class="v" id="r-instruction"></span></div>
+          <div class="row"><span class="k">Customer confirmed</span><span class="v" id="r-confirmed"></span></div>
+          <div class="row"><span class="k">Phone</span><span class="v" id="r-phone"></span></div>
+          <div class="row"><span class="k">Photo</span><span class="v" id="r-photo"></span></div>
+        </div>
+
+        <dl class="integrity">
+          <div><dt>Received at</dt><dd id="i-received"></dd></div>
+          <div id="i-phone-row" hidden><dt>Recorded on phone</dt><dd id="i-phone"></dd></div>
+          <div><dt>Audio hash</dt><dd id="i-audio" class="mono"></dd></div>
+          <div><dt>Session</dt><dd id="i-session"></dd></div>
+        </dl>
+        <p class="trust">Tamper-evident record · <span id="r-hash"></span>… Proves the audio wasn't edited later, not that the delivery happened.</p>
+      </div>
 
       <button id="again" type="button">Record again</button>
       <a class="dash-link" href="/dashboard">View in platform dashboard →</a>
@@ -282,7 +284,7 @@
     <div id="help-log" class="help-log" aria-live="polite"></div>
     <form id="help-form" class="help-row">
       <input id="help-input" type="text" maxlength="300" placeholder="Type or tap the mic" autocomplete="off" aria-label="Your question">
-      <button id="help-mic" class="help-mic" type="button" aria-label="Speak your question">🎤</button>
+      <button id="help-mic" class="help-mic" type="button" aria-label="Speak your question"></button>
       <button id="help-send" class="help-send" type="submit">Send</button>
     </form>
   </section>
@@ -290,7 +292,9 @@
   <script>
     const MAX_SECONDS = 10;
     const MIN_MS = 700;
-    const IDLE_LABEL = '🎤 Speak to record';
+    const IDLE_LABEL = 'Speak to record';
+    const REC_PILL = { favor_rider: 'Strong evidence', inconclusive: 'Inconclusive', favor_customer: 'Weak evidence' };
+    const MIC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
     const IDLE_HINT = 'Hold the button, say one line, let go.';
     const BANNER_SUB = {
       favor_rider: 'Strong evidence for this delivery',
@@ -314,7 +318,7 @@
 
     $('order').textContent = ctx.order_id;
     $('rider').textContent = ctx.rider_id;
-    setStatus('gps', ctx.gps_matched, 'GPS');
+    setChip('gps', ctx.gps_matched, 'GPS');
 
     // Customer phone -> QR -> customer taps "Yes" on their device -> rider page polls the server.
     // A confirmation lasts for this order_id for the session (re-records and reloads included).
@@ -337,8 +341,8 @@
       if (sessionId) store.set(SESSION_KEY, sessionId);
       store.set(PHONE_KEY, phoneInput.value);
       $('handover-step').hidden = true;
-      $('confirmed-tile').hidden = false;
-      $('status-row').classList.remove('single');
+      setChip('qr', true, 'QR');
+      setChip('phone', true, 'Phone');
     }
 
     if (store.get(CONFIRM_KEY) === 'true') {
@@ -370,6 +374,7 @@
       phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
       store.set(PHONE_KEY, phoneInput.value);
       const ok = phoneInput.value.length === 10;
+      setChip('phone', ok || customerConfirmed, 'Phone');
       $('phone-state').textContent = ok ? '✓ Number entered' : 'Enter the number to show the confirmation code';
       $('phone-state').className = 'otp-state ' + (ok ? 'ok' : 'no');
       if (ok) {
@@ -443,7 +448,8 @@
       photoUrl = file ? URL.createObjectURL(file) : null;
       $('photo-thumb').src = photoUrl || '';
       $('photo-preview').hidden = !file;
-      $('photo-btn').textContent = file ? '📷 Retake delivery photo' : '📷 Add delivery photo (optional)';
+      $('photo-btn').textContent = file ? 'Retake delivery photo' : 'Add delivery photo (optional)';
+      setChip('photo', !!file, 'Photo');
     }
 
     // Phone photos can be 5-12 MB; resize to max 1280px JPEG so uploads stay small on 4G.
@@ -476,10 +482,10 @@
     recordBtn.addEventListener('contextmenu', (e) => e.preventDefault());
     $('again').addEventListener('click', reset);
 
-    function setStatus(id, ok, label) {
-      const el = $(id);
+    function setChip(name, ok, label) {
+      const el = $('chip-' + name);
       el.textContent = (ok ? '✓ ' : '— ') + label;
-      el.className = 'status ' + (ok ? 'ok' : 'no');
+      el.classList.toggle('ok', !!ok);
     }
 
     function getGps() {
@@ -523,12 +529,12 @@
       startedAt = Date.now();
 
       recordBtn.classList.add('recording');
-      recordBtn.textContent = '0s';
+      recordBtn.textContent = 'Recording… 0s / ' + MAX_SECONDS + 's';
       hintEl.textContent = 'Listening… speak one line';
       hintEl.classList.add('live');
       timer = setInterval(() => {
         const s = Math.floor((Date.now() - startedAt) / 1000);
-        recordBtn.textContent = s + 's / ' + MAX_SECONDS + 's';
+        recordBtn.textContent = 'Recording… ' + s + 's / ' + MAX_SECONDS + 's';
         if (s >= MAX_SECONDS) end();
       }, 250);
     }
@@ -813,7 +819,7 @@
         helpRecorder.stream.getTracks().forEach((t) => t.stop());
       }
       helpMic.classList.remove('listening');
-      helpMic.textContent = '🎤';
+      helpMic.innerHTML = MIC_ICON;
       helpMic.setAttribute('aria-label', 'Speak your question');
     }
 
@@ -849,11 +855,12 @@
       };
       helpRecorder.start();
       helpMic.classList.add('listening');
-      helpMic.textContent = '■';
+      helpMic.textContent = 'Stop';
       helpMic.setAttribute('aria-label', 'Stop recording');
       helpTimer = setTimeout(() => stopHelpMic(false), 10000);
     });
 
+    helpMic.innerHTML = MIC_ICON;
     window.addEventListener('online', drainQueue);
     refreshPendingLine();
     drainQueue();
@@ -882,13 +889,16 @@
       const card = data.evidence_card;
       const score = data.dispute_score;
 
-      $('banner').className = 'banner ' + score.recommendation;
+      $('banner').className = 'card ' + score.recommendation;
+      $('rec-pill').textContent = REC_PILL[score.recommendation] || score.recommendation;
+      $('r-bar').style.width = '0';
+      requestAnimationFrame(() => { $('r-bar').style.width = Math.max(0, Math.min(100, score.evidence_strength)) + '%'; });
       $('banner-sub').textContent = BANNER_SUB[score.recommendation] || '';
       setRow('r-location', card.handover_location);
       setRow('r-obstacle', card.obstacle);
       setRow('r-instruction', card.customer_instruction, true);
       setRow('r-context', card.spoken_context, true);
-      $('r-confirmed').textContent = card.customer_confirmed ? '✓ Yes (QR scan)' : 'Not confirmed';
+      $('r-confirmed').textContent = card.customer_confirmed ? 'Yes (QR scan)' : 'Not confirmed';
       $('r-confirmed').classList.toggle('missing', !card.customer_confirmed);
       $('r-phone').textContent = card.customer_phone || 'Not given';
       $('r-phone').classList.toggle('missing', !card.customer_phone);
@@ -902,7 +912,7 @@
         photoEl.appendChild(img);
         photoEl.classList.remove('missing');
       } else {
-        photoEl.textContent = card.photo_captured ? '✓ Saved' : 'Photo: not provided';
+        photoEl.textContent = card.photo_captured ? 'Saved' : 'Not provided';
         photoEl.classList.toggle('missing', !card.photo_captured);
       }
       $('r-score').textContent = score.evidence_strength;
