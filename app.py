@@ -3,6 +3,9 @@ import hmac
 import json
 import secrets
 import os
+import re
+import tempfile
+import time
 import urllib.request
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -90,13 +93,13 @@ def transcribe_wispr(path, api_key):
         return json.loads(resp.read()).get("text", "")
 
 
-def transcribe_sarvam(path, api_key):
+def transcribe_sarvam(path, api_key, language_code="unknown"):  # default: auto-detect (evidence path)
     ext = path.rsplit(".", 1)[-1]
     with open(path, "rb") as f:
         resp = httpx.post(
             SARVAM_URL,
             headers={"api-subscription-key": api_key},
-            data={"model": "saaras:v3", "mode": "codemix", "language_code": "unknown"},
+            data={"model": "saaras:v3", "mode": "codemix", "language_code": language_code},
             files={"file": (os.path.basename(path), f, AUDIO_MIME.get(ext, "application/octet-stream"))},
             timeout=20,
         )
@@ -598,6 +601,104 @@ def evidence():
     payload, status = create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched,
                                       photo=request.files.get("photo"))
     return jsonify(payload), status
+
+
+# ---- Speech help (rider page): stateless, nothing stored or logged ----
+
+HELP_PROMPT_PATH = os.path.join(BASE_DIR, "prompts", "help.txt")
+HELP_FALLBACK = "Please tap the record button and speak one line about the delivery."
+HELP_LIMIT, HELP_WINDOW_S = 10, 60
+HELP_HITS = {}  # client ip -> recent request times (in memory, rate limit only)
+SENTENCE_END = re.compile(r"(?<=[.!?।])\s+")
+
+
+def help_rate_limited():
+    ip = (request.headers.get("X-Forwarded-For") or request.remote_addr or "?").split(",")[0].strip()
+    now = time.monotonic()
+    hits = [t for t in HELP_HITS.get(ip, []) if now - t < HELP_WINDOW_S]
+    limited = len(hits) >= HELP_LIMIT
+    if not limited:
+        hits.append(now)
+    HELP_HITS[ip] = hits
+    if len(HELP_HITS) > 5000:  # keep the table small
+        HELP_HITS.clear()
+    return limited
+
+
+def help_chat(question):
+    with open(HELP_PROMPT_PATH, "r") as f:
+        system_prompt = f.read()
+    messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": question}]
+    openrouter_key = env_key("OPENROUTER_API_KEY")
+    if openrouter_key:
+        try:
+            client = OpenAI(base_url=OPENROUTER_URL, api_key=openrouter_key)
+            r = client.chat.completions.create(
+                model=OPENROUTER_MODEL, messages=messages, temperature=0, max_tokens=120, timeout=20
+            )
+            return r.choices[0].message.content or ""
+        except Exception as e:
+            app.logger.warning("Help: OpenRouter failed (%s), falling back to OpenAI", type(e).__name__)
+    r = openai_client().chat.completions.create(
+        model="gpt-4o-mini", messages=messages, temperature=0, max_tokens=120, timeout=20
+    )
+    return r.choices[0].message.content or ""
+
+
+def tidy_help_answer(text):
+    text = (text or "").strip().strip("'\"").strip()
+    if not text or text.lower().startswith(HELP_FALLBACK.rstrip(".").lower()):
+        return HELP_FALLBACK
+    answer = " ".join(SENTENCE_END.split(text)[:2])
+    return answer[:400].rstrip()
+
+
+@app.route("/help", methods=["POST"])
+def help_answer():
+    question = str((request.get_json(silent=True) or {}).get("question") or "").strip()[:300]
+    if not question:
+        return jsonify({"error": "Ask a question first."}), 400
+    if help_rate_limited():
+        return jsonify({"error": "Too many questions. Please wait a minute."}), 429
+    try:
+        answer = tidy_help_answer(help_chat(question))
+    except Exception as e:
+        app.logger.warning("Help answer failed (%s)", type(e).__name__)  # no question text in logs
+        return jsonify({"error": "Help is unavailable right now."}), 502
+    return jsonify({"answer": answer})
+
+
+@app.route("/help/stt", methods=["POST"])
+def help_stt():
+    audio = request.files.get("audio")
+    if not audio or not audio.filename:
+        return jsonify({"error": "no audio file"}), 400
+    if help_rate_limited():
+        return jsonify({"error": "Too many questions. Please wait a minute."}), 429
+    ext = audio.filename.rsplit(".", 1)[-1].lower()
+    ext = ext if ext in ALLOWED_EXT else "webm"
+    fd, path = tempfile.mkstemp(suffix="." + ext)  # outside static/, deleted below
+    os.close(fd)
+    try:
+        audio.save(path)
+        sarvam_key = env_key("SARVAM_API_KEY")
+        transcript = None
+        if sarvam_key:
+            try:
+                transcript = transcribe_sarvam(path, sarvam_key, language_code="hi-IN")
+            except Exception as e:
+                app.logger.warning("Help STT: Sarvam failed (%s), using fallback engine", type(e).__name__)
+        if transcript is None:
+            transcript, _ = transcribe_audio(path)
+        return jsonify({"transcript": (transcript or "").strip()[:300]})
+    except Exception as e:
+        app.logger.warning("Help STT failed (%s)", type(e).__name__)
+        return jsonify({"error": "Could not hear that. Please type your question."}), 502
+    finally:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
 
 
 if __name__ == "__main__":

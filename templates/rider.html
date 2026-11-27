@@ -153,6 +153,46 @@
     .offline-banner[hidden] { display: none; }
     .pending-line { text-align: center; font-size: 16px; color: var(--grey); margin-top: 20px; }
     .reset-link { display: block; text-align: center; margin-top: 28px; font-size: 16px; color: var(--grey); }
+
+    /* Speech help: small link + bottom sheet */
+    .help-link {
+      display: block; margin: 16px auto 0; min-height: 48px; padding: 0 16px; border: none; background: none;
+      font-size: 17px; font-weight: 600; color: #15803d; cursor: pointer;
+    }
+    .sheet-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 20; }
+    .sheet-backdrop[hidden], .sheet[hidden] { display: none; }
+    .sheet {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; height: 60vh; max-width: 560px; margin: 0 auto;
+      background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+      display: flex; flex-direction: column; padding: 8px 16px 16px;
+      animation: sheet-up 200ms ease-out; touch-action: pan-y;
+    }
+    @keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .sheet-handle { padding: 8px 0 12px; cursor: grab; touch-action: none; }
+    .sheet-handle span { display: block; width: 44px; height: 5px; border-radius: 999px; background: #cbd5e1; margin: 0 auto; }
+    .sheet-close {
+      position: absolute; top: 8px; right: 8px; width: 48px; height: 48px; border: none; background: none;
+      font-size: 20px; color: var(--grey); cursor: pointer; border-radius: 50%;
+    }
+    .sheet-sub { font-size: 16px; color: var(--grey); padding-right: 48px; }
+    .help-log { flex: 1; overflow-y: auto; margin: 12px 0; display: flex; flex-direction: column; gap: 10px; }
+    .help-msg { font-size: 17px; line-height: 1.45; padding: 10px 14px; border-radius: 14px; max-width: 90%; }
+    .help-msg.q { align-self: flex-end; background: var(--panel); }
+    .help-msg.a { align-self: flex-start; background: var(--green-bg); color: #14532d; }
+    .help-msg.pending { color: var(--grey); background: none; padding-left: 0; }
+    .help-msg.err { align-self: flex-start; background: var(--red-bg); color: #991b1b; }
+    .help-row { display: flex; gap: 8px; }
+    .help-row input {
+      flex: 1; min-width: 0; height: 52px; padding: 0 14px; font-size: 17px;
+      border: 1.5px solid var(--line); border-radius: 14px; color: var(--ink);
+    }
+    .help-row input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2); }
+    .help-mic, .help-send { height: 52px; min-width: 52px; border-radius: 14px; font-size: 17px; font-weight: 700; cursor: pointer; }
+    .help-mic { border: 1.5px solid var(--line); background: #fff; }
+    .help-mic.listening { background: var(--red); border-color: var(--red); color: #fff; }
+    .help-send { border: none; background: var(--green); color: #fff; padding: 0 16px; }
+    .help-send:disabled, .help-mic:disabled { opacity: 0.5; }
+    .help-link:focus-visible, .sheet-close:focus-visible, .help-mic:focus-visible, .help-send:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
     .dash-link { display: block; text-align: center; margin-top: 16px; font-size: 18px; color: var(--ink); font-weight: 600; padding: 10px; }
   </style>
 </head>
@@ -230,8 +270,22 @@
     </section>
 
     <p id="pending-line" class="pending-line">Pending uploads: 0</p>
+    <button id="help-open" class="help-link" type="button">Need help? Ask →</button>
     <a id="reset-confirm" class="reset-link" href="#">Reset confirmation</a>
   </main>
+
+  <div id="help-backdrop" class="sheet-backdrop" hidden></div>
+  <section id="help-sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+    <div id="help-handle" class="sheet-handle" aria-hidden="true"><span></span></div>
+    <button id="help-close" class="sheet-close" type="button" aria-label="Close help">✕</button>
+    <p id="help-title" class="sheet-sub">Ask about recording your delivery.</p>
+    <div id="help-log" class="help-log" aria-live="polite"></div>
+    <form id="help-form" class="help-row">
+      <input id="help-input" type="text" maxlength="300" placeholder="Type or tap the mic" autocomplete="off" aria-label="Your question">
+      <button id="help-mic" class="help-mic" type="button" aria-label="Speak your question">🎤</button>
+      <button id="help-send" class="help-send" type="submit">Send</button>
+    </form>
+  </section>
 
   <script>
     const MAX_SECONDS = 10;
@@ -675,6 +729,130 @@
         retryTimer = setTimeout(drainQueue, RETRY_MS);
       }
     }
+
+    // ---- Speech help (stateless; shares nothing with the evidence recorder) ----
+    const helpSheet = $('help-sheet'), helpBackdrop = $('help-backdrop'), helpInput = $('help-input');
+    const helpLog = $('help-log'), helpMic = $('help-mic'), helpSend = $('help-send');
+    let helpRecorder = null, helpChunks = [], helpTimer = null, helpOpener = null;
+
+    function openHelp() {
+      helpOpener = document.activeElement;
+      helpSheet.hidden = false;
+      helpBackdrop.hidden = false;
+      helpSheet.style.transform = '';
+      setTimeout(() => helpInput.focus(), 50);
+    }
+    function closeHelp() {
+      stopHelpMic(true);
+      helpSheet.hidden = true;
+      helpBackdrop.hidden = true;
+      if (helpOpener && helpOpener.focus) helpOpener.focus();
+    }
+    $('help-open').addEventListener('click', openHelp);
+    $('help-close').addEventListener('click', closeHelp);
+    helpBackdrop.addEventListener('click', closeHelp);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpSheet.hidden) closeHelp(); });
+
+    // Swipe down on the handle to dismiss.
+    let dragStartY = null;
+    $('help-handle').addEventListener('pointerdown', (e) => {
+      dragStartY = e.clientY;
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    $('help-handle').addEventListener('pointermove', (e) => {
+      if (dragStartY === null) return;
+      const dy = Math.max(0, e.clientY - dragStartY);
+      helpSheet.style.transform = `translateY(${dy}px)`;
+    });
+    const endDrag = (e) => {
+      if (dragStartY === null) return;
+      const dy = e.clientY - dragStartY;
+      dragStartY = null;
+      helpSheet.style.transform = '';
+      if (dy > 80) closeHelp();
+    };
+    $('help-handle').addEventListener('pointerup', endDrag);
+    $('help-handle').addEventListener('pointercancel', endDrag);
+
+    function addHelpMsg(text, kind) {
+      const el = document.createElement('p');
+      el.className = 'help-msg ' + kind;
+      el.textContent = text;
+      helpLog.appendChild(el);
+      helpLog.scrollTop = helpLog.scrollHeight;
+      return el;
+    }
+
+    $('help-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const question = helpInput.value.trim();
+      if (!question) return;
+      helpInput.value = '';
+      addHelpMsg(question, 'q');
+      const pending = addHelpMsg('Thinking…', 'pending');
+      helpSend.disabled = true;
+      try {
+        const res = await fetch('/help', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question }),
+        });
+        const data = await res.json();
+        pending.remove();
+        addHelpMsg(data.answer || data.error || 'Help is unavailable right now.', data.answer ? 'a' : 'err');
+      } catch (_) {
+        pending.remove();
+        addHelpMsg('No connection. Help needs the internet.', 'err');
+      }
+      helpSend.disabled = false;
+    });
+
+    function stopHelpMic(discard) {
+      clearTimeout(helpTimer);
+      if (helpRecorder && helpRecorder.state === 'recording') {
+        if (discard) helpRecorder.onstop = null;
+        helpRecorder.stop();
+        helpRecorder.stream.getTracks().forEach((t) => t.stop());
+      }
+      helpMic.classList.remove('listening');
+      helpMic.textContent = '🎤';
+      helpMic.setAttribute('aria-label', 'Speak your question');
+    }
+
+    helpMic.addEventListener('click', async () => {
+      if (helpRecorder && helpRecorder.state === 'recording') return stopHelpMic(false);
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (_) {
+        addHelpMsg('Microphone is blocked. Type your question instead.', 'err');
+        return;
+      }
+      helpChunks = [];
+      helpRecorder = new MediaRecorder(stream);
+      helpRecorder.ondataavailable = (e) => { if (e.data.size > 0) helpChunks.push(e.data); };
+      helpRecorder.onstop = async () => {
+        const type = helpRecorder.mimeType || 'audio/webm';
+        const ext = type.includes('mp4') ? 'mp4' : type.includes('ogg') ? 'ogg' : 'webm';
+        const form = new FormData();
+        form.append('audio', new Blob(helpChunks, { type }), 'question.' + ext);
+        helpMic.disabled = true;
+        helpInput.placeholder = 'Listening done, writing it down…';
+        try {
+          const data = await (await fetch('/help/stt', { method: 'POST', body: form })).json();
+          if (data.transcript) helpInput.value = data.transcript;
+          else addHelpMsg(data.error || 'Could not hear that. Please type your question.', 'err');
+        } catch (_) {
+          addHelpMsg('No connection. Help needs the internet.', 'err');
+        }
+        helpMic.disabled = false;
+        helpInput.placeholder = 'Type or tap the mic';
+        helpInput.focus();
+      };
+      helpRecorder.start();
+      helpMic.classList.add('listening');
+      helpMic.textContent = '■';
+      helpMic.setAttribute('aria-label', 'Stop recording');
+      helpTimer = setTimeout(() => stopHelpMic(false), 10000);
+    });
 
     window.addEventListener('online', drainQueue);
     refreshPendingLine();
