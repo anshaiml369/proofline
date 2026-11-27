@@ -300,7 +300,7 @@ def save_photo(photo):
     return photo_id
 
 
-def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched, photo=None):
+def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched, photo=None, card_extras=None):
     """Shared by /process (demo page) and /evidence (platform API). Returns (payload, status)."""
     try:
         photo_id = save_photo(photo)
@@ -339,6 +339,7 @@ def create_evidence(audio, form, order_id, rider_id, otp_confirmed, gps_matched,
     card = build_evidence_card(extracted, order_id, rider_id, otp_confirmed, gps_matched)
     card["photo_captured"] = bool(photo_id)
     card["photo_id"] = photo_id
+    card.update(card_extras or {})  # added before scoring so the reasoning can name the check used
     customer_claim = (form.get("customer_claim") or "").strip()[:200]
     dispute_score = score_dispute(card, customer_claim)
     LIVE_RECORDS.appendleft({
@@ -369,10 +370,12 @@ def process():
         customer_confirmed,  # QR confirmation is the OTP signal for scoring
         parse_bool(form.get("gps_matched")),
         photo=request.files.get("photo"),
+        card_extras={
+            "customer_confirmed": customer_confirmed,
+            "customer_phone": mask_phone(form.get("customer_phone")),
+        },
     )
     if status == 200:
-        payload["evidence_card"]["customer_confirmed"] = customer_confirmed
-        payload["evidence_card"]["customer_phone"] = mask_phone(form.get("customer_phone"))
         CONFIRMATIONS.pop(order_id, None)  # one confirmation per record
     return jsonify(payload), status
 

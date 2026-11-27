@@ -19,6 +19,13 @@ def classify_claim(customer_claim):
     return "contents"
 
 
+def handover_check_label(card, passed):
+    """The rider demo page uses a customer QR tap as the handover check; the platform API sends an OTP flag."""
+    if "customer_confirmed" in card:
+        return "Customer confirmed receipt" if passed else "Customer did not confirm receipt"
+    return "OTP confirmed" if passed else "OTP not confirmed"
+
+
 def evidence_strength(card):
     """Additive score: OTP +40, GPS match +30, confidence not low +20, named handover location +10."""
     otp = card.get("otp_confirmed") is True
@@ -30,7 +37,7 @@ def evidence_strength(card):
     score = (40 if otp else 0) + (30 if gps else 0) + (20 if confident else 0) + (10 if location_known else 0)
 
     parts = [
-        "OTP confirmed" if otp else "OTP not confirmed",
+        handover_check_label(card, otp),
         "GPS matched" if gps else "GPS did not match",
         f"{card.get('confidence', 'low')}-confidence spoken account",
     ]
