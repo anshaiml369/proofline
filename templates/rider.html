@@ -49,12 +49,19 @@
     .status-row.single { grid-template-columns: 1fr; }
 
     .field-label { display: block; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    #otp-input {
+    #qr-block { margin: 4px 0 18px; text-align: center; }
+    #qr-block[hidden] { display: none; }
+    #qr-block .field-label { text-align: left; margin-top: 4px; }
+    .qr { display: inline-block; background: #fff; padding: 8px; border: 2px solid var(--line); border-radius: 14px; }
+    .qr svg { width: 220px; height: 220px; display: block; }
+    .qr-note { font-size: 17px; color: var(--grey); margin-top: 8px; }
+    #confirm-state { font-size: 20px; }
+    #phone-input {
       width: 100%; min-height: 56px; padding: 8px 16px;
       border: 2px solid var(--line); border-radius: 14px;
       font-size: 28px; font-weight: 800; letter-spacing: 0.4em; color: var(--ink); background: #fff;
     }
-    #otp-input:focus { outline: none; border-color: var(--ink); }
+    #phone-input:focus { outline: none; border-color: var(--ink); }
     .otp-state { font-size: 17px; margin: 8px 0 16px; font-weight: 600; }
     .otp-state.ok { color: #166534; }
     .otp-state.no { color: var(--grey); font-weight: 400; }
@@ -151,9 +158,16 @@
     </div>
 
     <section id="capture">
-      <label for="otp-input" class="field-label">Customer OTP (4 digits)</label>
-      <input id="otp-input" type="tel" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off">
-      <p id="otp-state" class="otp-state no">OTP not entered — evidence will be weaker</p>
+      <label for="phone-input" class="field-label">Customer phone</label>
+      <input id="phone-input" type="tel" maxlength="10" inputmode="numeric" autocomplete="off" placeholder="10-digit mobile">
+      <p id="phone-state" class="otp-state no">Enter the number to show the confirmation code</p>
+
+      <section id="qr-block" hidden>
+        <h2 class="field-label">Customer confirmation</h2>
+        <a class="qr" href="{{ confirm_url }}" target="_blank" rel="noopener" aria-label="Customer confirmation QR code">{{ qr_svg | safe }}</a>
+        <p class="qr-note">Customer scans this code to confirm receipt.</p>
+        <p id="confirm-state" class="otp-state no">Waiting for customer confirmation...</p>
+      </section>
 
       <button id="record" type="button">🎤 Speak to record</button>
       <p id="hint">Hold the button, say one line, let go.</p>
@@ -165,7 +179,7 @@
         <button id="photo-remove" class="photo-remove" type="button" aria-label="Remove photo">✕</button>
       </div>
       <div id="error" role="alert"></div>
-      <p class="foot">OTP simulated for demo. In production, the platform sends the OTP via its existing system.</p>
+      <p class="foot">QR confirmation simulated for demo. In production, the customer scans on their own phone.</p>
     </section>
 
     <section id="result" aria-live="polite">
@@ -179,7 +193,8 @@
         <div class="row"><div class="k">Obstacle</div><div class="v" id="r-obstacle"></div></div>
         <div class="row"><div class="k">Customer instruction</div><div class="v" id="r-instruction"></div></div>
         <div class="row"><div class="k">What you said</div><div class="v quote" id="r-context"></div></div>
-        <div class="row"><div class="k">OTP</div><div class="v" id="r-otp"></div></div>
+        <div class="row"><div class="k">Customer confirmed</div><div class="v" id="r-confirmed"></div></div>
+        <div class="row"><div class="k">Phone</div><div class="v" id="r-phone"></div></div>
         <div class="row"><div class="k">Photo</div><div class="v" id="r-photo"></div></div>
       </div>
 
@@ -221,15 +236,37 @@
     $('rider').textContent = ctx.rider_id;
     setStatus('gps', ctx.gps_matched, 'GPS');
 
-    // Simulated OTP: confirmed when exactly 4 digits are typed.
-    const otpInput = $('otp-input');
-    const otpEntered = () => /^\d{4}$/.test(otpInput.value);
-    otpInput.addEventListener('input', () => {
-      otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 4);
-      const ok = otpEntered();
-      $('otp-state').textContent = ok ? '✓ OTP entered' : 'OTP not entered — evidence will be weaker';
-      $('otp-state').className = 'otp-state ' + (ok ? 'ok' : 'no');
+    // Customer phone -> QR -> customer taps "Yes" on their device -> rider page polls the server.
+    const phoneInput = $('phone-input');
+    let customerConfirmed = false, poll = null;
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+      const ok = phoneInput.value.length === 10;
+      $('phone-state').textContent = ok ? '✓ Number entered' : 'Enter the number to show the confirmation code';
+      $('phone-state').className = 'otp-state ' + (ok ? 'ok' : 'no');
+      if (ok) {
+        $('qr-block').hidden = false;
+        startPolling();
+      }
     });
+
+    function startPolling() {
+      if (poll || customerConfirmed) return;
+      const check = async () => {
+        try {
+          const res = await fetch('/confirmation-status?order_id=' + encodeURIComponent(ctx.order_id));
+          if ((await res.json()).confirmed) {
+            customerConfirmed = true;
+            clearInterval(poll);
+            poll = null;
+            $('confirm-state').textContent = '✓ Customer confirmed';
+            $('confirm-state').className = 'otp-state ok';
+          }
+        } catch (_) { /* keep polling */ }
+      };
+      check();
+      poll = setInterval(check, 2000);
+    }
 
     // Optional delivery photo.
     let deliveryPhoto = null, photoUrl = null;
@@ -364,7 +401,8 @@
       form.append('audio', new Blob(chunks, { type }), 'recording.' + ext);
       form.append('order_id', ctx.order_id);
       form.append('rider_id', ctx.rider_id);
-      form.append('otp_confirmed', otpEntered());
+      form.append('customer_confirmed', customerConfirmed);
+      form.append('customer_phone', phoneInput.value);
       form.append('gps_matched', ctx.gps_matched);
       if (deliveryPhoto) form.append('photo', deliveryPhoto, deliveryPhoto.name || 'photo.jpg');
 
@@ -413,8 +451,10 @@
       setRow('r-obstacle', card.obstacle);
       setRow('r-instruction', card.customer_instruction, true);
       setRow('r-context', card.spoken_context, true);
-      $('r-otp').textContent = card.otp_confirmed ? '✓ Entered (simulated)' : 'Not entered';
-      $('r-otp').classList.toggle('missing', !card.otp_confirmed);
+      $('r-confirmed').textContent = card.customer_confirmed ? '✓ Yes (QR scan)' : 'Not confirmed';
+      $('r-confirmed').classList.toggle('missing', !card.customer_confirmed);
+      $('r-phone').textContent = card.customer_phone || 'Not given';
+      $('r-phone').classList.toggle('missing', !card.customer_phone);
       const photoEl = $('r-photo');
       photoEl.textContent = '';
       if (card.photo_captured && photoUrl) {
@@ -448,6 +488,11 @@
     function reset() {
       $('result').style.display = 'none';
       $('capture').style.display = 'block';
+      // The server uses each confirmation for one record, so a new record needs a new scan.
+      customerConfirmed = false;
+      $('confirm-state').textContent = 'Waiting for customer confirmation...';
+      $('confirm-state').className = 'otp-state no';
+      if (phoneInput.value.length === 10) startPolling();
       hideError();
       resetButton();
     }

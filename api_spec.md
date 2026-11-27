@@ -107,8 +107,21 @@ Every error is JSON with an `error` field.
 
 Typical latency: 3–4 s (Sarvam ~0.5 s + extraction ~2–3 s).
 
+## Demo-page routes (not part of the platform API)
+
+The rider demo page uses three extra routes. `/evidence` is unchanged: a platform sends `otp_confirmed` directly.
+
+| Route | What it does |
+|---|---|
+| `GET /rider?order_id=&rider_id=` | Rider page. Shows a QR that points to `/confirm` for this order. Opening it clears any earlier confirmation for the order. |
+| `GET /confirm?order_id=` · `POST /confirm` | Customer page opened from the QR. Tapping "Yes, I received this" marks the order confirmed (in memory). |
+| `GET /confirmation-status?order_id=` | `{"confirmed": true\|false}`. The rider page polls it every 2 s. |
+
+`POST /process` (the demo page's upload) takes `customer_confirmed` and `customer_phone` instead of `otp_confirmed`. The confirmation counts only if the server recorded the customer's tap, and it feeds the OTP +40 in scoring. Each confirmation is used for one record. The card gains `customer_confirmed` and `customer_phone` (masked, e.g. `******3210`; the full number is not stored).
+
 ## Not in this hackathon build
 
 - **Authentication:** production needs a per-platform API key header. Right now anyone who can reach the URL can call it.
 - **Durable audio storage:** files are on local disk and are lost on redeploy. Production needs object storage.
+- **Customer confirmation:** `/confirm` has no login or one-time token, so anyone who knows an order ID can confirm it. Production needs a signed, single-use token in the QR.
 - **Wispr:** the code path is ready, but its endpoint is unverified until a key is issued.

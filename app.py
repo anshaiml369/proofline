@@ -7,6 +7,8 @@ from collections import deque
 from datetime import datetime, timedelta, timezone
 
 import httpx
+import qrcode
+import qrcode.image.svg
 from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 from openai import OpenAI
@@ -39,6 +41,7 @@ WHISPER_HINT = (
 IST = timezone(timedelta(hours=5, minutes=30))
 # In-process only (no database): lets the dashboard show what the rider page just recorded. Cleared on restart.
 LIVE_RECORDS = deque(maxlen=20)
+CONFIRMATIONS = {}  # order_id -> True once the customer taps "Yes" on /confirm. In-memory, demo only.
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
@@ -213,7 +216,34 @@ def index():
 
 @app.route("/rider")
 def rider():
-    return render_template("rider.html")
+    order_id = (request.args.get("order_id") or "ORD123").strip()[:64]
+    rider_id = (request.args.get("rider_id") or "RID456").strip()[:64]
+    CONFIRMATIONS.pop(order_id, None)  # fresh handover each time the rider page opens
+    confirm_url = request.host_url.rstrip("/") + url_for("confirm", order_id=order_id, rider_id=rider_id)
+    qr_svg = qrcode.make(
+        confirm_url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10
+    ).to_string(encoding="unicode")
+    return render_template("rider.html", qr_svg=qr_svg, confirm_url=confirm_url)
+
+
+@app.route("/confirm", methods=["GET", "POST"])
+def confirm():
+    """Customer-side page opened from the QR. One tap marks the order as received (in memory, demo only)."""
+    order_id = clean_id(request.values.get("order_id"))
+    if request.method == "POST" and order_id != "not_provided":
+        CONFIRMATIONS[order_id] = True
+        return render_template("confirm.html", order_id=order_id, done=True)
+    return render_template("confirm.html", order_id=order_id, done=False)
+
+
+@app.route("/confirmation-status")
+def confirmation_status():
+    return jsonify({"confirmed": CONFIRMATIONS.get(clean_id(request.args.get("order_id")), False)})
+
+
+def mask_phone(raw):
+    digits = "".join(c for c in (raw or "") if c.isdigit())
+    return "*" * (len(digits) - 4) + digits[-4:] if len(digits) >= 10 else None
 
 
 def ist_time(moment):
@@ -331,12 +361,19 @@ def process():
     if not audio:
         return jsonify({"error": "no audio file"}), 400
     form = request.form
+    order_id = clean_id(form.get("order_id"))
+    # The client flag only counts if the server saw the customer's tap on /confirm.
+    customer_confirmed = parse_bool(form.get("customer_confirmed")) and CONFIRMATIONS.get(order_id, False)
     payload, status = create_evidence(
-        audio, form,
-        clean_id(form.get("order_id")), clean_id(form.get("rider_id")),
-        parse_bool(form.get("otp_confirmed")), parse_bool(form.get("gps_matched")),
+        audio, form, order_id, clean_id(form.get("rider_id")),
+        customer_confirmed,  # QR confirmation is the OTP signal for scoring
+        parse_bool(form.get("gps_matched")),
         photo=request.files.get("photo"),
     )
+    if status == 200:
+        payload["evidence_card"]["customer_confirmed"] = customer_confirmed
+        payload["evidence_card"]["customer_phone"] = mask_phone(form.get("customer_phone"))
+        CONFIRMATIONS.pop(order_id, None)  # one confirmation per record
     return jsonify(payload), status
 
 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm delivery</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fff; color: #111827; font-size: 18px; line-height: 1.4;
+    }
+    main { max-width: 480px; margin: 0 auto; padding: 32px 20px; min-height: 100vh; display: flex; flex-direction: column; }
+    .eyebrow { font-size: 16px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    h1 { font-size: 26px; font-weight: 800; margin-top: 6px; }
+    .order { font-size: 32px; font-weight: 800; margin-top: 8px; word-break: break-all; }
+    .sub { font-size: 17px; color: #6b7280; margin-top: 12px; }
+    form { margin-top: auto; padding-top: 32px; }
+    button {
+      width: 100%; min-height: 120px; border: none; border-radius: 20px;
+      background: #16a34a; color: #fff; font-size: 26px; font-weight: 800; cursor: pointer;
+    }
+    .done { margin-top: 32px; border-radius: 16px; padding: 24px 20px; background: #dcfce7; color: #166534; }
+    .done .title { font-size: 26px; font-weight: 800; }
+    .done p { font-size: 18px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Proofline</p>
+    {% if done %}
+      <h1>Delivery confirmed</h1>
+      <p class="order">{{ order_id }}</p>
+      <div class="done" role="status">
+        <div class="title">✓ Thanks, delivery confirmed</div>
+        <p>You can close this page.</p>
+      </div>
+    {% else %}
+      <h1>Confirm delivery for order</h1>
+      <p class="order">{{ order_id }}</p>
+      <p class="sub">Tap only if the package is in your hands.</p>
+      <form method="post">
+        <input type="hidden" name="order_id" value="{{ order_id }}">
+        <button type="submit">✓ Yes, I received this</button>
+      </form>
+    {% endif %}
+  </main>
+</body>
+</html>
