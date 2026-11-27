@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 import httpx
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 from openai import OpenAI
 
 from dispute_engine import score_dispute
@@ -200,7 +200,12 @@ def too_large(_):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return redirect(url_for("rider", **request.args))
+
+
+@app.route("/rider")
+def rider():
+    return render_template("rider.html")
 
 
 @app.route("/dashboard")
