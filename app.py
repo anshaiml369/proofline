@@ -213,15 +213,23 @@ def rider():
     return render_template("rider.html")
 
 
-def ist_time(iso_utc):
-    return datetime.fromisoformat(iso_utc.replace("Z", "+00:00")).astimezone(IST).strftime("%d %b, %H:%M")
+def ist_time(moment):
+    return moment.astimezone(IST).strftime("%d %b, %H:%M")
 
 
 @app.route("/dashboard")
 def dashboard():
-    mock = [{**d, "score": score_dispute(d["card"], d["customer_claim"]), "live": False} for d in MOCK_DISPUTES]
-    rows = [{**r, "time": ist_time(r["timestamp"])} for r in [*LIVE_RECORDS, *mock]]
-    return render_template("dashboard.html", rows=rows, live_count=len(LIVE_RECORDS))
+    now = datetime.now(timezone.utc)
+    live = [
+        {**r, "time": ist_time(datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00")))}
+        for r in LIVE_RECORDS
+    ]
+    mock = [
+        {**d, "score": score_dispute(d["card"], d["customer_claim"]), "live": False,
+         "time": ist_time(now - timedelta(minutes=d["minutes_ago"]))}
+        for d in MOCK_DISPUTES
+    ]
+    return render_template("dashboard.html", rows=[*live, *mock], live_count=len(live))
 
 
 @app.route("/transcribe", methods=["POST"])
