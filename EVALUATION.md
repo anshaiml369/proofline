@@ -41,6 +41,37 @@ A1 5-6 months → 130 days → ₹700: v3-before FAIL, v4 PASS
 | haan | Kul kamaai teen hazaar paanch sau. Advance shunya, ab tak mila nabbe hazaar teen sau, kul mila nabbe hazaar teen sau. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya. | Kul kamaai ikyaanave hazaar. Advance shunya, ab tak mila nabbe hazaar teen sau, kul mila nabbe hazaar teen sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun? |
 | **outstanding** | 0 | 700 |
 
+### A1 on the live site (LLM path)
+
+The corpus above ran on the rules path only. A1 was also played against https://pagarsaathi.up.railway.app, where the OpenAI key works and every turn ran on the LLM path (`text_source: llm`). These were HTTP runs of the same seven worker lines, plus the final "haan", sent to `/turn`.
+
+| After commit | Runs | Outstanding | What the runs showed |
+|---|---|---|---|
+| 16116ae (Phase 16) | 1 | ₹700 | Passed, but turn 1 had two acknowledgements: Python's fixed line, then the LLM's own ("Aapki baat samajh mein aayi…"). |
+| 9d2766b (one acknowledgement) | 3 | none | Turn 1 fixed. All three runs stalled at "nabbe hazaar teen sau mile": the agent re-asked instead of storing 90300. Locally, every misread value tried (90000 + 300, 90000, 9300) was rejected, and nothing recovered it. This bug was there before Phase 16. |
+| 522ddd6 (misread amount falls back to Python's reading) | 3 | ₹700, ₹700, ₹700 | All passed. In two runs turn 1 asked for days and the daily rate in one question ("…kitne din kaam kiya aur roz kitna milta tha, bataiye?"). |
+| 5673e1d (one number per question) | 3 | ₹700, ₹700, ₹700 | All passed, with one question and one acknowledgement per turn. In all three the LLM asked a single question on its own, so the one-number check had nothing to fix live. A local test (`test_llm_question_asking_two_numbers_becomes_one`) replays the two-number reply from the previous row. |
+
+The first run after 5673e1d, verbatim:
+
+| Worker | Agent (live, LLM path) |
+|---|---|
+| (opening) | Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai? |
+| meri pagar badhao. | Aapki baat samajh gaya, aapki mazdoori badhane ki ichha hai. Aapne kitne din kaam kiya? |
+| kuch 5-6 mahine | 5-6 mahine, mahine ke 26 kaam ke din — matlab kareeb 156 din. Sahi hai, ya hafte mein kam din jaate the? `5-6 mo (6 used) × 26 d/mo ≈ 156` |
+| maine kareeb har hafte ke paanch din | 5-6 mahine, hafte mein 5 din — matlab kareeb 130 din. Sahi hai? `5-6 mo (6 used) × 4.33 wk × 5 d/wk ≈ 130` |
+| Hafte mein 7 din mein se 5 din kaam kiye. 5 din | Theek hai, 130 din. Roz ki mazdoori kitni tay hui thi? |
+| roz 700 | Achha, roz 700 rupaye tay hue. Ab bataiye, aapko kitna advance mila tha? |
+| advance nahi mila | Theek hai, aapko koi advance nahi mila. Ab tak aapko kitna payment mila hai? |
+| nabbe hazaar teen sau mile | Confirm karta hoon: ek sau tees din, saat sau roz, koi advance nahi, nabbe hazaar teen sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye. |
+| haan | Kul kamaai ikyaanave hazaar. Advance shunya, ab tak mila nabbe hazaar teen sau, kul mila nabbe hazaar teen sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun? |
+
+The derived-number lines and the read-back are Python's in every run, and they were identical across runs. Only the LLM's own wording varied: the acknowledgement and the advance and payment questions.
+
+What these runs do and don't show:
+- **Three passing runs show the path works, not how often it fails.** The LLM is not deterministic.
+- **There is no LLM-path number for the whole corpus.** The local key is rejected, so `v3-before-llm` and `v4-llm` have not been measured.
+
 ### Corpus: 115 cases
 
 | Metric | v3-before | v4 |
