@@ -110,3 +110,39 @@ def test_words_and_yes_no():
     assert parse_yes_no("haan bhej do") is True
     assert parse_yes_no("sahi nahi hai") is False
     assert parse_yes_no("हाँ") is True
+
+
+# ---------- rules path: several amounts in one answer (no keys) ----------
+
+def test_two_numbers_are_not_merged():
+    from hinglish_numbers import parse_amounts
+    assert parse_amounts("6 din, 700 roz") == [6, 700]
+    assert parse_amounts("chhe din saat sau roz") == [6, 700]
+    assert parse_amounts("2000, 1000") == [2000, 1000]
+    assert parse_amounts("1,20,000") == [120000]
+    assert parse_amounts("teen hazaar paanch sau") == [3500]
+    assert parse_amounts("twenty five") == [25]
+
+
+def test_rules_pick_the_tagged_amount_and_keep_the_rest():
+    s = c.new_session()
+    c.opening(s)
+    r = c.step(s, "Mere 6 din ke 700 roz ke hisaab se paise baaki hain", c.local_extract)
+    assert s["facts"] == {"days": 6, "rate": 700} and r["state"] == c.ASK_ADVANCE
+    r = c.step(s, "500 advance aur 3000 mile", c.local_extract)
+    assert s["facts"] == {"days": 6, "rate": 700, "advance": 500, "payments": 3000}
+    assert r["state"] == c.CONFIRM
+    r = c.step(s, "haan", c.local_extract)
+    assert r["case"]["outstanding"] == 700
+
+
+def test_rules_days_answer_with_rate_in_it():
+    s = c.new_session()
+    c.opening(s)
+    c.step(s, "paise nahi mile", c.local_extract)
+    r = c.step(s, "6 din, 700 roz", c.local_extract)
+    assert s["facts"] == {"days": 6, "rate": 700} and r["state"] == c.ASK_ADVANCE
+
+
+def test_rules_several_payments_still_add_up():
+    assert c.local_extract("payments", "", "do hazaar aur ek hazaar mile")["parts"] == [2000, 1000]

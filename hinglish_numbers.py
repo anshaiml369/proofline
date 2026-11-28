@@ -77,50 +77,97 @@ def _tokens(text):
     return _TOKEN.findall(_norm(text))
 
 
-def _parse_one(text):
-    """One spoken amount, or None. 'chaar hazaar do sau' -> 4200, '3,000' -> 3000, 'dedh hazaar' -> 1500."""
+_GROUP_TOKEN = re.compile(r"\d+(?:\.\d+)?|[\u0900-\u0963\u0970-\u097F]+|[a-z]+|;")
+
+
+def _number_groups(text):
+    """Separate spoken amounts in one chunk, each with the word before and after it.
+    'chaar hazaar do sau' -> [(4200, None, None)]; '6 din 700 roz' -> [(6, None, 'din'), (700, 'din', 'roz')].
+    A new amount starts after any other word ("din"), a comma, or a number right after a complete
+    number ("2000 1000"). Reading numbers is not arithmetic on the worker's case."""
     text = _norm(text).translate(_DEVANAGARI_DIGITS)
-    text = re.sub(r"(?<=\d),(?=\d)", "", text)          # 3,000 -> 3000
+    text = re.sub(r"(?<=\d),(?=\d{2,3}\b)", "", text) # 3,000 -> 3000; 1,20,000 -> 120000
+    text = text.replace(",", " ; ")                       # any other comma separates amounts
     text = re.sub(r"(\d)\s*k\b", r"\1 k", text)          # 3k -> 3 k
-    total, current, seen, half = 0.0, 0.0, False, False
-    prev_number = False      # a scale word counts only right after a number: "so far" is not "sau"
-    for tok in _TOKEN.findall(text):
-        is_number = False
-        if re.fullmatch(r"\d+(?:\.\d+)?", tok):
-            current += float(tok)
-            seen = is_number = True
-        elif tok in _UNITS:
-            current += _UNITS[tok] + (0.5 if half else 0)
-            half = False
-            seen = is_number = True
-        elif tok in _FRACTIONS:
-            current += _FRACTIONS[tok]
-            seen = is_number = True
-        elif tok in _PLUS_HALF:
-            half = True
-        elif tok in _SCALES and seen and (prev_number or tok in ("k",)):
+    toks = _GROUP_TOKEN.findall(text)
+    groups = []                                           # [value, start_index, end_index]
+    total = current = 0.0
+    seen = half = prev_number = gap = False
+    last_unit, start, end = None, 0, 0
+
+    def flush():
+        nonlocal total, current, seen
+        value = total + current
+        if seen and abs(value - round(value)) < 1e-6:
+            groups.append([int(round(value)), start, end])
+        total = current = 0.0
+        seen = False
+
+    for i, tok in enumerate(toks):
+        is_digit = bool(re.fullmatch(r"\d+(?:\.\d+)?", tok))
+        is_unit = tok in _UNITS
+        if is_digit or is_unit or tok in _FRACTIONS:
+            value = float(tok) if is_digit else _UNITS[tok] if is_unit else _FRACTIONS[tok]
+            # "twenty five" stays one number; "6 700" or "6 din 700" are two
+            tens_then_unit = (is_unit and prev_number and last_unit is not None and last_unit >= 20
+                              and last_unit % 10 == 0 and value < 10)
+            if seen and (gap or (prev_number and not tens_then_unit)):
+                flush()
+            if not seen:
+                start = i
+            current += value + (0.5 if is_unit and half else 0)
+            half, seen, gap, prev_number, end = False, True, False, True, i
+            last_unit = value if is_unit else None
+        elif tok in _PLUS_HALF:                           # "saadhe teen hazaar"
+            if seen and (gap or prev_number):
+                flush()
+            half, prev_number = True, False
+        elif (tok in _SCALES and seen and (prev_number or tok == "k")
+              and not (_SCALES[tok] == 100 and current >= 100)):   # "700 so far" is not 70000
             scale = _SCALES[tok]
             if scale == 100:
-                if current < 100:                         # "saat sau" = 700, but "700 so far" stays 700
-                    current = (current or 1) * 100
+                current = (current or 1) * 100
             else:
                 total += (current or 1) * scale
                 current = 0
-        prev_number = is_number
-    if not seen:
-        return None
-    value = total + current
-    return int(round(value)) if abs(value - round(value)) < 1e-6 else None
+            prev_number, last_unit, gap, end = False, None, False, i
+        else:                                             # any other word ends the amount
+            gap = gap or seen
+            prev_number = False
+    flush()
+
+    def nearby(j, step, n=2):
+        """Up to n words next to an amount, stopping at a comma or another number."""
+        found = []
+        while 0 <= j < len(toks) and len(found) < n:
+            t = toks[j]
+            if t == ";" or t[0].isdigit() or t in _UNITS:
+                break
+            if t not in _SCALES:
+                found.append(t)
+            j += step
+        return tuple(found)
+
+    return [(v, nearby(s_ - 1, -1), nearby(e_ + 1, 1)) for v, s_, e_ in groups]
+
+
+def amount_groups(text):
+    """[(value, words_before, words_after)] for every separate amount in the utterance."""
+    out = []
+    for chunk in _SPLIT.split(text or ""):
+        out.extend(_number_groups(chunk))
+    return out
 
 
 def parse_amounts(text):
-    """All amounts in an utterance, split on 'aur' / '+': 'do hazaar aur ek hazaar' -> [2000, 1000]."""
-    values = []
-    for chunk in _SPLIT.split(text or ""):
-        value = _parse_one(chunk)
-        if value is not None:
-            values.append(value)
-    return values
+    """All amounts in an utterance: 'do hazaar aur ek hazaar' -> [2000, 1000], '6 din 700 roz' -> [6, 700]."""
+    return [g[0] for g in amount_groups(text)]
+
+
+def _parse_one(text):
+    """Exactly one spoken amount, or None."""
+    values = parse_amounts(text)
+    return values[0] if len(values) == 1 else None
 
 
 _YES = {"haan", "haa", "ha", "han", "haanji", "ji", "jee", "yes", "yeah", "yep", "ok", "okay", "theek",

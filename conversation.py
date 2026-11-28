@@ -10,7 +10,9 @@ browser Hindi voices read naturally).
 """
 import uuid
 
-from hinglish_numbers import parse_amounts, parse_yes_no, says_none, to_words
+import unicodedata
+
+from hinglish_numbers import amount_groups, parse_amounts, parse_yes_no, says_none, to_words
 from wage_math import calculate_wages, payment_request
 
 START, ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS = "START", "ASK_DAYS", "ASK_RATE", "ASK_ADVANCE", "ASK_PAYMENTS"
@@ -161,7 +163,9 @@ def step(session, text, extract):
     session["turns"].append({"agent": session["last_agent_text"], "worker": text, "state": state})
 
     if state == START:
-        return _reply(session, _ask(session, ASK_DAYS))
+        stored = _merge_tagged(session, text)           # "6 din, 700 roz" in the first message counts
+        return _reply(session, _ask(session, _next_missing(session)),
+                      **({"facts": dict(session["facts"])} if stored else {}))
 
     if state in (ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS):
         field = STATES[state]["extract_field"]
@@ -175,7 +179,7 @@ def step(session, text, extract):
                 session["needs_assistance"].append(field)
             if field in ("advance", "payments"):
                 session["facts"][field] = 0
-                return _reply(session, _ask(session, NEXT[state], prefix=ASSIST_ZERO),
+                return _reply(session, _ask(session, _next_missing(session), prefix=ASSIST_ZERO),
                               parsed={"field": field, "value": 0, "assumed": True})
             # days and rate cannot be guessed: keep asking, with a hint
             return _reply(session, _join(ASSIST_NUMBER, STATES[state]["simpler"]), reasked=True)
@@ -183,7 +187,9 @@ def step(session, text, extract):
         session["turns"][-1]["value"] = value
         if field in session["needs_assistance"]:
             session["needs_assistance"].remove(field)
-        return _reply(session, _ask(session, NEXT[state]), parsed={"field": field, "value": value})
+        _merge_tagged(session, text, skip=field)         # other facts said in the same breath
+        return _reply(session, _ask(session, _next_missing(session)), parsed={"field": field, "value": value},
+                      facts=dict(session["facts"]))
 
     if state == CONFIRM:
         ok = _accept_bool(extract("confirm", session["last_agent_text"], text))
@@ -343,17 +349,66 @@ def mark_sent(session):
     return _reply(session, SENT)
 
 
+# Words that say which fact an amount belongs to: "6 din", "700 roz", "500 advance", "3000 mile".
+_TAGS = {
+    "days": {"din", "dino", "dinon", "day", "days", "दिन", "दिनों"},
+    "rate": {"roz", "roj", "rozana", "daily", "rate", "dihadi", "dihaadi", "mazdoori", "per", "रोज़", "रोज",
+             "रोजाना", "रोज़ाना", "दिहाड़ी", "मज़दूरी", "मजदूरी"},
+    "advance": {"advance", "advanced", "peshgi", "एडवांस", "पेशगी"},
+    "payments": {"mile", "mila", "mili", "milaa", "paid", "received", "diye", "diya", "payment", "मिले", "मिला",
+                 "मिली", "दिए", "दिया"},
+}
+_TAGS = {f: {unicodedata.normalize("NFC", w) for w in ws} for f, ws in _TAGS.items()}
+
+
+def _tag(before, after):
+    """Which fact an amount belongs to, from the nearest words after it, then before it."""
+    for w in tuple(after) + tuple(before):
+        for field, words in _TAGS.items():
+            if w in words:
+                return field
+    return None
+
+
+def tagged_facts(text):
+    """{field: value} for amounts clearly tied to a fact word. Two different values for the same
+    fact cancel out (unclear), and Python never adds them here."""
+    found = {}
+    for value, before, after in amount_groups(text):
+        field = _tag(before, after)
+        if field:
+            found.setdefault(field, set()).add(value)
+    return {f: vals.pop() for f, vals in found.items() if len(vals) == 1}
+
+
+def _merge_tagged(session, text, skip=None):
+    stored = {}
+    for field, value in tagged_facts(text).items():
+        lo, hi = LIMITS[field]
+        if field != skip and field not in session["facts"] and lo <= value <= hi:
+            session["facts"][field] = stored[field] = value
+    return stored
+
+
 def local_extract(field, question, text):
     """Rule-based reader for Wispr Flow text. Needs no API key. Handles digits ("700", "₹3,000"),
-    Roman Hinglish ("saat sau", "teen hazaar") and Devanagari ("छह दिन")."""
+    Roman Hinglish ("saat sau", "teen hazaar") and Devanagari ("छह दिन"). When an answer holds
+    several amounts, the one tagged for this question wins ("6 din, 700 roz" -> days 6)."""
     if field in ("confirm", "send"):
         value = parse_yes_no(text)
         return {"field": field, "value": value, "confidence": "high" if value is not None else "low"}
-    amounts = parse_amounts(text)
+    groups = amount_groups(text)
+    amounts = [g[0] for g in groups]
     if field in ("advance", "payments") and not amounts and says_none(text):
         return {"field": field, "value": 0, "confidence": "high"}
     if len(amounts) == 1:
         return {"field": field, "value": amounts[0], "confidence": "high"}
-    if len(amounts) > 1 and field in ("advance", "payments"):
+    tags = [_tag(b, a) for _, b, a in groups]
+    other_fact = any(t not in (None, field) for t in tags)
+    if len(amounts) > 1 and field in ("advance", "payments") and not other_fact:
+        # "do hazaar aur ek hazaar (mile)": several payments; Python adds the parts
         return {"field": field, "value": None, "parts": amounts, "confidence": "high"}
+    mine = {v for (v, _, _), t in zip(groups, tags) if t == field}
+    if len(mine) == 1:
+        return {"field": field, "value": mine.pop(), "confidence": "high"}
     return {"field": field, "value": None, "confidence": "low"}

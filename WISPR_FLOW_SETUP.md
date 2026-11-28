@@ -23,10 +23,20 @@ Because the app only receives text, it needs no Wispr Flow API key and no speech
 6. Tap the **mic** and say your answer. The text appears in the box.
 7. Tap **Continue**.
 
+## Showing Wispr Flow on camera
+
+Judges should *see* that the words come from your voice:
+
+1. Record the whole screen, not just the browser, so Wispr Flow's on-screen indicator is in the shot when you double-tap Fn.
+2. Click the answer box first; it has a white **W** and "Speak your answer" above it.
+3. Double-tap Fn, speak, and pause for a second. The words appear in the box on camera, then press **Continue**.
+4. On iPhone, screen-record with the Wispr Flow keyboard visible; tap its mic so the recording shows it.
+5. Keep the speaker volume up so the agent's reply is heard in the recording.
+
 ## What the app does with the text
 
 - The text can be Roman Hinglish ("saat sau"), digits ("700", "₹3,000") or Devanagari ("सात सौ"). The built-in reader handles all three with no API key.
-- The agent reads each question aloud using the **browser's own voice**: a Hindi voice if the device has one. That costs nothing and needs no key.
+- The agent speaks each reply: with Sarvam's Hindi voice when the server has a key, a recorded clip for the fixed lines, or the browser's own Hindi voice. A grey badge under each line says which.
 - If the answer isn't clear, the agent asks again in simpler words. After two misses it suggests asking a friend for help (*needs assistance*).
 
 ## No Wispr Flow on this device?

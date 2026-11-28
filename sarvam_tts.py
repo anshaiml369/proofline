@@ -1,8 +1,8 @@
-"""OPTIONAL Sarvam Bulbul v4 Flash voice (hi-IN, mp3) for the agent's replies.
+"""Sarvam Bulbul v4 Flash voice (hi-IN, mp3) for the agent's replies. Optional: needs SARVAM_API_KEY.
 
-The browser's own SpeechSynthesis is the primary voice and needs no key. This is only a fallback
-for browsers without a Hindi voice, and only if SARVAM_API_KEY is set. Returns None on any
-failure or missing key; the page then shows the text (and uses whatever browser voice exists).
+When the key is set, every agent line without a pre-recorded clip is synthesised here (the
+recorded clips in static/demo/ were made with the same model and speaker). Returns None on any
+failure, timeout or missing key; the page then speaks with the browser's own voice instead.
 """
 import base64
 import hashlib

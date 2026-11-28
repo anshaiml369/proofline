@@ -1,6 +1,7 @@
 # PagarSaathi: pitch deck (8 slides)
 
 Every figure is labelled **[SOURCED]**, **[UNVERIFIED]** or **[TARGET]**. Sources are in the README.
+Live app: **https://pagarsaathi.up.railway.app**
 
 ---
 
@@ -9,85 +10,93 @@ Every figure is labelled **[SOURCED]**, **[UNVERIFIED]** or **[TARGET]**. Source
 **Bolo, hisaab pao.**
 A daily-wage worker speaks; PagarSaathi works out what they are still owed and drafts the payment request.
 
-India Runs on Voice · Scaler × Wispr Flow · Nov 2026
+India Runs on Voice · Scaler × Wispr Flow · Nov 2026 · https://pagarsaathi.up.railway.app
 
 ---
 
-## 2. Problem
+## 2. Problem and user
 
-The daily rate is agreed by word of mouth. The contractor pays "something", minus an advance given earlier. **Nothing is written down.**
+A daily-wage worker (construction, loading, domestic or farm work) agrees a daily rate by word of mouth. The contractor pays "something", minus an advance given earlier. **Nothing is written down.**
 
 - The worker can't easily do the sum on the spot, so the gap goes unclaimed.
 - Unpaid wages are real. In a survey of 950 rescued bonded labourers, more than half had not been paid. **[SOURCED: NCCEBL]**
 - The formal route exists (the SAMADHAN portal takes unpaid-wage claims) **[SOURCED]**, but it starts with forms, not a conversation.
 
----
-
-## 3. User
-
-**A daily-wage worker** in construction, loading, domestic or farm work:
-- speaks Hindi or Hinglish;
-- has a phone;
-- may not want to type or calculate.
-
-**Second user:** a union or NGO volunteer sitting with that worker.
+**User:** a worker who speaks Hindi or Hinglish, has a phone, and may not want to type or calculate. **Second user:** a union or NGO volunteer sitting with them.
 
 ---
 
-## 4. Solution
+## 3. The ₹700 demo
 
-One spoken conversation, four questions:
-1. Days worked?
-2. Daily rate?
-3. Advance?
-4. Paid so far?
+One spoken conversation, four facts, one confirmation:
 
-The agent **reads all four back and waits for "haan"**. Then **Python, not the AI,** calculates:
+| Worker says (Wispr Flow) | Fact |
+|---|---|
+| "Chhe din" | 6 days |
+| "Saat sau rupaye" | ₹700 a day |
+| "Paanch sau" | ₹500 advance |
+| "Teen hazaar" | ₹3,000 paid |
+
+The agent reads all four back: *"Sahi hai?"* → **"Haan"**. Then **Python, not the AI,** calculates:
 
 > 6 × ₹700 = ₹4,200 − ₹500 advance − ₹3,000 paid = **₹700 outstanding**
 
-Then: message preview → **Send to contractor** → WhatsApp opens with the request filled in.
+Then: message preview → green **Send to contractor** → WhatsApp opens with the full Hinglish request filled in.
 
 ---
 
-## 5. Why Wispr Flow
+## 4. Why voice is the interface
 
-**The voice layer is the product's interface.**
-- Wispr Flow is OS-level dictation: double-tap Fn on Mac, the Wispr Flow keyboard on iPhone.
-- The worker speaks; the words land in the answer box. PagarSaathi needs **no mic code and no speech-to-text service.**
-- An LLM replies to what the worker actually said, and Sarvam speaks it in natural Hindi. **With no keys, the whole flow still works** using built-in rules and a recorded voice.
+- **Wispr Flow is the voice layer.** It is OS-level dictation: double-tap Fn on a Mac, the Wispr Flow keyboard on an iPhone. The worker speaks, and the words appear in the answer box on camera.
+- PagarSaathi needs **no mic code and no speech-to-text service**: it receives text.
 - Wispr Flow lists Hindi and Hinglish support and writes romanised Hindi **[SOURCED: wisprflow.ai]**. The app reads digits, Roman and Devanagari.
-- Voice fits this user: spoken numbers instead of typed ones. A speed gain for this user is **[UNVERIFIED]**: not yet measured.
+- The agent talks back: an LLM replies to what the worker actually said, and Sarvam Bulbul speaks it in natural Hindi.
+- Speaking numbers fits this user better than typing them. A speed gain is **[UNVERIFIED]**: not yet measured.
 
 ---
 
-## 6. Competitors and our wedge
+## 5. Competitors and our wedge
 
 | Product | Who it serves |
 |---|---|
 | PagarBook (10M+ downloads **[SOURCED: app listing]**), HajariBook, WorkPe, Haajri | **The contractor or employer**: attendance, payroll, advances |
 | SAMADHAN (Ministry of Labour) | **Formal claims**: registration and forms |
 
-**Wedge:** none of these is built for the **worker** to speak and get a number. PagarSaathi is worker-side, voice-first, and works from memory, with no records needed. Its output is a clear request that can lead to SAMADHAN if the contractor still doesn't pay.
+**Wedge:** these tools keep the contractor's records. PagarSaathi is **worker-side reconstruction**: the worker rebuilds the week from memory, by voice, and gets an exact figure and a written request. That request can lead to SAMADHAN if the contractor still doesn't pay.
 
-Note: "Labor Mistri" and "HaazriPro" from an earlier draft could not be found, so they were replaced with the apps above, which could be verified.
+Note: "Labor Mistri" and "HaazriPro" from an earlier draft could not be found, so they were replaced with apps that could be verified.
 
 ---
 
-## 7. Dependencies and risks
+## 6. Auditable by design
 
-| Dependency | Status |
+**Every agent line shows whether it came from the LLM, the rules, or a recorded clip.**
+
+```
+Achha, chhe din aur saat sau roz.  Koi advance mila tha pehle?
+Text: LLM · Voice: Sarvam
+```
+
+- `Text: LLM`: the LLM heard the facts and wrote the short reply. Python still checks every number.
+- `Text: Rules`: the built-in state machine, which needs no key.
+- `Voice: Recorded / Sarvam / Browser`: which voice actually spoke.
+- The worker's lines say `Wispr Flow / typed`.
+
+A judge, a volunteer or a worker's family can see exactly where each line came from. The money figure always comes from `wage_math.py`, never from a model.
+
+---
+
+## 7. Dependencies and fallbacks
+
+| Dependency | If it is missing or fails |
 |---|---|
-| Wispr Flow (OS-level) | The worker or volunteer installs it. No API key. |
-| OpenAI / OpenRouter LLM | Optional. Understands and replies; never calculates. Falls back to built-in rules. |
-| Sarvam voice | Optional. Natural Hindi voice; falls back to recorded clips and the browser voice. |
+| Wispr Flow (on the device) | The worker types instead; the same box works. |
+| OpenAI / OpenRouter LLM | That turn uses the built-in rules. They still read "6 din, 700 roz" and still reach ₹700. |
+| Sarvam Bulbul voice | The 9 recorded clips play, then the browser's own Hindi voice. Nothing goes silent. |
+| Network (demo day) | `?mode=scripted` runs the whole demo from the app's own server, with no outside calls. |
 
 **Biggest objection:** "The contractor will just ignore the message."
-**Answer:** PagarSaathi doesn't promise payment. It gives the worker an exact, read-back figure and a written request. That's the first step of any claim, including SAMADHAN.
-
-**Other risks:**
-- Real dictation brings phrasings the reader hasn't seen. Answers are re-asked, and the read-back catches mistakes.
-- Simple daily-rate cases only, for now.
+**Answer:** PagarSaathi doesn't promise payment. It gives the worker an exact, read-back figure and a written request: the first step of any claim, including SAMADHAN.
 
 ---
 
@@ -95,6 +104,8 @@ Note: "Labor Mistri" and "HaazriPro" from an earlier draft could not be found, s
 
 - **Free for workers.** Always.
 - **Pilot through unions and NGOs** that already help workers with wage disputes. A volunteer runs the conversation with the worker. **[TARGET: one pilot partner]**
-- **Next:** half days and overtime, a printable summary for a SAMADHAN claim, and more Indian languages.
+- **Next:** half days and overtime, a printable summary for a SAMADHAN claim, more Indian languages.
 
 **Ask:** introductions to one workers' union or NGO for a 4-week pilot. **[TARGET]**
+
+Try it: **https://pagarsaathi.up.railway.app** · backup demo: `/?mode=scripted`

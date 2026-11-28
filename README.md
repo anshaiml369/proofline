@@ -4,7 +4,7 @@
 
 Built for the *India Runs on Voice* hackathon (Scaler × Wispr Flow).
 
-> Demo video: _link to be added_ · Pitch deck: [`PITCH_DECK.md`](PITCH_DECK.md) · Live app: [pagarsaathi.up.railway.app](https://pagarsaathi.up.railway.app)
+> **Live app: https://pagarsaathi.up.railway.app** · Backup demo: [`/?mode=scripted`](https://pagarsaathi.up.railway.app/?mode=scripted) · Pitch deck: [`PITCH_DECK.md`](PITCH_DECK.md) · Where each reply comes from: [`PIPELINE.md`](PIPELINE.md) · Demo video: _link to be added_
 
 ## The problem
 
@@ -56,6 +56,8 @@ Setup steps are in [`WISPR_FLOW_SETUP.md`](WISPR_FLOW_SETUP.md).
 | Maths | `wage_math.py` (Python) | Same |
 | Voice out | Sarvam Bulbul, a natural Hindi voice | Pre-recorded Sarvam clips for fixed lines, then the browser's own voice |
 
+**Every line shows its source.** A small grey badge under each agent line reads, for example, `Text: LLM · Voice: Sarvam` or `Text: Rules · Voice: Recorded`. Worker lines read `Wispr Flow / typed`. The full pipeline, with the exact model and voice names, is in [`PIPELINE.md`](PIPELINE.md).
+
 **The LLM never calculates.** It returns the facts it heard as JSON. Python checks each one, adds multiple amounts, still insists on the "Sahi hai?" read-back, and does all the maths. If the LLM fails or takes over 8 seconds, that turn uses the built-in rules.
 
 ### A real conversation (LLM path)
@@ -83,7 +85,7 @@ pip3 install -r requirements.txt
 python3 app.py
 ```
 
-Open http://127.0.0.1:5050. No `.env` is needed.
+Open http://127.0.0.1:5050. No `.env` is needed. The dev server uses port 5050, not 5000, because macOS AirPlay Receiver already listens on port 5000.
 
 ## Run with Docker
 
@@ -107,11 +109,13 @@ Everything in the core flow works:
 - the WhatsApp message,
 - the scripted demo.
 
-`GET /health` returns `{"status": "ok", "key_set": false, "llm": false, "voice": false}`. Keys in `.env` (see `.env.example`) switch on the LLM conversation and the Sarvam voice.
+`GET /health` returns `{"status": "ok", "llm": false, "voice": false, "stt": false, "mode": "keyless", "missing": [...]}`, and the page shows a banner naming the missing keys. Keys in `.env` (see `.env.example`) or in Railway → web → Variables switch on the LLM conversation and the Sarvam voice.
 
 ## Modes
 
 - `/`: normal use. Dictate with Wispr Flow, or type, then press **Continue**.
+- `/?mode=text`: the same flow, labelled "Text mode", for a judge who will type rather than dictate.
+- `?debug=1` (with any mode): logs every audio play, pause, end and error in the browser console.
 - `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself, in about 55 seconds. It always uses the built-in rules and pre-recorded voice, so it calls no outside service and runs the same every time.
 
 ## API
@@ -131,7 +135,7 @@ pip3 install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-There are 48 tests. They need no network or keys (the LLM is faked). They cover:
+There are 54 tests. They need no network or keys (the LLM is faked). They cover:
 - the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
 - the demo conversation and Wispr-style text (digits, ₹, Devanagari);
 - the mandatory confirm step;
@@ -140,19 +144,27 @@ There are 48 tests. They need no network or keys (the LLM is faked). They cover:
 - "pata nahi" not being read as ₹0;
 - the nothing-owed path;
 - the LLM path: several facts in one sentence, corrections at the read-back, Python adding amounts, "haan" never read as ₹0, the reply never asking its own question, falling back to rules when the LLM fails;
-- "so far" not being read as "sau".
+- "so far" not being read as "sau";
+- several amounts in one answer without keys ("6 din, 700 roz" is 6 days and ₹700, not 706);
+- Hinglish error pages, and the `/health` fields.
 
 ## Built with
 
 - **Flask** (Python 3.11) and **gunicorn**
 - **Wispr Flow**: the voice layer (OS-level dictation)
 - **Browser SpeechSynthesis**: the agent's voice
-- **OpenAI `gpt-4.1-mini`** (or **OpenRouter**): the optional conversational layer; it never calculates
-- **Sarvam Bulbul**: the agent's natural Hindi voice
+- **OpenAI `gpt-4.1-mini`**, with **OpenRouter** as backup: the optional conversational layer; it never calculates
+- **Sarvam Bulbul `bulbul:v4-flash`**: the agent's natural Hindi voice (live, and the 9 recorded clips)
+- **Sarvam Saaras v4**: used offline only, to check that every recorded clip says the right words. The app has no speech-to-text; Wispr Flow does that on the device.
+- **Railway**: hosting
 - **SQLite**: finished cases, in the `wage_cases` table
 - **Tailwind CSS**: compiled to a static file, so pages need no CDN
 - **Docker**
 - Built with **Wispr Flow + Claude Code**
+
+### Optional LLM fallback
+
+The **Hugging Face Inference API** is a documented alternative LLM provider: any OpenAI-compatible chat endpoint can be added to `agent_llm.providers()`. It is **not wired by default**.
 
 ## Claims and sources
 
@@ -181,6 +193,7 @@ There are 48 tests. They need no network or keys (the LLM is faked). They cover:
 | `app.py` | Flask: `GET /`, `POST /turn`, `GET /health` |
 | `conversation.py` | The state machine, the built-in Hinglish reader, and the LLM turn (`step_llm`) |
 | `agent_llm.py`, `prompts/agent.txt` | The optional LLM layer: hears facts, writes the reply |
+| `PIPELINE.md` | Exactly where each line's text and voice come from, in each mode |
 | `wage_math.py` | All arithmetic, as pure functions |
 | `hinglish_numbers.py` | Number words, both ways (4200 ⇄ "chaar hazaar do sau") |
 | `sarvam_tts.py` | Sarvam voice |
