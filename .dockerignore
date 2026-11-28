@@ -1,12 +1,13 @@
 .env
 .env.*
 !.env.example
-evidence.db
-evidence.db-*
+*.db
+*.db-*
 photos/
-static/audio/*
-!static/audio/.gitkeep
+static/audio/
+static/tts/
 __pycache__/
 *.pyc
 .git/
 .DS_Store
+tests/

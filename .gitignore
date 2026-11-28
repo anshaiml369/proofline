@@ -2,8 +2,10 @@
 __pycache__/
 *.pyc
 .DS_Store
-static/audio/*
-!static/audio/.gitkeep
+static/audio/
+static/tts/
 photos/
 evidence.db
 evidence.db-*
+pagarsaathi.db
+pagarsaathi.db-*

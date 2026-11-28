@@ -1,0 +1,76 @@
+"""Sarvam Bulbul v4 Flash text-to-speech (hi-IN), returning mp3 bytes.
+
+Same text → same file, so repeated questions cost one API call. Returns None on any failure:
+the caller then shows the question as text and the conversation carries on.
+"""
+import base64
+import hashlib
+import os
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+
+import httpx
+
+TTS_URL = "https://api.sarvam.ai/text-to-speech"
+TTS_MODEL = os.getenv("SARVAM_TTS_MODEL", "bulbul:v4-flash")
+# Always name a speaker: in testing, a v4-flash request without one hung for minutes.
+TTS_SPEAKER = os.getenv("SARVAM_TTS_SPEAKER", "shubh_enhi_companion")
+TTS_DEADLINE_S = 12  # hard wall-clock limit; httpx's timeout is per read, not total
+
+_pool = ThreadPoolExecutor(max_workers=4)
+
+# Spoken-only spellings for words Bulbul misreads in Roman script (checked by sending the
+# audio back through Saaras). The on-screen text is unchanged.
+PRONOUNCE = {
+    "PagarSaathi": "पगार साथी",
+    "WhatsApp": "व्हाट्सऐप",
+    "bhejun": "भेजूँ",
+    "Thekedar": "ठेकेदार",
+    "thekedar": "ठेकेदार",
+}
+
+
+def spoken(text):
+    for word, say in PRONOUNCE.items():
+        text = text.replace(word, say)
+    return text
+
+
+def audio_name(text):
+    return hashlib.sha1(f"{TTS_MODEL}|{TTS_SPEAKER}|{text}".encode()).hexdigest()[:20] + ".mp3"
+
+
+def _request(text, api_key):
+    resp = httpx.post(
+        TTS_URL,
+        headers={"api-subscription-key": api_key},
+        json={"text": spoken(text), "language_code": "hi-IN", "model": TTS_MODEL, "speaker": TTS_SPEAKER,
+              "output_audio_codec": "mp3", "pace": 1.0, "temperature": 0.3},
+        timeout=httpx.Timeout(10.0),
+    )
+    resp.raise_for_status()
+    return base64.b64decode(resp.json()["audios"][0])
+
+
+def synthesize(text, api_key, out_dir, log=None):
+    """Write <out_dir>/<hash>.mp3 for `text` if needed. Returns the file name, or None if TTS failed."""
+    if not api_key or not text:
+        return None
+    name = audio_name(text)
+    path = os.path.join(out_dir, name)
+    if os.path.exists(path):
+        return name
+    try:
+        audio = _pool.submit(_request, text, api_key).result(timeout=TTS_DEADLINE_S)
+    except FutureTimeout:
+        if log:
+            log.warning("Sarvam TTS timed out after %ss", TTS_DEADLINE_S)
+        return None
+    except Exception as e:  # network, 4xx/5xx, bad JSON
+        if log:
+            log.warning("Sarvam TTS failed (%s)", type(e).__name__)
+        return None
+    tmp = path + ".part"
+    with open(tmp, "wb") as f:
+        f.write(audio)
+    os.replace(tmp, path)
+    return name

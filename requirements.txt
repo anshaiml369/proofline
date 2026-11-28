@@ -3,4 +3,3 @@ openai
 httpx
 python-dotenv
 gunicorn
-qrcode
