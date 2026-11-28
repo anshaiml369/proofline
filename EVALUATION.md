@@ -120,7 +120,7 @@ The failures in that run were real bugs, fixed in this phase. Each now has a reg
 
 v3-before went from 38.3% to 40.9% passed between the two runs, because nine `must_contain_in_agent` strings in classes E and H were corrected (see TEST_CORPUS.md).
 
-### Held-out: 20 cases, first and only tuned-free run
+### Held-out: 20 cases (run 1 is the untuned result)
 
 These cases were written after the fixes above, run once, and not tuned on.
 
@@ -150,9 +150,15 @@ These cases were written after the fixes above, run once, and not tuned on.
 | H | 2/2 | 2/2 |
 
 **What the held-out run shows:**
-- **X12 fails on v4.** The worker said "bhai se 1000 udhaar liya, woh alag hai". `observe.py` sees the loan is private, but on the rules path the core still stores 1000 as the advance. This is a known bug and is left unfixed.
+- **X12 failed on v4 in this run.** The worker said "bhai se 1000 udhaar liya, woh alag hai". `observe.py` saw that the loan was private, but on the rules path the core still stored 1000 as the advance. This was fixed later (see below).
 - **0 context turns were detected** in the held-out lines. `observe.py`'s context words miss "darr lag raha hai", "sarkari app", "shikayat karni hai" and "thekedar bhaag gaya". This is a gap in the context detector, not an acknowledgement result.
 - **A second run was made after a later change.** A private-loan acknowledgement was added after the original test set's I2 case. In that run (`eval/results/holdout_run2.txt`), X12 still fails, and its loan line now counts as one acknowledged context turn for both backends.
+- **A third run came after X12 was fixed** (`eval/results/holdout_run3.txt`): v4 passed 20/20, v3-before 10/20. **This run is tuned on X12, so it is not held-out evidence. The held-out figure is run 1's 95%.**
+  - The fix, on the rules path: a loan the worker calls "alag" is acknowledged once and stored nowhere.
+  - If the advance question was being asked, the advance is set to 0 and the agent says so ("To mazdoori ka advance 0 likhta hoon"). The worker can still correct it at the read-back.
+  - At any other question, the same question is asked again.
+  - The LLM path is unchanged, because its policy handles loans itself.
+  - The corpus table and the 32-case results did not change with this fix.
 
 ### The original 32-case test set after Phase 16
 

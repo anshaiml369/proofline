@@ -2,9 +2,9 @@
  "summary": {
   "backend": "v4",
   "cases": 20,
-  "passed": 95.0,
+  "passed": 100.0,
   "completed": 100.0,
-  "correct_outstanding": 95.0,
+  "correct_outstanding": 100.0,
   "repetition_rate": 0.0,
   "avg_turns": 6.1,
   "reasks_per_slot": 0.075,
@@ -16,7 +16,7 @@
    "A": "4/4",
    "B": "3/3",
    "C": "3/3",
-   "D": "1/2",
+   "D": "2/2",
    "E": "2/2",
    "F": "2/2",
    "G": "2/2",
@@ -1454,10 +1454,10 @@
    "id": "X12",
    "class": "D",
    "hard": false,
-   "passed": false,
+   "passed": true,
    "completed": true,
-   "correct": false,
-   "outstanding": 2000,
+   "correct": true,
+   "outstanding": 3000,
    "expected_outstanding": 3000,
    "missing": [],
    "repeats": 0,
@@ -1511,22 +1511,22 @@
     },
     {
      "worker": "bhai se 1000 udhaar liya, woh alag hai",
-     "agent": "Samajh gaya. Jo loan aapki mazdoori se kaata gaya, use advance mein ginenge. Ab tak kitne paise mile?",
+     "agent": "Woh alag udhaar hai, use mazdoori mein nahi ginenge. To mazdoori ka advance 0 likhta hoon. Ab tak kitne paise mile?",
      "state": "ASK_PAYMENTS",
-     "action": null,
+     "action": "python_derived",
      "formula": null,
      "clarify": null,
      "facts": {
       "days": 10,
       "rate": 500,
-      "advance": 1000,
+      "advance": 0,
       "payments": null
      },
      "source": "rules"
     },
     {
      "worker": "2000 mile",
-     "agent": "Confirm karta hoon: das din, paanch sau roz, ek hazaar advance, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Confirm karta hoon: das din, paanch sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "action": null,
      "formula": null,
@@ -1534,14 +1534,14 @@
      "facts": {
       "days": 10,
       "rate": 500,
-      "advance": 1000,
+      "advance": 0,
       "payments": 2000
      },
      "source": "rules"
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai paanch hazaar. Advance ek hazaar, ab tak mila do hazaar, kul mila teen hazaar. Baaki do hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "agent": "Kul kamaai paanch hazaar. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki teen hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "action": null,
      "formula": null,
@@ -1549,7 +1549,7 @@
      "facts": {
       "days": 10,
       "rate": 500,
-      "advance": 1000,
+      "advance": 0,
       "payments": 2000
      },
      "source": "rules"

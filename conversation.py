@@ -1378,6 +1378,20 @@ def derive_turn(session, text, llm_observations=None):
             if entry:
                 return _present(session, pend["slot"], entry, prefix)
 
+    # "bhai se 1000 udhaar liya, woh alag hai": a private loan is not an advance and not any other
+    # number; the core would otherwise store the 1000 in whatever slot is being asked
+    private = [x for x in contexts if x.get("category") == "private_loan"]
+    if private and llm_observations is None and not facts_new and not pend and asking:
+        line = _with(prefix, _ack_for(private[0])) if prefix != _ack_for(private[0]) else prefix
+        if asking == "advance":
+            session["facts"]["advance"] = 0
+            stored.append({"type": "advance", "value": 0, "ambiguous": False, "confirmed": True, "source": "private loan"})
+            _refresh(session)
+            line = _with(line, ("To mazdoori ka advance 0 likhta hoon. ", "तो मज़दूरी का एडवांस 0 लिखता हूँ। "))
+            return _reply(session, _ask_next(session, prefix=line), action="python_derived",
+                          facts=dict(session["facts"]), parsed={"field": "advance", "value": 0})
+        return _reply(session, _ask(session, state, prefix=line), action="python_derived",
+                      qtype=f"ask_number:{asking}")
     if not facts_new:
         return None
     rules_path = llm_observations is None

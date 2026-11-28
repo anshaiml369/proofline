@@ -202,3 +202,15 @@ def test_one_number_questions_from_the_llm_are_kept():
     llm = "Achha. Abhi tak kitne din kaam kiya hai jiski payment baaki hai?"
     r = c.step_policy(s, "paise nahi mile", decided(llm))
     assert r["agent_text"] == llm
+
+
+def test_private_loan_is_not_the_advance():                             # held-out X12
+    s, out = _play(["10 din", "500 roz", "bhai se 1000 udhaar liya, woh alag hai"])
+    assert s["facts"]["advance"] == 0 and s["state"] == c.ASK_PAYMENTS
+    assert out[-1]["agent_text"].startswith("Woh alag udhaar hai")
+
+
+def test_private_loan_mid_way_stores_nothing():
+    s, out = _play(["10 din", "bhai se 1000 udhaar liya, woh alag hai"])
+    assert "rate" not in s["facts"] and s["state"] == c.ASK_RATE
+    assert out[-1]["agent_text"].endswith("Roz ki mazdoori kitni tay hui thi?")
