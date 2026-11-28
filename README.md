@@ -219,7 +219,7 @@ pip3 install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-There are 109 tests. They need no network or keys (the LLM is faked). They cover:
+There are 111 tests. They need no network or keys (the LLM is faked). They cover:
 - the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
 - the demo conversation and Wispr-style text (digits, ₹, Devanagari);
 - the mandatory confirm step;
@@ -235,7 +235,7 @@ There are 109 tests. They need no network or keys (the LLM is faked). They cover
 - Hinglish error pages, and the `/health` fields;
 - the audit layer: the hash is stored, verifies, and is never overwritten, and an edited record fails; `/mark-sent` and `/state`; the follow-up after a simulated 25 hours (and none after 2), with "kal dega" setting tomorrow's date; the escalation draft and share page carrying the hash; delete only after a spoken yes, and the row really gone;
 - the three choices; a contradiction ("6 din", later "5 din") asked about with both values kept, and an explicit "nahi nahi, 5 din" taken without a question;
-- language detection for all seven codes, Marathi switching the voice and the lines, Hindi staying Hindi, the toggle;
+- language detection for all seven codes, Marathi switching the voice and the lines, Marathi number words ("सहा", "सातशे"), Hindi staying Hindi, the toggle;
 - overtime and deductions: the maths, the read-back again, and the four-number path unchanged.
 
 ## Built with

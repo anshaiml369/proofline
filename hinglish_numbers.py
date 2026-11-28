@@ -51,12 +51,22 @@ _UNITS.update({
     "एक": 1, "दो": 2, "तीन": 3, "चार": 4, "पांच": 5, "पाँच": 5, "छह": 6, "छः": 6, "छे": 6,
     "सात": 7, "आठ": 8, "नौ": 9, "दस": 10, "ग्यारह": 11, "बारह": 12, "पंद्रह": 15, "बीस": 20,
     "तीस": 30, "चालीस": 40, "पचास": 50, "साठ": 60, "सत्तर": 70, "अस्सी": 80, "नब्बे": 90,
+    # Marathi (Devanagari and Roman), as Wispr Flow may write them
+    "सहा": 6, "पाच": 5, "दहा": 10, "नऊ": 9, "अकरा": 11, "चाळीस": 40, "पन्नास": 50, "साठ": 60,
+    "saha": 6, "paach": 5, "pach": 5, "daha": 10, "nau": 9,
+})
+# Marathi hundreds are one word ("सातशे" = 700)
+_UNITS.update({
+    "शंभर": 100, "दोनशे": 200, "तीनशे": 300, "चारशे": 400, "पाचशे": 500, "सहाशे": 600, "सातशे": 700,
+    "आठशे": 800, "नऊशे": 900, "shambhar": 100, "donshe": 200, "teenshe": 300, "tinshe": 300, "chaarshe": 400,
+    "charshe": 400, "paachshe": 500, "pachshe": 500, "sahashe": 600, "saatshe": 700, "satshe": 700,
+    "aathshe": 800, "naushe": 900,
 })
 _UNITS = {unicodedata.normalize("NFC", k): v for k, v in _UNITS.items()}
 _SCALES = {
     "sau": 100, "so": 100, "hundred": 100, "सौ": 100,
     "hazaar": 1000, "hazar": 1000, "hajar": 1000, "hajaar": 1000, "thousand": 1000, "k": 1000,
-    "हज़ार": 1000, "हजार": 1000,
+    "हज़ार": 1000, "हजार": 1000, "हजाराचे": 1000,
     "lakh": 100_000, "lac": 100_000, "लाख": 100_000,
 }
 _SCALES = {unicodedata.normalize("NFC", k): v for k, v in _SCALES.items()}

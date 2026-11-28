@@ -249,3 +249,19 @@ def test_rules_take_a_tagged_correction_of_a_known_number():
         c.step(s, w, c.local_extract)
     r = c.step(s, "sorry, advance 500 tha", c.local_extract)
     assert s["facts"]["advance"] == 500 and "payments" not in s["facts"] and r["state"] == c.ASK_PAYMENTS
+
+
+def test_marathi_number_words():
+    from hinglish_numbers import parse_amounts
+    assert parse_amounts("सहा दिवस") == [6]
+    assert parse_amounts("रोज सातशे रुपये") == [700]
+    assert parse_amounts("तीन हजार मिळाले") == [3000]
+    assert parse_amounts("saha divas, saatshe roj, paachshe advance") == [6, 700, 500]
+
+
+def test_marathi_days_are_accepted_on_the_llm_path():
+    s = c.new_session()
+    s["language"] = "mr"
+    c.opening(s)
+    r = c.step_policy(s, "मी सहा दिवस काम केलं आहे", decided("ठीक आहे. रोजची मजुरी किती?", [x("days", 6)], target="rate"))
+    assert s["facts"]["days"] == 6 and not r["agent_text"].startswith("माफ")
