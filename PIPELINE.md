@@ -117,8 +117,26 @@ The browser tries these in order (`speak()` in `static/app.js`):
 ```
 $ curl -s https://pagarsaathi.up.railway.app/health
 {"key_set":true,"llm":true,"llm_provider":"openai","missing":[],"mode":"live","status":"ok","stt":false,"voice":true}
-# captured 28 Nov 2026 after the keys were added in Railway Variables
+# captured 2026-11-28 14:51 UTC
 ```
+
+**`/health` shows that a key is set, not that it works.** To see whether the LLM actually answers, send a turn and read `text_source`, `policy_source` and `llm_error`:
+
+```
+$ two live /turn calls, 2026-11-28 14:51 UTC
+text_source=llm policy_source=llm action=ask_slot llm_error=None audio=sarvam 5.3s
+text_source=llm policy_source=llm action=ask_slot llm_error=None audio=sarvam 8.1s
+```
+
+| Provider | Live status (2026-11-28) |
+|---|---|
+| OpenAI `gpt-4.1-mini` (tried first) | **Working.** Every turn of a Hindi and a Marathi test conversation came from the LLM, 2.5–8 s per turn including the Sarvam voice. |
+| OpenRouter (backup) | **Out of credits** (HTTP 402). If OpenAI fails on a turn, that turn goes straight to the rules, which still reach the right amount. |
+| Sarvam Bulbul voice | Working (`audio_source: sarvam`, or `recorded` for the demo clips). |
+
+**`llm_error`** in each `/turn` reply says why the LLM was skipped on that turn: the error class, HTTP status and host, for example `HTTPStatusError 401 @ api.openai.com`. It never contains a key or a response body. `null` means no provider failed.
+
+What it caught on 2026-11-28: after the phase 10–15 deploy, every live turn showed `HTTPStatusError 401 @ api.openai.com` (the OpenAI key on Railway was rejected) and then `HTTPStatusError 402 @ openrouter.ai` (no OpenRouter credits), so conversations ran on the rules while `/health` still said `"llm": true`. A new OpenAI key was set in Railway Variables and deployed, and `llm_error` went back to `null`.
 
 ### To switch on the LLM and the Sarvam voice on Railway
 
@@ -129,4 +147,4 @@ Go to Railway → project **perceptive-growth** → service **web** → **Variab
 | `OPENAI_API_KEY` (or `OPENROUTER_API_KEY`) | `"llm": true`: conversational replies |
 | `SARVAM_API_KEY` | `"voice": true`: Sarvam Bulbul voice |
 
-Railway redeploys on its own. Then `curl -s https://pagarsaathi.up.railway.app/health` should show `"llm": true, "voice": true, "mode": "live"`.
+Railway stages a variable edit: click **Deploy** on the "Apply 1 change" banner, or the running service keeps the old value. When the new deployment is Active, `curl -s https://pagarsaathi.up.railway.app/health` should show `"llm": true, "voice": true, "mode": "live"`. Then send one turn and check that `llm_error` is `null` and `text_source` is `llm`.
