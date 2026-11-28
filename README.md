@@ -52,13 +52,13 @@ Setup steps are in [`WISPR_FLOW_SETUP.md`](WISPR_FLOW_SETUP.md).
 | Part | With keys | With no keys |
 |---|---|---|
 | Voice in | Wispr Flow (OS-level dictation) | Same: Wispr Flow needs no key |
-| Understanding and replying | An LLM (OpenAI `gpt-4.1-mini`, or OpenRouter) reads each message, hears several facts at once, takes corrections, and replies to what the worker actually said | Built-in Hinglish rules: digits, Roman, Devanagari, "nahi mila" |
+| Deciding what to say next | An LLM dialogue policy (OpenAI `gpt-4.1-mini`, or OpenRouter) reads the whole conversation and chooses each move: ask, follow up, clarify, respond to what the worker volunteered (hospital, a loan, "3 saal"), answer an off-topic question, rephrase | Built-in Hinglish rules: digits, Roman, Devanagari, "nahi mila", plus answers for hospital, loan, years, "ek hafta" |
 | Maths | `wage_math.py` (Python) | Same |
 | Voice out | Sarvam Bulbul, a natural Hindi voice | Pre-recorded Sarvam clips for fixed lines, then the browser's own voice |
 
 **Every line shows its source.** A small grey badge under each agent line reads, for example, `Text: LLM · Voice: Sarvam` or `Text: Rules · Voice: Recorded`. Worker lines read `Wispr Flow / typed`. The full pipeline, with the exact model and voice names, is in [`PIPELINE.md`](PIPELINE.md).
 
-**The LLM never calculates.** It returns the facts it heard as JSON. Python checks each one, adds multiple amounts, still insists on the "Sahi hai?" read-back, and does all the maths. If the LLM fails or takes over 8 seconds, that turn uses the built-in rules.
+**The LLM decides the conversation, never the money.** Each turn it returns an action, the line to say, the numbers it heard and any new context, as JSON. Python stores a number only if the worker actually said it, adds multiple amounts, blocks any line that states an amount the worker did not say, never lets the same line repeat, steps in after three turns going nowhere, and always runs the "Sahi hai?" read-back before the maths. If the LLM fails or takes over 8 seconds, that turn uses the built-in rules. The full contract and guards are in [`PIPELINE.md`](PIPELINE.md#the-dialogue-policy-llm-path).
 
 ### A real conversation (LLM path)
 
@@ -135,7 +135,7 @@ pip3 install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-There are 54 tests. They need no network or keys (the LLM is faked). They cover:
+There are 72 tests. They need no network or keys (the LLM is faked). They cover:
 - the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
 - the demo conversation and Wispr-style text (digits, ₹, Devanagari);
 - the mandatory confirm step;
@@ -143,7 +143,8 @@ There are 54 tests. They need no network or keys (the LLM is faked). They cover:
 - multiple payments added in Python;
 - "pata nahi" not being read as ₹0;
 - the nothing-owed path;
-- the LLM path: several facts in one sentence, corrections at the read-back, Python adding amounts, "haan" never read as ₹0, the reply never asking its own question, falling back to rules when the LLM fails;
+- the LLM policy path: hospital, loan and "3 saal" handled as context, off-topic questions, a number the worker never said being refused, a total never spoken, no line repeated, Python stepping in when stuck, several facts in one sentence, corrections at the read-back, Python adding amounts, "haan" never read as ₹0, falling back to rules when the LLM fails;
+- the rules path without keys: "3 saal" and "ek hafta" not stored as days, hospital and loan acknowledged, no line repeated;
 - "so far" not being read as "sau";
 - several amounts in one answer without keys ("6 din, 700 roz" is 6 days and ₹700, not 706);
 - Hinglish error pages, and the `/health` fields.
@@ -191,8 +192,8 @@ The **Hugging Face Inference API** is a documented alternative LLM provider: any
 | Path | What it is |
 |---|---|
 | `app.py` | Flask: `GET /`, `POST /turn`, `GET /health` |
-| `conversation.py` | The state machine, the built-in Hinglish reader, and the LLM turn (`step_llm`) |
-| `agent_llm.py`, `prompts/agent.txt` | The optional LLM layer: hears facts, writes the reply |
+| `conversation.py` | The frame and states, the built-in Hinglish reader, and the guarded LLM policy turn (`step_policy`) |
+| `agent_llm.py`, `prompts/policy.txt` | The optional LLM dialogue policy: chooses the next move and writes the line |
 | `PIPELINE.md` | Exactly where each line's text and voice come from, in each mode |
 | `wage_math.py` | All arithmetic, as pure functions |
 | `hinglish_numbers.py` | Number words, both ways (4200 ⇄ "chaar hazaar do sau") |

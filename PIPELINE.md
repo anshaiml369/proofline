@@ -15,13 +15,44 @@ This page is written from the code (`app.py`, `agent_llm.py`, `conversation.py`,
 
 | Mode | Source | Code |
 |---|---|---|
-| Live with an LLM key | **OpenAI `gpt-4.1-mini`** via `OPENAI_API_KEY`, tried first. If that fails: **OpenRouter `openai/gpt-4.1-mini`** via `OPENROUTER_API_KEY`. Settings: temperature 0.3, max 300 tokens, JSON output, 8 s timeout (`LLM_TIMEOUT_S`). Models can be overridden with `OPENAI_MODEL` / `OPENROUTER_MODEL`. | `agent_llm.providers()`, `agent_llm.understand()` |
-| | The LLM returns the facts it heard plus a short reply (`say`) and an optional clarifying question (`ask`). **Python** validates the facts, adds multiple amounts, runs the read-back and does all the maths. The questions, the read-back and the result lines are fixed text from `conversation.py`. | `conversation.step_llm()`, `wage_math.py` |
+| Live with an LLM key | **OpenAI `gpt-4.1-mini`** via `OPENAI_API_KEY`, tried first. If that fails: **OpenRouter `openai/gpt-4.1-mini`** via `OPENROUTER_API_KEY`. Settings: temperature 0.4, max 400 tokens, JSON output, 8 s timeout (`LLM_TIMEOUT_S`). Models can be overridden with `OPENAI_MODEL` / `OPENROUTER_MODEL`. | `agent_llm.providers()`, `agent_llm.decide()` |
+| | **The LLM is the dialogue policy.** Each turn it gets the frame, the whole conversation and the latest message, and chooses the next move and writes the line (see "The dialogue policy" below). **Python** keeps the frame, accepts only numbers the worker said, breaks loops, forces the read-back and does all the maths. The read-back and the result lines are fixed text from `conversation.py`. | `conversation.step_policy()`, `wage_math.py` |
 | | Fallback: if every provider fails or times out, that turn uses the rules below. | `app.turn()` |
-| Live without keys | **Rules:** the state machine in `conversation.py` plus the Hinglish number reader in `hinglish_numbers.py` (digits, Roman, Devanagari; tags amounts by "din", "roz", "advance", "mile"). | `conversation.step()`, `conversation.local_extract()` |
+| Live without keys | **Rules:** the state machine in `conversation.py` plus the Hinglish number reader in `hinglish_numbers.py` (digits, Roman, Devanagari; tags amounts by "din", "roz", "advance", "mile"). The rules also answer a few off-script topics (hospital or illness, a loan, "3 saal", "ek hafta", "ek mahina") and never repeat the same line twice in a row. | `conversation.step()`, `conversation.local_extract()` |
 | `?mode=scripted` | Rules only, always, even when keys are set, so the demo runs the same every time. | `app.turn()` (`scripted` flag) |
 
 Badge: `Text: LLM` or `Text: Rules`, from the `text_source` field of each `/turn` reply.
+
+## The dialogue policy (LLM path)
+
+The conversation is not a fixed list of questions. With a key set, the LLM decides every next move.
+
+**The frame** (Python, per session): the four numbers `days`, `rate`, `advance`, `payments`; `context_notes` (what the worker volunteered: hospital, a loan, years at the site); `unresolved` (numbers heard but unclear); the last question; the turn count. It is sent to the LLM every turn, with the whole conversation (`agent_llm.frame()`, `agent_llm.build_user_message()`).
+
+**The LLM returns** (`prompts/policy.txt`):
+
+```json
+{"action": "ask_slot | follow_up | clarify | acknowledge_context | handle_off_topic | rephrase | conclude",
+ "target_slot": "days | rate | advance | payments | none",
+ "agent_text": "...", "agent_text_hi": "...",
+ "extracted": [{"slot": "rate", "value": 650, "confidence": "high"}],
+ "context_delta": "Was in hospital for 4 days",
+ "intent": "yes | no | other"}
+```
+
+**Python's guards** (`conversation.step_policy()`):
+
+| Guard | What it stops |
+|---|---|
+| A number is stored only if the worker said it (this message or the one before), it is in range, and ₹0 only if they said "nothing" | The model turning "ek hafta" into 7 days or "3 saal" into 1,095 days; "haan" read as ₹0 |
+| Several amounts come back as a list; Python adds them | The model doing arithmetic |
+| The line may not contain any amount of ₹32 or more that the worker did not say | The model stating a total or an amount owed |
+| The line may not be the same words as the last one | Asking the same question again and again |
+| Three turns in a row with no new number and no new context: Python steps in (assumes ₹0 for advance or payments and flags it, or rephrases for days and rate) | Going round in circles |
+| When all four numbers are known, the next line is always Python's read-back, and the maths runs only on a "haan" the rules also do not read as "nahi" | Skipping the read-back |
+| A rejected line is replaced by the rules' answer or a fixed question | Saying anything unsafe |
+
+Each `/turn` reply has `action` (what the policy chose) and `context_notes`; the server log has `action=` and `guarded=` for every turn. The page shows the notes under the four boxes as "Aapne bataya".
 
 ## The agent's voice
 

@@ -8,11 +8,11 @@ on iPhone) and the words land in the text box. This module has no I/O. Each agen
 `agent_text` (Roman Hinglish, shown on screen) and `speak_text` (Devanagari with digits, which
 browser Hindi voices read naturally).
 """
+import re
+import unicodedata
 import uuid
 
-import unicodedata
-
-from hinglish_numbers import amount_groups, parse_amounts, parse_yes_no, says_none, to_words
+from hinglish_numbers import amount_groups, parse_amounts, parse_yes_no, says_none, says_nothing, to_words, tokens
 from wage_math import calculate_wages, payment_request
 
 START, ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS = "START", "ASK_DAYS", "ASK_RATE", "ASK_ADVANCE", "ASK_PAYMENTS"
@@ -30,24 +30,32 @@ STATES = {
         "question_hi": ("Aapne kitne din kaam kiya?", "आपने कितने दिन काम किया?"),
         "simpler": ("Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
                     "कितने दिन काम किया? सिर्फ़ नंबर बोलिए, जैसे छह दिन।"),
+        "example": ("Hafte ke hisaab se sochiye: jis hafte ka paisa baaki hai, usme kitne din kaam par gaye?",
+                    "हफ़्ते के हिसाब से सोचिए: जिस हफ़्ते का पैसा बाकी है, उसमें कितने दिन काम पर गए?"),
     },
     ASK_RATE: {
         "extract_field": "rate",
         "question_hi": ("Roz ki mazdoori kitni tay hui thi?", "रोज़ की मज़दूरी कितनी तय हुई थी?"),
         "simpler": ("Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
                     "एक दिन के कितने रुपये तय हुए थे? जैसे सात सौ रुपये।"),
+        "example": ("Thekedar ne ek din ka kitna bola tha? Sirf rupaye boliye.",
+                    "ठेकेदार ने एक दिन का कितना बोला था? सिर्फ़ रुपये बोलिए।"),
     },
     ASK_ADVANCE: {
         "extract_field": "advance",
         "question_hi": ("Koi advance mila tha pehle?", "कोई एडवांस मिला था पहले?"),
         "simpler": ("Kaam se pehle kitne paise mile the? Nahi mile to boliye nahi.",
                     "काम से पहले कितने पैसे मिले थे? नहीं मिले तो बोलिए नहीं।"),
+        "example": ("Kaam shuru hone se pehle ya beech mein, mazdoori mein se katne wale kitne paise liye the?",
+                    "काम शुरू होने से पहले या बीच में, मज़दूरी में से कटने वाले कितने पैसे लिए थे?"),
     },
     ASK_PAYMENTS: {
         "extract_field": "payments",
         "question_hi": ("Ab tak kitne paise mile?", "अब तक कितने पैसे मिले?"),
         "simpler": ("Advance ke alawa ab tak kitne rupaye mile? Kuch nahi mila to boliye nahi.",
                     "एडवांस के अलावा अब तक कितने रुपये मिले? कुछ नहीं मिला तो बोलिए नहीं।"),
+        "example": ("Is kaam ke liye haath mein kitne rupaye aa chuke hain? Kuch nahi aaya to boliye kuch nahi.",
+                    "इस काम के लिए हाथ में कितने रुपये आ चुके हैं? कुछ नहीं आया तो बोलिए कुछ नहीं।"),
     },
     CONFIRM: {
         "extract_field": "confirm",
@@ -80,7 +88,9 @@ ASSIST_ZERO = ("Koi baat nahi, abhi ke liye zero maan lete hain. Confirm karte w
 
 def new_session():
     return {"id": uuid.uuid4().hex, "state": START, "facts": {}, "failures": 0, "case": None,
-            "case_id": None, "needs_assistance": [], "turns": [], "last_agent_text": ""}
+            "case_id": None, "needs_assistance": [], "turns": [], "last_agent_text": "",
+            # the frame the dialogue policy reads, beyond the four numbers
+            "context_notes": [], "unresolved": [], "turn_count": 0}
 
 
 def _reply(session, line, **extra):
@@ -112,8 +122,12 @@ def readback(f):
 
 
 def result_line(case):
-    shown = f"Kul kamaai {to_words(case['expected'])}. Mila {to_words(case['received'])}."
-    spoken = f"कुल कमाई {case['expected']} रुपये। मिला {case['received']} रुपये।"
+    if case["received"]:
+        shown = f"Kul kamaai {to_words(case['expected'])}. Mila {to_words(case['received'])}."
+        spoken = f"कुल कमाई {case['expected']} रुपये। मिला {case['received']} रुपये।"
+    else:
+        shown = f"Kul kamaai {to_words(case['expected'])}. Abhi tak kuch nahi mila."
+        spoken = f"कुल कमाई {case['expected']} रुपये। अभी तक कुछ नहीं मिला।"
     if case["outstanding"] <= 0:
         return (f"{shown} Hisaab ke hisaab se koi paisa baaki nahi hai.",
                 f"{spoken} हिसाब के हिसाब से कोई पैसा बाकी नहीं है।")
@@ -169,11 +183,18 @@ def step(session, text, extract):
 
     if state in (ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS):
         field = STATES[state]["extract_field"]
-        value = _accept_number(field, extract(field, session["last_agent_text"], text))
+        ctx = rules_context(field, text)
+        if ctx:
+            _note(session, ctx["note"])
+        value = None if ctx and ctx["block"] else _accept_number(field, extract(field, session["last_agent_text"], text))
         if value is None:
+            if ctx and ctx["block"]:                          # "3 saal" / "ek hafta" is not a day count: ask
+                return _reply(session, ctx["line"], reasked=True, context=True)
+            if ctx and ctx["line"]:                           # hospital, loan...: respond, then ask again
+                return _reply(session, _join(ctx["line"], STATES[state]["question_hi"]), context=True)
             session["failures"] += 1
             if session["failures"] == 1:                      # re-ask once, simpler
-                return _reply(session, STATES[state]["simpler"], reasked=True)
+                return _reply(session, _reask(session, state), reasked=True)
             # second miss: flag for help and move on where we safely can
             if field not in session["needs_assistance"]:
                 session["needs_assistance"].append(field)
@@ -181,15 +202,16 @@ def step(session, text, extract):
                 session["facts"][field] = 0
                 return _reply(session, _ask(session, _next_missing(session), prefix=ASSIST_ZERO),
                               parsed={"field": field, "value": 0, "assumed": True})
-            # days and rate cannot be guessed: keep asking, with a hint
-            return _reply(session, _join(ASSIST_NUMBER, STATES[state]["simpler"]), reasked=True)
+            # days and rate cannot be guessed: keep asking, a different way each time
+            return _reply(session, _reask(session, state), reasked=True)
         session["facts"][field] = value
         session["turns"][-1]["value"] = value
         if field in session["needs_assistance"]:
             session["needs_assistance"].remove(field)
         _merge_tagged(session, text, skip=field)         # other facts said in the same breath
-        return _reply(session, _ask(session, _next_missing(session)), parsed={"field": field, "value": value},
-                      facts=dict(session["facts"]))
+        nxt = _ask(session, _next_missing(session))
+        return _reply(session, _join(ctx["line"], nxt) if ctx and ctx["line"] else nxt,
+                      parsed={"field": field, "value": value}, facts=dict(session["facts"]))
 
     if state == CONFIRM:
         ok = _accept_bool(extract("confirm", session["last_agent_text"], text))
@@ -228,32 +250,14 @@ def step(session, text, extract):
     return _reply(session, DONE_LINE)
 
 
-# ---------- LLM path: the agent replies to what the worker actually said ----------
+# ---------- LLM dialogue policy: the LLM decides the next move, Python guards it ----------
 
 ORDER = (("days", ASK_DAYS), ("rate", ASK_RATE), ("advance", ASK_ADVANCE), ("payments", ASK_PAYMENTS))
+ASK_STATE = dict(ORDER)
 WHAT_WRONG = ("Kya galat hai? Din, roz ki mazdoori, advance ya mila hua paisa: sahi number boliye.",
               "क्या गलत है? दिन, रोज़ की मज़दूरी, एडवांस या मिला हुआ पैसा: सही नंबर बोलिए।")
-
-
-def merge_facts(session, text, understood):
-    """Validate and store the facts the LLM heard. Python adds multiple amounts. Returns
-    {field: value} for what was stored this turn."""
-    stored = {}
-    for field, _ in ORDER:
-        parts = understood["parts"].get(field)
-        value = sum(parts) if parts else understood["facts"].get(field)
-        if value is None:
-            continue
-        # ₹0 only when the worker actually said "nothing" (a bare "haan" is not zero)
-        if value == 0 and field in ("advance", "payments") and not (says_none(text) or 0 in parse_amounts(text)):
-            continue
-        lo, hi = LIMITS[field]
-        if lo <= value <= hi and session["facts"].get(field) != value:   # new or changed only
-            session["facts"][field] = value
-            stored[field] = value
-            if field in session["needs_assistance"]:
-                session["needs_assistance"].remove(field)
-    return stored
+SORRY = ("Maaf kijiye, theek se samajh nahi aaya. ", "माफ़ कीजिए, ठीक से समझ नहीं आया। ")
+STALL_LIMIT = 3        # turns in a row with no new number and no new context -> Python steps in
 
 
 def _next_missing(session):
@@ -263,81 +267,184 @@ def _next_missing(session):
     return CONFIRM
 
 
-def _say(understood):
-    """The LLM's short reply, as a (shown, spoken) prefix."""
-    if not understood["say"]:
-        return None
-    return (understood["say"].rstrip() + " ", understood["say_hi"].rstrip() + " ")
-
-
 def _with(prefix, line):
     return _join(prefix, line) if prefix else line
 
 
-def step_llm(session, text, understood):
-    """One worker turn when the LLM understood the message. Same states and rules as step():
-    the read-back is still mandatory and Python still does the maths."""
+def _norm(s):
+    return " ".join("".join(ch for ch in s.lower() if ch.isalnum() or ch.isspace()).split())
+
+
+def _note(session, note):
+    if note and note.lower() not in (n.lower() for n in session["context_notes"]):
+        session["context_notes"] = (session["context_notes"] + [note])[-6:]
+
+
+def _recently_said(session, text):
+    """Numbers in the worker's latest message and the one before it ("2000 ka loan" ... "haan,
+    woh kaat liya" makes 2000 the advance)."""
+    earlier = [t["worker"] for t in session["turns"][-2:-1] if t.get("worker")]
+    return set(parse_amounts(text)).union(*(parse_amounts(w) for w in earlier))
+
+
+def accept_extracted(session, text, decision):
+    """Validate the numbers the policy heard. A number counts only if the worker actually said
+    it (in this message or the one before), is in a plausible range, and (for ₹0) the worker said "nothing".
+    Python adds multiple amounts. Returns (stored {slot: value}, rejected [slot])."""
+    heard = _recently_said(session, text)
+    stored, rejected = {}, []
+    moving_on = decision["action"] in ("ask_slot", "conclude")
+    for item in decision["extracted"]:
+        slot, value = item["slot"], item["value"]
+        if item["confidence"] != "high" and not moving_on:
+            session["unresolved"] = sorted(set(session["unresolved"]) | {slot})   # e.g. two different rates
+            continue
+        # "shayad 600" and the policy moves on: keep it; the mandatory read-back will check it
+        parts = value if isinstance(value, list) else [value]
+        ok = all(p in heard or (p == 0 and says_nothing(text)) for p in parts)
+        total = sum(parts)                       # Python adds, never the model
+        lo, hi = LIMITS[slot]
+        if total == 0 and slot in ("days", "rate"):
+            ok = False
+        if not ok or not lo <= total <= hi:
+            rejected.append(slot)
+            continue
+        if session["facts"].get(slot) != total:  # new or changed only
+            session["facts"][slot] = stored[slot] = total
+        if slot in session["needs_assistance"]:
+            session["needs_assistance"].remove(slot)
+        session["unresolved"] = [u for u in session["unresolved"] if u != slot]
+    return stored, rejected
+
+
+def guard_line(session, text, decision):
+    """The policy's line, if it is safe to say: not empty, not a word-for-word repeat of the last
+    question, and no amount the worker did not say (so never a total or an amount owed)."""
+    shown, spoken = decision["agent_text"], decision["agent_text_hi"]
+    if not shown or _norm(shown) == _norm(session["last_agent_text"]):
+        return None
+    allowed = _recently_said(session, text) | set(session["facts"].values())
+    digits = {int(d) for d in re.findall(r"\d+", (shown + " " + spoken).replace(",", ""))}
+    # number words: only amounts of 100+ count ("saath" is also "together", not just 60)
+    words = {n for n in parse_amounts(shown) + parse_amounts(spoken) if n >= 100}
+    if any(n > 31 and n not in allowed for n in digits | words):
+        return None
+    return (shown, spoken)
+
+
+def _reask(session, state):
+    """A re-ask that changes with each miss and is never the same words as the last line."""
+    options = [STATES[state]["simpler"], STATES[state].get("example"), _join(ASSIST_NUMBER, STATES[state]["simpler"]),
+               STATES[state].get("question_hi")]
+    options = [o for o in options if o and _norm(o[0]) != _norm(session["last_agent_text"])]
+    return options[max(session["failures"] - 1, 0) % len(options)]
+
+
+_PROMPT_WORDS = ("bataiye", "batayein", "bataye", "boliye", "batao", "bolo")
+
+
+def _ends_with_question(line):
+    """The line already asks something: a "?" or a closing "bataiye" / "boliye"."""
+    last = re.split(r"(?<=[.!?।])\s+", line[0].strip())[-1].lower()
+    return "?" in line[0] or any(w in last for w in _PROMPT_WORDS)
+
+
+def step_policy(session, text, decision):
+    """One worker turn driven by the LLM dialogue policy. The policy chooses what to say and
+    which number to go after; Python keeps the frame, accepts only numbers the worker said,
+    breaks loops, forces the read-back before any maths, and does the maths."""
     state = session["state"]
     text = (text or "").strip()
-    session["turns"].append({"agent": session["last_agent_text"], "worker": text, "state": state})
-    prefix = _say(understood)
+    session["turns"].append({"agent": session["last_agent_text"], "worker": text, "state": state,
+                             "action": decision["action"]})
+    session["turn_count"] += 1
+    if decision["context_delta"]:
+        _note(session, decision["context_delta"])
+    stored, rejected = accept_extracted(session, text, decision)
+    session["turns"][-1]["facts"] = stored
+    line = None if rejected else guard_line(session, text, decision)
+    if line is None:
+        session["turns"][-1]["guarded"] = "rejected number" if rejected else "unsafe or repeated line"
+    extra = {"facts": dict(session["facts"]), "action": decision["action"]}
+    if stored:
+        extra["parsed"] = {"field": list(stored)[-1], "value": list(stored.values())[-1]}
 
     if state in (START, ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS):
-        stored = merge_facts(session, text, understood)
-        session["turns"][-1]["facts"] = stored
-        extra = {"facts": dict(session["facts"])}
-        if stored:
-            extra["parsed"] = {"field": list(stored)[-1], "value": list(stored.values())[-1]}
-        if state == START and not stored and understood["ask"]:
-            _advance_to(session, ASK_DAYS)
-            return _reply(session, _with(prefix, (understood["ask"], understood["ask_hi"])), **extra)
-        if state == START or stored:
-            return _reply(session, _with(prefix, _ask(session, _next_missing(session))), **extra)
-        session["failures"] += 1
-        field = STATES[state]["extract_field"]
-        if session["failures"] == 1:
-            question = (understood["ask"], understood["ask_hi"]) if understood["ask"] else STATES[state]["question_hi"]
-            return _reply(session, _with(prefix, question), reasked=True, **extra)
-        if field not in session["needs_assistance"]:
-            session["needs_assistance"].append(field)
-        if field in ("advance", "payments") and session["failures"] >= 3:
-            session["facts"][field] = 0
-            return _reply(session, _ask(session, _next_missing(session), prefix=ASSIST_ZERO),
-                          parsed={"field": field, "value": 0, "assumed": True}, facts=dict(session["facts"]))
-        return _reply(session, _with(prefix, STATES[state]["simpler"]), reasked=True, **extra)
+        progressed = bool(stored or decision["context_delta"])
+        session["failures"] = 0 if progressed else session["failures"] + 1
+        nxt = _next_missing(session)
+        if nxt == CONFIRM:                      # all four known: the read-back is Python's, always
+            ack = line if line and decision["action"] == "conclude" and not _ends_with_question(line) else None
+            return _reply(session, _with(_space(ack), _ask(session, CONFIRM)), **extra)
+        target = decision["target_slot"]
+        if target in ASK_STATE and target not in session["facts"]:
+            nxt = ASK_STATE[target]             # the policy may choose which open number to go after
+        field = STATES[nxt]["extract_field"]
+        if session["failures"] >= STALL_LIMIT:  # going round in circles: Python steps in
+            if field not in session["needs_assistance"]:
+                session["needs_assistance"].append(field)
+            if field in ("advance", "payments"):
+                session["facts"][field] = 0
+                failures, session["failures"] = session["failures"], 0
+                return _reply(session, _ask(session, _next_missing(session), prefix=ASSIST_ZERO),
+                              parsed={"field": field, "value": 0, "assumed": True},
+                              facts=dict(session["facts"]), action="python_assist", stalls=failures)
+            session["state"] = nxt
+            return _reply(session, _reask(session, nxt), reasked=True, **extra, stall=True)
+        session["state"] = nxt
+        ctx = rules_context(field, text) if line is None and not rejected else None
+        if ctx and ctx["line"]:                 # policy line unusable, but the rules know this one
+            return _reply(session, ctx["line"] if ctx["block"] else _join(ctx["line"], STATES[nxt]["question_hi"]),
+                          guarded=True, **extra)
+        if line is None:                        # unsafe or repeated line: Python's own question
+            prefix = SORRY if rejected else None
+            q = STATES[nxt]["question_hi"] if not session["failures"] else _reask(session, nxt)
+            return _reply(session, _with(prefix, q), reasked=bool(session["failures"]), guarded=True, **extra)
+        if not _ends_with_question(line):       # every collecting turn moves the hisaab forward
+            line = _join(_space(line), STATES[nxt]["question_hi"])
+        return _reply(session, line, reasked=bool(session["failures"]), **extra)
 
     if state == CONFIRM:
-        stored = merge_facts(session, text, understood)
-        if stored:                                   # a correction: read everything back again
+        if stored:                               # a correction: read everything back again
             _advance_to(session, CONFIRM)
-            return _reply(session, _with(prefix, readback(session["facts"])),
-                          facts=dict(session["facts"]), corrected=stored)
-        if understood["intent"] == "yes":
+            return _reply(session, readback(session["facts"]), corrected=stored, **extra)
+        rules_yes = parse_yes_no(text)
+        if decision["intent"] == "yes" and rules_yes is not False:
             return step(_undo_turn(session), text, lambda *a: {"value": True, "confidence": "high"})
-        if understood["intent"] == "no":
+        if decision["intent"] == "no":
             session["failures"] += 1
             if session["failures"] >= 2:
                 session["facts"] = {}
                 session["needs_assistance"] = []
                 _advance_to(session, ASK_DAYS)
                 return _reply(session, RESTART, restarted=True, facts={})
-            return _reply(session, WHAT_WRONG)
-        return _reply(session, _with(prefix, STATES[CONFIRM]["simpler"]), reasked=True)
+            return _reply(session, WHAT_WRONG, **extra)   # never guess which number is wrong
+        session["failures"] += 1
+        reask = STATES[CONFIRM]["simpler"]
+        return _reply(session, _join(_space(line), reask) if line and not _ends_with_question(line)
+                      else line or reask, reasked=True, **extra)
 
     if state == ASK_SEND:
-        if understood["intent"] in ("yes", "no"):
-            ok = understood["intent"] == "yes"
+        if decision["intent"] in ("yes", "no"):
+            ok = decision["intent"] == "yes"
             return step(_undo_turn(session), text, lambda *a: {"value": ok, "confidence": "high"})
-        return _reply(session, _with(prefix, STATES[ASK_SEND]["simpler"]), reasked=True)
+        reask = STATES[ASK_SEND]["simpler"]
+        return _reply(session, _join(_space(line), reask) if line and not _ends_with_question(line)
+                      else line or reask, reasked=True, **extra)
 
     if state == SHOW_PREVIEW:
-        return _reply(session, _with(prefix, PREVIEW))
-    return _reply(session, _with(prefix, DONE_LINE))
+        return _reply(session, PREVIEW)
+    return _reply(session, DONE_LINE)
+
+
+def _space(line):
+    return (line[0].rstrip() + " ", line[1].rstrip() + " ") if line else None
 
 
 def _undo_turn(session):
-    """step() records the turn itself; drop the one step_llm() just added."""
+    """step() records the turn itself; drop the one step_policy() just added."""
     session["turns"].pop()
+    session["turn_count"] -= 1
     return session
 
 
@@ -388,6 +495,57 @@ def _merge_tagged(session, text, skip=None):
         if field != skip and field not in session["facts"] and lo <= value <= hi:
             session["facts"][field] = stored[field] = value
     return stored
+
+
+# Things a worker says outside the four numbers. The rules path responds to them like a person
+# would (the LLM policy does this far better when a key is set), and keeps a note.
+_W = lambda *ws: {unicodedata.normalize("NFC", w) for w in ws}  # noqa: E731
+CONTEXT_RULES = (
+    # keys, note kept for the hisaab, ack said before the usual question, and for the days question
+    # only: a clarifying question asked INSTEAD of storing the number ("4 din hospital" is not 4
+    # days of work; "3 saal" / "ek hafta" is not a day count).
+    {"keys": _W("hospital", "aspatal", "aspataal", "bimar", "beemar", "bimaar", "bukhar", "sick", "ill", "chot",
+                "injury", "injured", "अस्पताल", "बीमार", "बुखार", "चोट"),
+     "note": "Was ill / in hospital for some days",
+     "ack": ("Yeh sunkar dukh hua. Sirf jin dino kaam kiya, wahi ginenge. ",
+             "यह सुनकर दुख हुआ। सिर्फ़ जिन दिनों काम किया, वही गिनेंगे। "),
+     "days": ("Yeh sunkar dukh hua, ab aap theek rahiye. Hospital ya bimaari ke din chhod kar, kitne din kaam kiya?",
+              "यह सुनकर दुख हुआ, अब आप ठीक रहिए। अस्पताल या बीमारी के दिन छोड़ कर, कितने दिन काम किया?")},
+    {"keys": _W("loan", "udhaar", "udhar", "karz", "karza", "qarz", "karj", "borrowed", "उधार", "कर्ज़", "कर्ज", "लोन"),
+     "note": "Took a loan",
+     "ack": ("Samajh gaya. Jo loan aapki mazdoori se kaata gaya, use advance mein ginenge. ",
+             "समझ गया। जो लोन आपकी मज़दूरी से काटा गया, उसे एडवांस में गिनेंगे। ")},
+    {"keys": _W("saal", "year", "years", "baras", "साल", "बरस"),
+     "note": "Has worked there for years",
+     "days": ("Lamba saath hai. Jis time ka paisa baaki hai, jaise pichhla hafta ya mahina, usme kitne din kaam kiya?",
+              "लंबा साथ है। जिस टाइम का पैसा बाकी है, जैसे पिछला हफ़्ता या महीना, उसमें कितने दिन काम किया?")},
+    {"keys": _W("mahina", "mahine", "mahino", "month", "months", "महीना", "महीने"),
+     "days": ("Theek hai. Us mahine mein asal mein kitne din kaam kiya? Chhutti ke din chhod kar boliye.",
+              "ठीक है। उस महीने में असल में कितने दिन काम किया? छुट्टी के दिन छोड़ कर बोलिए।")},
+    {"keys": _W("hafta", "hafte", "hafton", "week", "weeks", "हफ़्ता", "हफ्ता", "हफ़्ते", "हफ्ते"),
+     "days": ("Hafte mein kitne din kaam kiya, chhe ya saat? Ya jitne din gaye, utne boliye.",
+              "हफ़्ते में कितने दिन काम किया, छह या सात? या जितने दिन गए, उतने बोलिए।")},
+)
+_PERIOD_KEYS = {"saal", "year", "years", "baras", "साल", "बरस", "mahina", "mahine", "mahino", "month", "months",
+                "महीना", "महीने", "hafta", "hafte", "hafton", "week", "weeks", "हफ़्ता", "हफ्ता", "हफ़्ते", "हफ्ते"}
+
+
+def rules_context(field, text):
+    """{note, block, line} when the worker said something outside the plain number, else None."""
+    words = set(tokens(text))
+    for rule in CONTEXT_RULES:
+        if not words & rule["keys"]:
+            continue
+        period = bool(rule["keys"] & _PERIOD_KEYS)
+        if field == "days" and "days" in rule:
+            if period and words & _TAGS["days"]:
+                continue                     # "hafte mein 6 din": the days are named, fine
+            return {"note": rule.get("note"), "block": True, "line": rule["days"]}
+        if "ack" in rule:
+            return {"note": rule.get("note"), "block": False, "line": rule["ack"]}
+        if rule.get("note"):
+            return {"note": rule["note"], "block": False, "line": None}
+    return None
 
 
 def local_extract(field, question, text):

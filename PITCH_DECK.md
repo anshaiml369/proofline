@@ -50,7 +50,7 @@ Then: message preview → green **Send to contractor** → WhatsApp opens with t
 - **Wispr Flow is the voice layer.** It is OS-level dictation: double-tap Fn on a Mac, the Wispr Flow keyboard on an iPhone. The worker speaks, and the words appear in the answer box on camera.
 - PagarSaathi needs **no mic code and no speech-to-text service**: it receives text.
 - Wispr Flow lists Hindi and Hinglish support and writes romanised Hindi **[SOURCED: wisprflow.ai]**. The app reads digits, Roman and Devanagari.
-- The agent talks back: an LLM replies to what the worker actually said, and Sarvam Bulbul speaks it in natural Hindi.
+- The agent talks back: an LLM dialogue policy decides each next move from the whole conversation (it follows up, clarifies, and responds to "main hospital mein tha" or "manager se loan liya"), and Sarvam Bulbul speaks it in natural Hindi.
 - Speaking numbers fits this user better than typing them. A speed gain is **[UNVERIFIED]**: not yet measured.
 
 ---
@@ -77,8 +77,8 @@ Achha, chhe din aur saat sau roz.  Koi advance mila tha pehle?
 Text: LLM · Voice: Sarvam
 ```
 
-- `Text: LLM`: the LLM heard the facts and wrote the short reply. Python still checks every number.
-- `Text: Rules`: the built-in state machine, which needs no key.
+- `Text: LLM`: the LLM policy chose the move and wrote the line. Python still checks every number against what the worker said.
+- `Text: Rules`: the built-in rules, which need no key.
 - `Voice: Recorded / Sarvam / Browser`: which voice actually spoke.
 - The worker's lines say `Wispr Flow / typed`.
 

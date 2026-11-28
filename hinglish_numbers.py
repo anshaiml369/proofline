@@ -200,3 +200,17 @@ def says_none(text):
     if tokens & _UNSURE:          # "pata nahi" = don't know, not "got nothing"
         return False
     return bool(tokens & (_NO | {"kuch", "zero", "shunya", "कुछ"})) and not parse_amounts(text)
+
+
+def tokens(text):
+    """Lower-case words of the text (Roman and Devanagari), for keyword checks."""
+    return _tokens(text)
+
+
+def says_nothing(text):
+    """The worker says they got nothing for some fact, even if other amounts are in the same
+    sentence: 'advance nahi mila, 3000 mile'. 'pata nahi' (don't know) is not nothing."""
+    words = set(_tokens(text))
+    if words & _UNSURE:
+        return False
+    return bool(words & (_NO | {"kuch", "zero", "shunya", "कुछ", "nothing", "none"})) or 0 in parse_amounts(text)

@@ -2,8 +2,8 @@
 
 The worker dictates with Wispr Flow (an OS-level dictation layer), so the app receives TEXT.
 No API key is needed for the core flow. Optional extras, only if keys are set:
-- OPENAI_API_KEY or OPENROUTER_API_KEY: an LLM understands each message and replies to what the
-  worker actually said (agent_llm.py). It never calculates.
+- OPENAI_API_KEY or OPENROUTER_API_KEY: an LLM dialogue policy decides each next move (ask, follow up,
+  clarify, respond to context) from the frame and transcript (agent_llm.py). It never calculates.
 - SARVAM_API_KEY: Sarvam Bulbul, a natural Hindi voice for the agent
 """
 import logging
@@ -109,6 +109,8 @@ def respond(session, reply, scripted, heard=None, text_source="rules"):
         "reasked": reply.get("reasked", False),
         "needs_assistance": reply.get("needs_assistance", False),
         "facts": dict(session["facts"]),
+        "context_notes": list(session.get("context_notes", [])),
+        "action": reply.get("action"),
     })
 
 
@@ -182,13 +184,14 @@ def turn():
 
     reply, source, started = None, "rules", time.time()
     if not scripted and agent_llm.enabled():
-        understood = agent_llm.understand(session, session["last_agent_text"], text, app.logger)
-        if understood:
-            reply, source = conversation.step_llm(session, text, understood), "llm"
+        decision = agent_llm.decide(session, text, app.logger)
+        if decision:
+            reply, source = conversation.step_policy(session, text, decision), "llm"
     if reply is None:   # no key, scripted demo, or the LLM failed: built-in rules
         reply = conversation.step(session, text, conversation.local_extract)
-    app.logger.info("turn %s state=%s text=%s in %.2fs", session["id"][:8], reply["state"], source,
-                    time.time() - started)
+    guarded = session["turns"][-1].get("guarded", "-") if session["turns"] else "-"
+    app.logger.info("turn %s state=%s text=%s action=%s guarded=%s in %.2fs", session["id"][:8], reply["state"],
+                    source, reply.get("action", "-"), guarded, time.time() - started)
     return respond(session, reply, scripted, heard=text, text_source=source)
 
 

@@ -165,6 +165,18 @@
     for (const [field, value] of Object.entries(facts)) showFact({ field, value });
   }
 
+  function showNotes(notes) {     // context the agent kept: hospital, loan, years...
+    const list = document.getElementById('notes');
+    list.replaceChildren();
+    for (const n of notes || []) {
+      const li = document.createElement('li');
+      li.className = 'rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-0.5 text-xs text-sky-200';
+      li.textContent = n;
+      list.append(li);
+    }
+    show(document.getElementById('notes-wrap'), !!(notes && notes.length));
+  }
+
   function clearFacts() {
     document.querySelectorAll('.fact').forEach((box) => {
       box.classList.remove('border-emerald-400/40', 'bg-emerald-400/10');
@@ -224,6 +236,7 @@
     if (data.state === 'ASK_DAYS' && saidText !== undefined && last && last.state === 'CONFIRM') clearFacts();
     if (data.facts) showFacts(data.facts); else showFact(data.parsed);
     if (data.parsed && data.parsed.assumed) showFact(data.parsed);
+    showNotes(data.context_notes);
 
     last = data;
     el.agent.textContent = data.agent_text;
