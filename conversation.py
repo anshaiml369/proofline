@@ -485,6 +485,20 @@ def _mix(session, llm, py):
     return _join(llm, py), None
 
 
+_SCRIPT = {"mr": ("\u0900", "\u097F"), "bn": ("\u0980", "\u09FF"), "ta": ("\u0B80", "\u0BFF"),
+           "te": ("\u0C00", "\u0C7F")}
+
+
+def _script_ok(session, line):
+    """In Marathi, Bengali, Tamil and Telugu the policy's line must be in that script; a Roman
+    Hinglish line would be read by the wrong voice."""
+    rng = _SCRIPT.get(session.get("language", "hi"))
+    if not rng or not line:
+        return True
+    letters = [ch for ch in line[0] if ch.isalpha()]
+    return bool(letters) and sum(rng[0] <= ch <= rng[1] for ch in letters) / len(letters) > 0.6
+
+
 def _llm_lang(session):
     lang = session.get("language", "hi")
     return lang if lang in ("mr",) + BETA_FIXED_HINDI else None
@@ -542,7 +556,10 @@ def step_policy(session, text, decision):
         stored.update(backstop(session, text, decision))
     session["turns"][-1]["facts"] = stored
     line = None if rejected else guard_line(session, text, decision)
-    if line is None:
+    if line is not None and not _script_ok(session, line):
+        line = None
+        session["turns"][-1]["guarded"] = "wrong language"
+    elif line is None:
         session["turns"][-1]["guarded"] = "rejected number" if rejected else "unsafe or repeated line"
     extra = {"facts": dict(session["facts"]), "action": decision["action"]}
     if stored:
@@ -839,7 +856,8 @@ _TAGS = {
     "days": {"din", "dino", "dinon", "day", "days", "दिन", "दिनों", "divas", "दिवस"},
     "rate": {"roz", "roj", "rozana", "daily", "rate", "dihadi", "dihaadi", "mazdoori", "per", "रोज़", "रोज",
              "रोजाना", "रोज़ाना", "दिहाड़ी", "मज़दूरी", "मजदूरी", "मजुरी", "majuri", "रोजची"},
-    "advance": {"advance", "advanced", "peshgi", "एडवांस", "पेशगी"},
+    "advance": {"advance", "advanced", "peshgi", "एडवांस", "पेशगी", "ॲडव्हान्स", "अ‍ॅडव्हान्स", "अॅडव्हान्स", "ऍडव्हान्स",
+                "एडव्हान्स", "उचल"},
     "payments": {"mile", "mila", "mili", "milaa", "paid", "received", "diye", "diya", "payment", "मिले", "मिला",
                  "मिली", "दिए", "दिया", "milale", "मिळाले", "मिळाला"},
 }

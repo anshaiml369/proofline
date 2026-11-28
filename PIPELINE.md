@@ -55,6 +55,7 @@ The conversation is not a fixed list of questions. With a key set, the LLM decid
 | When all four numbers are known, the next line is always Python's read-back, and the maths runs only on a "haan" the rules also do not read as "nahi" | Skipping the read-back |
 | A rejected line is replaced by the rules' answer or a fixed question | Saying anything unsafe |
 | A known number comes back different, with no "nahi", "galat" or "sorry": Python asks "Aapne pehle X kaha, ab Y: kaunsa sahi hai?" and keeps both values in the turn log (`conflict_asked`, then `conflict` with the choice) | Silently overwriting a number |
+| In Marathi, Bengali, Tamil or Telugu, a policy line not in that language's script is replaced by Python's own question (`guarded=wrong language`) | A Roman Hinglish line read out by the Marathi voice |
 | The three choices, overtime and deductions, the follow-up reply and delete are read by Python, not the LLM | A model choosing to send, escalate or delete |
 
 Each `/turn` reply has `action` (what the policy chose; `python_conflict` when Python asked about a contradiction), `policy_source` (`llm` or `fallback`), `node_path` (the states so far) and `context_notes`; the server log has `action=` and `guarded=` for every turn. The page shows the notes under the four boxes as "Aapne bataya".

@@ -265,3 +265,16 @@ def test_marathi_days_are_accepted_on_the_llm_path():
     c.opening(s)
     r = c.step_policy(s, "मी सहा दिवस काम केलं आहे", decided("ठीक आहे. रोजची मजुरी किती?", [x("days", 6)], target="rate"))
     assert s["facts"]["days"] == 6 and not r["agent_text"].startswith("माफ")
+
+
+def test_wrong_script_line_is_replaced_in_marathi():
+    s = c.new_session()
+    s["language"] = "mr"
+    c.opening(s)
+    r = c.step_policy(s, "मी सहा दिवस काम केलं", decided("Achha, 6 din. Roz kitna milta tha?", [x("days", 6)], target="rate"))
+    assert r["agent_text"] == "रोजची मजुरी किती ठरली होती?" and r["line_lang"] == "mr"
+    assert s["turns"][-1]["guarded"] == "wrong language"
+
+
+def test_marathi_advance_spelling_is_advance():
+    assert c.tagged_facts("पाचशे ॲडव्हान्स मिळाला होता") == {"advance": 500}
