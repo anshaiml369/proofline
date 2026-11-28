@@ -278,3 +278,9 @@ def test_wrong_script_line_is_replaced_in_marathi():
 
 def test_marathi_advance_spelling_is_advance():
     assert c.tagged_facts("पाचशे ॲडव्हान्स मिळाला होता") == {"advance": 500}
+
+
+def test_marathi_yes_and_no():
+    from hinglish_numbers import parse_yes_no
+    assert parse_yes_no("हो") is True and parse_yes_no("होय, बरोबर") is True and parse_yes_no("नाही") is False
+    assert parse_yes_no("काम हो गया") is None

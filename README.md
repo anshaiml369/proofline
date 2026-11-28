@@ -219,7 +219,7 @@ pip3 install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-There are 113 tests. They need no network or keys (the LLM is faked). They cover:
+There are 114 tests. They need no network or keys (the LLM is faked). They cover:
 - the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
 - the demo conversation and Wispr-style text (digits, ₹, Devanagari);
 - the mandatory confirm step;

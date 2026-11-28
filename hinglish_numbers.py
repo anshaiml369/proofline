@@ -182,8 +182,10 @@ def _parse_one(text):
 
 _YES = {"haan", "haa", "ha", "han", "haanji", "ji", "jee", "yes", "yeah", "yep", "ok", "okay", "theek",
         "thik", "sahi", "bilkul", "bhejo", "bhej", "bhejiye", "kardo", "हाँ", "हां", "हा", "जी", "सही",
-        "ठीक", "बिल्कुल", "भेजो", "भेज"}
-_NO = {"nahi", "nahin", "nai", "na", "naa", "no", "nope", "galat", "mat", "नहीं", "नही", "ना", "गलत", "मत"}
+        "ठीक", "बिल्कुल", "भेजो", "भेज", "होय", "hoy", "बरोबर", "barobar", "पाठवा"}
+_NO = {"nahi", "nahin", "nai", "na", "naa", "no", "nope", "galat", "mat", "नहीं", "नही", "ना", "गलत", "मत",
+       "नाही", "naahi", "चूक", "chuk"}
+_ONLY_YES = {"हो", "ho"}       # Marathi "yes", but also part of Hindi "हो गया": counts only on its own
 
 
 _YES = {unicodedata.normalize("NFC", w) for w in _YES}
@@ -195,7 +197,7 @@ def parse_yes_no(text):
     tokens = set(_tokens(text))
     if tokens & _NO:
         return False
-    if tokens & _YES:
+    if tokens & _YES or (tokens and tokens <= _ONLY_YES):
         return True
     return None
 

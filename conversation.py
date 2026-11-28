@@ -638,7 +638,7 @@ def step_policy(session, text, decision):
             return _reply(session, readback(session["facts"], session.get("language", "hi"),
                                             extras=session.get("extras")), corrected=stored, **extra)
         rules_yes = parse_yes_no(text)
-        if decision["intent"] == "yes" and rules_yes is not False:
+        if (decision["intent"] == "yes" and rules_yes is not False) or (rules_yes is True and decision["intent"] == "other"):
             return step(_undo_turn(session), text, lambda *a: {"value": True, "confidence": "high"})
         if decision["intent"] == "no":
             session["failures"] += 1
