@@ -51,6 +51,7 @@ The corpus above ran on the rules path only. A1 was also played against https://
 | 9d2766b (one acknowledgement) | 3 | none | Turn 1 fixed. All three runs stalled at "nabbe hazaar teen sau mile": the agent re-asked instead of storing 90300. Locally, every misread value tried (90000 + 300, 90000, 9300) was rejected, and nothing recovered it. This bug was there before Phase 16. |
 | 522ddd6 (misread amount falls back to Python's reading) | 3 | ₹700, ₹700, ₹700 | All passed. In two runs turn 1 asked for days and the daily rate in one question ("…kitne din kaam kiya aur roz kitna milta tha, bataiye?"). |
 | 5673e1d (one number per question) | 3 | ₹700, ₹700, ₹700 | All passed, with one question and one acknowledgement per turn. In all three the LLM asked a single question on its own, so the one-number check had nothing to fix live. A local test (`test_llm_question_asking_two_numbers_becomes_one`) replays the two-number reply from the previous row. |
+| 800bcac (context detector) | 1 | ₹700 | Passed, with one question and one acknowledgement per turn. A1 has none of the new context phrases, so this run only shows the change broke nothing on this path. |
 
 The first run after 5673e1d, verbatim:
 
@@ -69,7 +70,7 @@ The first run after 5673e1d, verbatim:
 The derived-number lines and the read-back are Python's in every run, and they were identical across runs. Only the LLM's own wording varied: the acknowledgement and the advance and payment questions.
 
 What these runs do and don't show:
-- **Three passing runs show the path works, not how often it fails.** The LLM is not deterministic.
+- **Seven passing runs since 522ddd6 show the path works, not how often it fails.** The LLM is not deterministic.
 - **There is no LLM-path number for the whole corpus.** The local key is rejected, so `v3-before-llm` and `v4-llm` have not been measured.
 
 ### Corpus: 115 cases
