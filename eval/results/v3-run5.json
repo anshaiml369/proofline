@@ -1,0 +1,3531 @@
+{
+ "summary": {
+  "version": "v3",
+  "cases": 32,
+  "slot_accuracy": 97.7,
+  "math_correct": 96.9,
+  "completed": 100.0,
+  "repetition_rate": 0.0,
+  "cases_with_repeat": 0,
+  "avg_turns_completed": 5.75,
+  "bundled_success": 100.0,
+  "bundled_cases": 7,
+  "context_ack": 83.3,
+  "context_cases": 6,
+  "llm_turns": 183,
+  "fallback_turns": 1,
+  "rules_turns": 0,
+  "seconds": 99.0
+ },
+ "results": [
+  {
+   "id": "A1",
+   "category": "A canonical",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "no payment received"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya ki paise nahi mile. Aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "chhe din",
+     "agent": "Theek hai, aapne chhe din kaam kiya. Rozana kitne rupaye milne wale the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "saat sau rupaye",
+     "agent": "Achha, rozana 700 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "paanch sau",
+     "agent": "Samajh gaya, aapko 500 rupaye advance mile the. Ab tak kitne paise mil chuke hain, advance ke alawa?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "teen hazaar",
+     "agent": "Theek hai, aapko advance ke alawa 3000 rupaye mil chuke hain. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "A2",
+   "category": "A canonical",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 1800,
+   "expected": {
+    "days": 10,
+    "rate": 500,
+    "advance": 200,
+    "payments": 3000,
+    "outstanding": 1800
+   },
+   "final_facts": {
+    "days": 10,
+    "rate": 500,
+    "advance": 200,
+    "payments": 3000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "thekedar ne poore paise nahi diye",
+     "agent": "Samajh gaya, thekedar ne poore paise nahi diye. Pehle batayein, aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "das din",
+     "agent": "Theek hai, aapne 10 din kaam kiya. Rozana kitne rupaye milte the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 10
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "paanch sau",
+     "agent": "Achha, aapko rozana 500 rupaye milte the. Kya aapko koi advance mila tha ya nahi?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 10,
+      "rate": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "do sau",
+     "agent": "Samajh gaya, aapko 200 rupaye advance mile the. Ab batayein, aapko ab tak kitne rupaye mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 200
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "teen hazaar",
+     "agent": "Aapko ab tak 3000 rupaye mile hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: das din, paanch sau roz, do sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 200,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai paanch hazaar. Advance do sau, ab tak mila teen hazaar, kul mila teen hazaar do sau. Baaki ek hazaar aath sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 200,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "B1",
+   "category": "B bundled",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 2,
+   "repeats": 0,
+   "worker_turns": 2,
+   "context_ack": null,
+   "bundled_ok": true,
+   "sources": [
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "Chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila",
+     "agent": "Aapne 6 din kaam kiya, rozana 700 rupaye, aur 500 advance liya. Ab tak 3000 rupaye mile hain. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "B2",
+   "category": "B bundled",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 1200,
+   "expected": {
+    "days": 8,
+    "rate": 650,
+    "advance": 1000,
+    "payments": 3000,
+    "outstanding": 1200
+   },
+   "final_facts": {
+    "days": 8,
+    "rate": 650,
+    "advance": 1000,
+    "payments": 3000
+   },
+   "agent_lines": 3,
+   "repeats": 0,
+   "worker_turns": 3,
+   "context_ack": null,
+   "bundled_ok": true,
+   "sources": [
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise baaki hain",
+     "agent": "Samajh gaya, aapke paise baaki hain. Pehle bataiye ki kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "8 din kaam, 650 roz, advance 1000, 3000 mile",
+     "agent": "Aapne bataya 8 din kaam kiya, 650 rupaye rozana, 1000 advance aur 3000 rupaye mile. Confirm karta hoon: aath din, chhe sau pachaas roz, ek hazaar advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 8,
+      "rate": 650,
+      "advance": 1000,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai paanch hazaar do sau. Advance ek hazaar, ab tak mila teen hazaar, kul mila chaar hazaar. Baaki ek hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 8,
+      "rate": 650,
+      "advance": 1000,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "C1",
+   "category": "C bundled+context",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 2,
+   "repeats": 0,
+   "worker_turns": 2,
+   "context_ack": true,
+   "bundled_ok": true,
+   "sources": [
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "hospital last week"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "Teen saal se is kaam par hoon, pichhle hafte hospital tha, chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila",
+     "agent": "Aap hospital mein the, ummeed hai ab theek hain. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "acknowledge_context"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "C2",
+   "category": "C bundled+context",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 2000,
+   "expected": {
+    "days": 5,
+    "rate": 800,
+    "advance": 0,
+    "payments": 2000,
+    "outstanding": 2000
+   },
+   "final_facts": {
+    "days": 5,
+    "rate": 800,
+    "advance": 0,
+    "payments": 2000
+   },
+   "agent_lines": 2,
+   "repeats": 0,
+   "worker_turns": 2,
+   "context_ack": false,
+   "bundled_ok": true,
+   "sources": [
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "wife sick, took 2 days leave"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "Meri biwi bimar thi isliye 2 din chhutti li, baaki 5 din kaam kiya, 800 roz, advance nahi, 2000 mile",
+     "agent": "Aapne bataya 5 din kaam kiya, roz 800 rupaye, advance nahi liya. Ab tak 2000 rupaye mile hain. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki do hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "D1",
+   "category": "D vague",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 8,
+   "repeats": 0,
+   "worker_turns": 8,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "pata nahi",
+     "agent": "Thoda asaan shabdon mein batayein, aapne kitne din kaam kiya? Sirf ek number batayein, jaise 6 din.",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "rephrase"
+    },
+    {
+     "worker": "yaad nahi",
+     "agent": "Kya aapko yaad hai ki aapne ek hafte mein ya mahine mein kitne din kaam kiya tha? Sirf ek number batayein.",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "rephrase"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Ab bataiye, aapka rozana kitna paisa milta tha?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700",
+     "agent": "700 rupaye rozana the, samajh gaya. Ab bataiye, kya aapko koi advance mila tha ya nahi?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500",
+     "agent": "Achha, aapko 500 rupaye advance mile the. Ab batayein, aapko ab tak kitne paise mile hain is kaam ke liye?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000",
+     "agent": "Aapko ab tak 3000 rupaye mile hain. Shukriya, main aapka hisaab ab nikalta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "D2",
+   "category": "D vague",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": false,
+    "payments": false
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 3000,
+    "payments": 500
+   },
+   "agent_lines": 8,
+   "repeats": 0,
+   "worker_turns": 8,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapko paise nahi mile, yeh samajh gaya. Pehle batayein, aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "pata nahi kitna tha",
+     "agent": "Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "rephrase"
+    },
+    {
+     "worker": "yaad nahi aa raha",
+     "agent": "Koi baat nahi, aapko yaad ho toh batayenge. Kya aapko yaad hai ki aapko kabhi koi advance mila tha ya ab tak kitna paisa mila hai?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "follow_up"
+    },
+    {
+     "worker": "700",
+     "agent": "Achha, toh aapka rozana ka rate 700 rupaye tha. Kya aapko koi advance mila tha ya ab tak kitna paisa mila hai?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500",
+     "agent": "Aapne bataya ki ab tak 500 rupaye mile hain. Kya aapko koi advance bhi mila tha, ya advance nahi mila?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "payments": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000",
+     "agent": "Samajh gaya, aapko 3000 rupaye advance mile the. Ab aapne bataya ki 500 rupaye aur mile hain. Confirm karta hoon: chhe din, saat sau roz, teen hazaar advance, paanch sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "payments": 500,
+      "advance": 3000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance teen hazaar, ab tak mila paanch sau, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "payments": 500,
+      "advance": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "E1",
+   "category": "E refusal",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "no payment received"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, aapko paise nahi mile. Sabse pehle, aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "nahi bataunga",
+     "agent": "Thik hai, bas dinon ki sankhya batayein, jaise 5 din ya 10 din, sirf number chahiye.",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "rephrase"
+    },
+    {
+     "worker": "achha theek hai, 6 din",
+     "agent": "Shukriya, aapne 6 din kaam kiya. Ab bataiye ki aapka rozana kitna rate tha?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "700 rupaye rozana the, samajh gaya. Ab bataiye, aapko kitna advance mila tha ya nahi mila?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500 advance",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne paise aur mile hain, advance ke alawa?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000 mile",
+     "agent": "Achha, aapko 3000 rupaye aur mile. Ab main aapke hisaab ko aage badhata hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "E2",
+   "category": "E refusal",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 3500,
+   "expected": {
+    "days": 5,
+    "rate": 900,
+    "advance": 0,
+    "payments": 1000,
+    "outstanding": 3500
+   },
+   "final_facts": {
+    "days": 5,
+    "rate": 900,
+    "advance": 0,
+    "payments": 1000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, aapko paise nahi mile. Pehle batayein, aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "5 din",
+     "agent": "Theek hai, 5 din kaam kiya. Ab batayein, aapka rozana kitna rate tha?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 5
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "yeh sab kyun poochh rahe ho, nahi bataunga",
+     "agent": "Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 5
+     },
+     "source": "llm",
+     "action": "rephrase"
+    },
+    {
+     "worker": "theek hai, 900 roz",
+     "agent": "Shukriya, aapka rozana 900 rupaye tha. Ab bataiye, aapko kitna advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 5,
+      "rate": 900
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "advance nahi mila",
+     "agent": "Samajh gaya, aapko koi advance nahi mila. Ab batayein, ab tak aapko kitne rupaye mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 5,
+      "rate": 900,
+      "advance": 0
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "1000 mile",
+     "agent": "Dhanyavaad, aapko ab tak 1000 rupaye mile hain. Confirm karta hoon: paanch din, nau sau roz, koi advance nahi, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 5,
+      "rate": 900,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar paanch sau. Advance shunya, ab tak mila ek hazaar, kul mila ek hazaar. Baaki teen hazaar paanch sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 5,
+      "rate": 900,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "F1",
+   "category": "F off-topic",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": true,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "worker's son is ill"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "mera beta bimar hai",
+     "agent": "Yeh sunkar dukh hua, aapke bete ke liye dua karta hoon. Rozana kitne rupaye milte the aapko kaam ke liye?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "acknowledge_context"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500 advance",
+     "agent": "500 rupaye advance mila, samajh gaya. Ab tak aapko kitne rupaye aur mile hain is kaam ke liye?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000 mile",
+     "agent": "3000 rupaye mile, samajh gaya. Ab main aapke hisaab ko padh raha hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "F2",
+   "category": "F off-topic",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 2200,
+   "expected": {
+    "days": 7,
+    "rate": 600,
+    "advance": 0,
+    "payments": 2000,
+    "outstanding": 2200
+   },
+   "final_facts": {
+    "days": 7,
+    "rate": 600,
+    "advance": 0,
+    "payments": 2000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": true,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "aaj baarish bahut ho rahi hai",
+     "agent": "Baarish kaafi ho rahi hai aaj. Ab bataiye, aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "handle_off_topic"
+    },
+    {
+     "worker": "7 din",
+     "agent": "Theek hai, aapne 7 din kaam kiya. Rozana kitna paisa milta tha aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 7
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "600",
+     "agent": "Rozana 600 rupaye the, samajh gaya. Ab bataiye, aapko kitna advance mila tha kaam ke dauran ya pehle?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 7,
+      "rate": 600
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitna paisa mila hai is kaam ke liye?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 7,
+      "rate": 600,
+      "advance": 0
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "2000",
+     "agent": "Shukriya, aapko ab tak 2000 rupaye mile hain. Confirm karta hoon: saat din, chhe sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 7,
+      "rate": 600,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki do hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 7,
+      "rate": 600,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "G1",
+   "category": "G contradiction",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 1000,
+   "expected": {
+    "days": 5,
+    "rate": 700,
+    "advance": 500,
+    "payments": 2000,
+    "outstanding": 1000
+   },
+   "final_facts": {
+    "days": 5,
+    "rate": 700,
+    "advance": 500,
+    "payments": 2000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "no payment received"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Chh din kaam kiya, samajh gaya. Rozana kitne rupaye milte the aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700",
+     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kaam ke liye kitne rupaye aur mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "2000",
+     "agent": "2000 rupaye aur mile, samajh gaya. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 2000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "nahi, 5 din the",
+     "agent": "Confirm karta hoon: paanch din, saat sau roz, paanch sau advance, do hazaar paid. Sahi hai?",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 5,
+      "rate": 700,
+      "advance": 500,
+      "payments": 2000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai teen hazaar paanch sau. Advance paanch sau, ab tak mila do hazaar, kul mila do hazaar paanch sau. Baaki ek hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 5,
+      "rate": 700,
+      "advance": 500,
+      "payments": 2000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "G2",
+   "category": "G contradiction",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 3000,
+   "expected": {
+    "days": 5,
+    "rate": 800,
+    "advance": 0,
+    "payments": 1000,
+    "outstanding": 3000
+   },
+   "final_facts": {
+    "days": 5,
+    "rate": 800,
+    "advance": 0,
+    "payments": 1000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiska paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milne wale the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "800 roz",
+     "agent": "Samajh gaya, aapko roz 800 rupaye milne the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 800
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "nahi nahi, 5 din kaam kiya tha",
+     "agent": "Aapne abhi kaha 5 din kaam kiya. Kya aap confirm kar sakte hain ki kaam ke liye total din kitne hain, 5 ya 6?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 5,
+      "rate": 800
+     },
+     "source": "llm",
+     "action": "follow_up"
+    },
+    {
+     "worker": "advance nahi",
+     "agent": "Theek hai, aapne kaha advance nahi mila. Ab tak kitna payment mila hai aapko?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "1000 mile",
+     "agent": "Aapko 1000 rupaye payment mila hai. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar. Advance shunya, ab tak mila ek hazaar, kul mila ek hazaar. Baaki teen hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "H1",
+   "category": "H zero owed",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 0,
+   "expected": {
+    "days": 5,
+    "rate": 800,
+    "advance": 0,
+    "payments": 4000,
+    "outstanding": 0
+   },
+   "final_facts": {
+    "days": 5,
+    "rate": 800,
+    "advance": 0,
+    "payments": 4000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "full payment received 4000"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise ka hisaab dekhna hai",
+     "agent": "Theek hai, sabse pehle bataiye ki aapne kitne din kaam kiya tha us period mein?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "5 din",
+     "agent": "Achha, aapne 5 din kaam kiya. Ab bataiye ki aapko rozana kitne rupaye milte hain?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 5
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "800",
+     "agent": "Achha, rozana 800 rupaye milte hain. Ab bataiye ki aapko kitna advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 5,
+      "rate": 800
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "advance nahi",
+     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "poora paisa mil gaya, 4000",
+     "agent": "Achha, aapko poora paisa mil gaya hai, 4000 rupaye. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0,
+      "payments": 4000
+     },
+     "source": "llm",
+     "action": "acknowledge_context"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar. Advance shunya, ab tak mila chaar hazaar, kul mila chaar hazaar. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya.",
+     "state": "DONE",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0,
+      "payments": 4000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "H2",
+   "category": "H zero owed",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 0,
+   "expected": {
+    "days": 4,
+    "rate": 500,
+    "advance": 500,
+    "payments": 1500,
+    "outstanding": 0
+   },
+   "final_facts": {
+    "days": 4,
+    "rate": 500,
+    "advance": 500,
+    "payments": 1500
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "bas confirm karna hai",
+     "agent": "Ji, zaroor. Pehle yeh batayein ki aapne kitne din kaam kiya tha jiski mazdoori baaki hai?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "follow_up"
+    },
+    {
+     "worker": "4 din",
+     "agent": "Chaar din kaam kiya, samajh gaya. Ab aapka rozana kitna paisa milta tha?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 4
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500 roz",
+     "agent": "Rozana 500 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 4,
+      "rate": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500 advance",
+     "agent": "Achha, 500 rupaye advance mile. Ab tak aapko kitne rupaye payment ke roop mein mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 4,
+      "rate": 500,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "1500 mile",
+     "agent": "Aapko 1500 rupaye payment ke roop mein mile. Ab main aapka hisaab padhata hoon. Confirm karta hoon: chaar din, paanch sau roz, paanch sau advance, ek hazaar paanch sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 4,
+      "rate": 500,
+      "advance": 500,
+      "payments": 1500
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai do hazaar. Advance paanch sau, ab tak mila ek hazaar paanch sau, kul mila do hazaar. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya.",
+     "state": "DONE",
+     "facts": {
+      "days": 4,
+      "rate": 500,
+      "advance": 500,
+      "payments": 1500
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "I1",
+   "category": "I loan vs advance",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 5000,
+   "expected": {
+    "days": 30,
+    "rate": 600,
+    "advance": 5000,
+    "payments": 8000,
+    "outstanding": 5000
+   },
+   "final_facts": {
+    "days": 30,
+    "rate": 600,
+    "advance": 5000,
+    "payments": 8000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": true,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "loan from manager 5000",
+    "loan from manager 5000 cut from wages"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "30 din",
+     "agent": "Theek hai, aapne 30 din kaam kiya. Rozana kitne rupaye milte the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 30
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "600 roz",
+     "agent": "Aapko roz 600 rupaye milte the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 30,
+      "rate": 600
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "manager se paanch hazaar liya",
+     "agent": "Samajh gaya, manager se 5000 rupaye liye the. Kya yeh paise aapki mazdoori mein se kaate gaye hain, ya alag hain?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 30,
+      "rate": 600
+     },
+     "source": "llm",
+     "action": "acknowledge_context"
+    },
+    {
+     "worker": "haan, pagar mein se kaat liya",
+     "agent": "Samajh gaya, 5000 rupaye advance ke roop mein aapki mazdoori se kaat liye gaye. Ab aapko ab tak kitne rupaye aur mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 30,
+      "rate": 600,
+      "advance": 5000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "8000 mile",
+     "agent": "Dhanyavaad, aapko 8000 rupaye aur mile hain. Ab main aapke hisaab ko aage badhata hoon. Confirm karta hoon: tees din, chhe sau roz, paanch hazaar advance, aath hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 30,
+      "rate": 600,
+      "advance": 5000,
+      "payments": 8000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai athaarah hazaar. Advance paanch hazaar, ab tak mila aath hazaar, kul mila terah hazaar. Baaki paanch hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 30,
+      "rate": 600,
+      "advance": 5000,
+      "payments": 8000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "I2",
+   "category": "I loan vs advance",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 3000,
+   "expected": {
+    "days": 10,
+    "rate": 700,
+    "advance": 0,
+    "payments": 4000,
+    "outstanding": 3000
+   },
+   "final_facts": {
+    "days": 10,
+    "rate": 700,
+    "advance": 0,
+    "payments": 4000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": true,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "no payment received",
+    "loan from friend not advance"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, paise nahi mile. Pehle yeh bataiye ki aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "10 din",
+     "agent": "Theek hai, aapne 10 din kaam kiya. Ab bataiye ki rozana kitne rupaye milne wale the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 10
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700",
+     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 10,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "dost se 2000 udhaar liya tha, woh alag hai, advance nahi mila",
+     "agent": "Samajh gaya, dost se liya hua udhaar advance mein shamil nahi hai. Toh aapko kaam ke dauran ya pehle koi advance nahi mila, sahi hai?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 10,
+      "rate": 700,
+      "advance": 0
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "4000 mile",
+     "agent": "Achha, aapko 4000 rupaye mile hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: das din, saat sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 10,
+      "rate": 700,
+      "advance": 0,
+      "payments": 4000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai saat hazaar. Advance shunya, ab tak mila chaar hazaar, kul mila chaar hazaar. Baaki teen hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 10,
+      "rate": 700,
+      "advance": 0,
+      "payments": 4000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "J1",
+   "category": "J Hindi words",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "chhe",
+     "agent": "Chhe din kaam kiya, samajh gaya. Rozana kitne rupaye milne the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "saat sau",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "paanch sau",
+     "agent": "Aapko 500 rupaye advance mile, samajh gaya. Ab tak kitne rupaye aur mile hain kaam ke liye?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "teen hazaar",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye mile hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "J2",
+   "category": "J Hindi words",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "पैसे नहीं मिले",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "छह दिन",
+     "agent": "Chhah din kaam kiya, samajh gaya. Rozana kitne rupaye milte the aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "सात सौ",
+     "agent": "Rozana 700 rupaye the, theek hai. Kya aapko kaam ke dauran koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "पाँच सौ",
+     "agent": "Aapko 500 rupaye advance mile, samajh gaya. Ab tak kitne rupaye aur mile hain aapko?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "तीन हज़ार",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye mile hain. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "K1",
+   "category": "K digits",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, paise nahi mile. Aapne kitne din kaam kiya tha uss dauran?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milte the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700 rate",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "₹500",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mil chuke hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "₹3,000",
+     "agent": "Aapko ab tak 3000 rupaye mil chuke hain, samajh gaya. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "K2",
+   "category": "K digits",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 2600,
+   "expected": {
+    "days": 12,
+    "rate": 550,
+    "advance": 0,
+    "payments": 4000,
+    "outstanding": 2600
+   },
+   "final_facts": {
+    "days": 12,
+    "rate": 550,
+    "advance": 0,
+    "payments": 4000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, aapko paise nahi mile. Pehle batayein, aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "12",
+     "agent": "Theek hai, aapne 12 din kaam kiya. Rozana kitne rupaye milte the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 12
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "550",
+     "agent": "Rozana 550 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 12,
+      "rate": 550
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "0",
+     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne paise mile hain is kaam ke liye?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 12,
+      "rate": 550,
+      "advance": 0
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "4,000",
+     "agent": "Aapne bataya ki ab tak aapko 4000 rupaye mile hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: baarah din, paanch sau pachaas roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 12,
+      "rate": 550,
+      "advance": 0,
+      "payments": 4000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chhe hazaar chhe sau. Advance shunya, ab tak mila chaar hazaar, kul mila chaar hazaar. Baaki do hazaar chhe sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 12,
+      "rate": 550,
+      "advance": 0,
+      "payments": 4000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "L1",
+   "category": "L code-mix",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 5,
+   "repeats": 0,
+   "worker_turns": 5,
+   "context_ack": null,
+   "bundled_ok": true,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "contractor did not pay"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "My contractor did not pay me",
+     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori abhi tak nahi mili?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "I worked 6 days, rate 700",
+     "agent": "Chh din kaam kiya, samajh gaya. Aapka rozana mazdoori kitni thi, 700 rupaye hi sahi hai na?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "advance 500",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "received 3000",
+     "agent": "Aapko ab tak 3000 rupaye mile, theek hai. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "L2",
+   "category": "L code-mix",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 1750,
+   "expected": {
+    "days": 9,
+    "rate": 750,
+    "advance": 0,
+    "payments": 5000,
+    "outstanding": 1750
+   },
+   "final_facts": {
+    "days": 9,
+    "rate": 750,
+    "advance": 0,
+    "payments": 5000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "payment pending hai",
+     "agent": "Samajh gaya, payment pending hai. Pehle batayein, kitne din kaam kiya tha aapne?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "worked 9 days",
+     "agent": "Theek hai, aapne 9 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 9
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "daily 750",
+     "agent": "Rozana 750 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 9,
+      "rate": 750
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "no advance",
+     "agent": "Samajh gaya, aapko koi advance nahi mila. Ab tak aapko kitne rupaye payment ke roop mein mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 9,
+      "rate": 750,
+      "advance": 0
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "got 5000 so far",
+     "agent": "Aapko ab tak 5000 rupaye mile hain, main ye note kar leta hoon. Confirm karta hoon: nau din, saat sau pachaas roz, koi advance nahi, paanch hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 9,
+      "rate": 750,
+      "advance": 0,
+      "payments": 5000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chhe hazaar saat sau pachaas. Advance shunya, ab tak mila paanch hazaar, kul mila paanch hazaar. Baaki ek hazaar saat sau pachaas rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 9,
+      "rate": 750,
+      "advance": 0,
+      "payments": 5000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "M1",
+   "category": "M long multi-fact",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 2,
+   "repeats": 0,
+   "worker_turns": 2,
+   "context_ack": null,
+   "bundled_ok": true,
+   "sources": [
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "Dekho bhai, Somvaar se Shanivaar tak chhe din kaam kiya site pe, thekedar ne saat sau roz bola tha, shuru mein paanch sau advance diya aur kal teen hazaar diye, baaki nahi diya",
+     "agent": "Aapne 6 din kaam kiya, roz 700 rupaye milne the, 500 rupaye advance mile, aur 3000 rupaye ab tak payment hua. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "M2",
+   "category": "M long multi-fact",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 4000,
+   "expected": {
+    "days": 20,
+    "rate": 600,
+    "advance": 2000,
+    "payments": 6000,
+    "outstanding": 4000
+   },
+   "final_facts": {
+    "days": 20,
+    "rate": 600,
+    "advance": 2000,
+    "payments": 6000
+   },
+   "agent_lines": 3,
+   "repeats": 0,
+   "worker_turns": 3,
+   "context_ack": null,
+   "bundled_ok": true,
+   "sources": [
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "humne pichhle mahine 20 din kaam kiya tha aur 600 roz pe baat hui thi, beech mein 2000 advance liya aur abhi 6000 mile hain",
+     "agent": "Aapne 20 din kaam kiya, roz 600 rupaye, aur 2000 advance liye. Ab tak 6000 rupaye mile hain. Confirm karta hoon: bees din, chhe sau roz, do hazaar advance, chhe hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 20,
+      "rate": 600,
+      "advance": 2000,
+      "payments": 6000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai baarah hazaar. Advance do hazaar, ab tak mila chhe hazaar, kul mila aath hazaar. Baaki chaar hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 20,
+      "rate": 600,
+      "advance": 2000,
+      "payments": 6000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "N1",
+   "category": "N skip ahead",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700 roz milta tha",
+     "agent": "Samajh gaya, aapka rozana rate 700 rupaye tha. Ab bataiye, aapne kitne din kaam kiya tha?",
+     "state": "ASK_DAYS",
+     "facts": {
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Kya aapko is dauran koi advance mila tha jo aapke mazdoori mein se kata gaya ho?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "rate": 700,
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500 advance",
+     "agent": "Achha, aapko 500 rupaye advance mile the. Ab tak aapko kitne rupaye aur mile hain, advance ke alawa?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "rate": 700,
+      "days": 6,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000 mile",
+     "agent": "Aapko advance ke alawa 3000 rupaye aur mile hain. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "rate": 700,
+      "days": 6,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "rate": 700,
+      "days": 6,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "N2",
+   "category": "N skip ahead",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 6,
+   "repeats": 0,
+   "worker_turns": 6,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [
+    "500 rupees advance received"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, aapko paise nahi mile. Bataiye, kitne din kaam kiya tha aapne?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000 mile hain bas",
+     "agent": "Achha, aapko ab tak 3000 rupaye mile hain. Ab bataiye, kitne din kaam kiya tha aapne?",
+     "state": "ASK_DAYS",
+     "facts": {
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "payments": 3000,
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "payments": 3000,
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500 advance",
+     "agent": "500 rupaye advance mile, samajh gaya. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "payments": 3000,
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "payments": 3000,
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "O1",
+   "category": "O correction",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 1300,
+   "expected": {
+    "days": 6,
+    "rate": 800,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 1300
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 800,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kaam kitne din kiya tha jiske paise nahi mile?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Achha, aapne 6 din kaam kiya. Rozana kitne rupaye milte the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700",
+     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "nahi nahi, roz 800 tha",
+     "agent": "Samajh gaya, rozana 800 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 800
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500 advance",
+     "agent": "500 rupaye advance mila, samajh gaya. Ab tak aapko kitne rupaye aur mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000 mile",
+     "agent": "3000 rupaye mile, samajh gaya. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: chhe din, aath sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar aath sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki ek hazaar teen sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "O2",
+   "category": "O correction",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": false,
+    "payments": true
+   },
+   "math_ok": false,
+   "completed": true,
+   "outstanding": 200,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 1000,
+    "payments": 3000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "fallback",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, paise nahi mile. Pehle yeh bataye, kitne din kaam kiya tha aapne?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700",
+     "agent": "Rozana 700 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "1000 advance",
+     "agent": "Aapko 1000 rupaye advance mile the, samajh gaya. Ab tak aapko aur kitne rupaye mile hain?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 1000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "sorry, advance 500 tha",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, ek hazaar advance, paanch sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 1000,
+      "payments": 500
+     },
+     "source": "fallback",
+     "action": null
+    },
+    {
+     "worker": "3000 mile",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, ek hazaar advance, teen hazaar paid. Sahi hai?",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 1000,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance ek hazaar, ab tak mila teen hazaar, kul mila chaar hazaar. Baaki do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 1000,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "P1",
+   "category": "P silence",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "...",
+     "agent": "Namaste, aapne kitne din kaam kiya tha jiski mazdoori abhi tak nahi mili?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "hmm",
+     "agent": "Kripya sirf din ki sankhya batayein, jaise chhe din ya saat din.",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "rephrase"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Ab bataiye, rozana kitne rupaye milte the?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "700",
+     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak kitne paise aapko mil chuke hain kaam ke liye?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000",
+     "agent": "Aapko ab tak 3000 rupaye mil chuke hain, samajh gaya. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  },
+  {
+   "id": "P2",
+   "category": "P silence",
+   "slots": {
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
+   },
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
+   "expected": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000,
+    "outstanding": 700
+   },
+   "final_facts": {
+    "days": 6,
+    "rate": 700,
+    "advance": 500,
+    "payments": 3000
+   },
+   "agent_lines": 7,
+   "repeats": 0,
+   "worker_turns": 7,
+   "context_ack": null,
+   "bundled_ok": null,
+   "sources": [
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm",
+    "llm"
+   ],
+   "context_notes": [],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Samajh gaya, paise nahi mile. Aapne kitne din kaam kiya tha uss dauran?",
+     "state": "ASK_DAYS",
+     "facts": {},
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Theek hai, 6 din kaam kiya. Ab bataiye, aapka roz ka rate kitna tha?",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "...",
+     "agent": "Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
+     "state": "ASK_RATE",
+     "facts": {
+      "days": 6
+     },
+     "source": "llm",
+     "action": "rephrase"
+    },
+    {
+     "worker": "700",
+     "agent": "700 rupaye rozana the, samajh gaya. Ab bataiye, aapko kitna advance mila tha ya koi paisa kaat ke diya gaya tha?",
+     "state": "ASK_ADVANCE",
+     "facts": {
+      "days": 6,
+      "rate": 700
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "500",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak kitna payment mila hai aapko?",
+     "state": "ASK_PAYMENTS",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "llm",
+     "action": "ask_slot"
+    },
+    {
+     "worker": "3000",
+     "agent": "Aapko 3000 rupaye payment mila, samajh gaya. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": "conclude"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": 3000
+     },
+     "source": "llm",
+     "action": null
+    }
+   ]
+  }
+ ]
+}

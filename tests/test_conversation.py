@@ -18,10 +18,11 @@ def test_demo_flow():
     s, out = run(DEMO)
     assert out[0]["agent_text"] == "Aapne kitne din kaam kiya?"
     assert out[4]["agent_text"] == ("Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, "
-                                    "teen hazaar paid. Sahi hai?")
-    assert out[5]["agent_text"] == ("Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. "
-                                    "Baaki saat sau rupaye. Thekedar ko payment request bhejun?")
-    assert out[5]["speak_text"] == "कुल कमाई 4200 रुपये। मिला 3500 रुपये। बाकी 700 रुपये। ठेकेदार को पेमेंट रिक्वेस्ट भेजूँ?"
+                                    "teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.")
+    assert out[5]["agent_text"] == ("Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, "
+                                    "kul mila teen hazaar paanch sau. Baaki saat sau rupaye. "
+                                    "Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?")
+    assert out[5]["speak_text"].startswith("कुल कमाई 4200 रुपये।") and "बाकी 700 रुपये" in out[5]["speak_text"]
     assert s["case"]["outstanding"] == 700
     assert out[-1]["state"] == c.SHOW_PREVIEW
     assert "Baaki: ₹700" in s["case"]["payment_request"]

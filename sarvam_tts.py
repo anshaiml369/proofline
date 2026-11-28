@@ -27,6 +27,8 @@ PRONOUNCE = {
     "bhejun": "भेजूँ",
     "Thekedar": "ठेकेदार",
     "thekedar": "ठेकेदार",
+    "escalate karun": "एस्केलेट करूँ",
+    "katauti": "कटौती",
 }
 
 
@@ -36,15 +38,35 @@ def spoken(text):
     return text
 
 
-def audio_name(text):
-    return hashlib.sha1(f"{TTS_MODEL}|{TTS_SPEAKER}|{text}".encode()).hexdigest()[:20] + ".mp3"
+# One verified speaker per language: each was checked by sending its audio of a test line
+# (including "700 rupaye") back through Saaras speech-to-text. Bhojpuri and code-mixed English
+# use the Hindi voice (no Bhojpuri voice; the Hindi one misheard Bhojpuri words in that check).
+VOICES = {
+    "hi": ("hi-IN", TTS_SPEAKER), "bho": ("hi-IN", TTS_SPEAKER), "en-mix": ("hi-IN", TTS_SPEAKER),
+    "mr": ("mr-IN", "nilesh_mr_conversation"),
+    "bn": ("bn-IN", "arnab_bn_conversation"),
+    "ta": ("ta-IN", "gokul_ta_narration"),
+    "te": ("te-IN", "kavitha_te_conversation"),
+}
 
 
-def _request(text, api_key):
+def voice(lang):
+    return VOICES.get(lang or "hi", VOICES["hi"])
+
+
+def audio_name(text, lang="hi"):
+    code, speaker = voice(lang)
+    tag = f"{TTS_MODEL}|{speaker}|{text}" if code == "hi-IN" else f"{TTS_MODEL}|{code}|{speaker}|{text}"
+    return hashlib.sha1(tag.encode()).hexdigest()[:20] + ".mp3"
+
+
+def _request(text, api_key, lang="hi"):
+    code, speaker = voice(lang)
     resp = httpx.post(
         TTS_URL,
         headers={"api-subscription-key": api_key},
-        json={"text": spoken(text), "language_code": "hi-IN", "model": TTS_MODEL, "speaker": TTS_SPEAKER,
+        json={"text": spoken(text) if code == "hi-IN" else text, "language_code": code, "model": TTS_MODEL,
+              "speaker": speaker,
               "output_audio_codec": "mp3", "pace": 1.0, "temperature": 0.3},
         timeout=httpx.Timeout(10.0),
     )
@@ -52,21 +74,21 @@ def _request(text, api_key):
     return base64.b64decode(resp.json()["audios"][0])
 
 
-def speak(text, api_key=None, out_dir=None, log=None):
+def speak(text, api_key=None, out_dir=None, log=None, lang="hi"):
     """Alias: speak(text) -> mp3 file name, or None if the key is missing or the call fails."""
-    return synthesize(text, api_key, out_dir, log) if api_key and out_dir else None
+    return synthesize(text, api_key, out_dir, log, lang) if api_key and out_dir else None
 
 
-def synthesize(text, api_key, out_dir, log=None):
+def synthesize(text, api_key, out_dir, log=None, lang="hi"):
     """Write <out_dir>/<hash>.mp3 for `text` if needed. Returns the file name, or None if TTS failed."""
     if not api_key or not text:
         return None
-    name = audio_name(text)
+    name = audio_name(text, lang)
     path = os.path.join(out_dir, name)
     if os.path.exists(path):
         return name
     try:
-        audio = _pool.submit(_request, text, api_key).result(timeout=TTS_DEADLINE_S)
+        audio = _pool.submit(_request, text, api_key, lang).result(timeout=TTS_DEADLINE_S)
     except FutureTimeout:
         if log:
             log.warning("Sarvam TTS timed out after %ss", TTS_DEADLINE_S)

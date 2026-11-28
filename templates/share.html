@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PagarSaathi case #{{ row.id }}</title>
+<style>
+  :root { color-scheme: light; }
+  body { font: 16px/1.5 system-ui, sans-serif; background: #fff; color: #111; margin: 0; padding: 16px; }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .hash { font: 14px ui-monospace, monospace; word-break: break-all; }
+  .big { font-size: 40px; font-weight: 800; margin: 8px 0; }
+  pre { white-space: pre-wrap; font: 15px/1.5 ui-monospace, monospace; background: #f4f4f5; padding: 12px;
+        border-radius: 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  button, a.btn { font: 16px system-ui; padding: 12px 16px; border-radius: 10px; border: 1px solid #111;
+                  background: #fff; color: #111; text-decoration: none; min-height: 48px; }
+  @media print { .row { display: none; } pre { background: none; padding: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>PagarSaathi case #{{ row.id }}</h1>
+  <p class="hash">sha256: {{ row.case_hash or '-' }}</p>
+  <p>Hash se pata chalta hai ki case baad mein badla gaya ya nahi. Yeh case ko badalne se rokta nahi.</p>
+  <p class="big">Baaki ₹{{ "{:,}".format(row.outstanding) }}</p>
+  <div class="row">
+    <button type="button" onclick="window.print()">Print / PDF</button>
+    <button type="button" id="copy">Text copy karein</button>
+    <a class="btn" href="{{ samadhan }}" rel="noopener">SAMADHAN portal</a>
+    <a class="btn" href="tel:{{ labourline | replace(' ', '') }}">India Labourline {{ labourline }}</a>
+  </div>
+  <pre id="text">{{ text }}</pre>
+</main>
+<script>
+  document.getElementById("copy").addEventListener("click", function () {
+    var t = document.getElementById("text").innerText, b = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(
+      function () { b.textContent = "Copy ho gaya"; },
+      function () { b.textContent = "Text chun kar copy karein"; });
+  });
+</script>
+</body>
+</html>

@@ -54,23 +54,47 @@ The conversation is not a fixed list of questions. With a key set, the LLM decid
 | A number the worker clearly tagged ("rate 700", "advance nahi") is kept if the model missed it | Lost facts in a bundle |
 | When all four numbers are known, the next line is always Python's read-back, and the maths runs only on a "haan" the rules also do not read as "nahi" | Skipping the read-back |
 | A rejected line is replaced by the rules' answer or a fixed question | Saying anything unsafe |
+| A known number comes back different, with no "nahi", "galat" or "sorry": Python asks "Aapne pehle X kaha, ab Y: kaunsa sahi hai?" and keeps both values in the turn log (`conflict_asked`, then `conflict` with the choice) | Silently overwriting a number |
+| The three choices, overtime and deductions, the follow-up reply and delete are read by Python, not the LLM | A model choosing to send, escalate or delete |
 
-Each `/turn` reply has `action` (what the policy chose), `policy_source` (`llm` or `fallback`) and `context_notes`; the server log has `action=` and `guarded=` for every turn. The page shows the notes under the four boxes as "Aapne bataya".
+Each `/turn` reply has `action` (what the policy chose; `python_conflict` when Python asked about a contradiction), `policy_source` (`llm` or `fallback`), `node_path` (the states so far) and `context_notes`; the server log has `action=` and `guarded=` for every turn. The page shows the notes under the four boxes as "Aapne bataya".
 
 ## The agent's voice
 
 The browser tries these in order (`speak()` in `static/app.js`):
 
-1. **Recorded clip:** if `static/demo/<hash>.mp3` exists for the line. There are 9 clips, one per line of the scripted demo, made with Sarvam Bulbul `bulbul:v4-flash`, speaker `shubh_enhi_companion`. Badge: `Voice: Recorded`.
-2. **Sarvam, live:** with `SARVAM_API_KEY` set and not in scripted mode, `/turn` synthesises the line with **Sarvam Bulbul `bulbul:v4-flash`, speaker `shubh_enhi_companion`**, `hi-IN`, mp3, pace 1.0, temperature 0.3, with a 12 s hard deadline. Badge: `Voice: Sarvam`.
-3. **Browser voice:** `speechSynthesis` with a Hindi (`hi-IN`) voice, such as macOS "Lekha", if a clip is missing or cannot play. Badge: `Voice: Browser`.
+1. **Recorded clip:** if `static/demo/<hash>.mp3` exists for the line. There are 7 clips, one per agent line of the scripted demo, made with Sarvam Bulbul `bulbul:v4-flash`, speaker `shubh_enhi_companion`, each checked with Saaras speech-to-text. Badge: `Voice: Recorded`.
+2. **Sarvam, live:** with `SARVAM_API_KEY` set and not in scripted mode, `/turn` synthesises the line with **Sarvam Bulbul `bulbul:v4-flash`**, mp3, pace 1.0, temperature 0.3, with a 12 s hard deadline, in the speaker for the line's language (`voice_lang` in the reply; `sarvam_tts.VOICES`):
+
+   | Line language | `language_code` | Speaker |
+   |---|---|---|
+   | hi, bho, en-mix | `hi-IN` | `shubh_enhi_companion` |
+   | mr | `mr-IN` | `nilesh_mr_conversation` |
+   | bn | `bn-IN` | `arnab_bn_conversation` |
+   | ta | `ta-IN` | `gokul_ta_narration` |
+   | te | `te-IN` | `kavitha_te_conversation` |
+
+   In the beta languages (bn, ta, te) Python's fixed lines stay Hindi, so they are spoken in the Hindi voice; a reply is never split across two voices. Badge: `Voice: Sarvam`.
+3. **Browser voice:** `speechSynthesis` with a voice for the line's language (a Hindi voice such as macOS "Lekha" for Hindi and Marathi), if a clip is missing or cannot play. Badge: `Voice: Browser`.
 4. If the browser has no voice at all, the line stays on screen for reading time. Badge: `Voice: off`.
 
 | Mode | Usual voice |
 |---|---|
-| Live with `SARVAM_API_KEY` | Recorded for the 9 fixed demo lines, Sarvam for everything else |
-| Live without keys | Recorded for the 9 fixed lines, browser voice for the rest |
-| `?mode=scripted` | Recorded only, all 9 lines. No outside network: every request goes to the app's own origin |
+| Live with `SARVAM_API_KEY` | Recorded for the 7 fixed demo lines, Sarvam for everything else |
+| Live without keys | Recorded for the 7 fixed lines, browser voice for the rest |
+| `?mode=scripted` | Recorded only, all 7 lines. No outside network: every request goes to the app's own origin |
+
+## The case record (audit layer)
+
+| Step | Where |
+|---|---|
+| Python calculates → `audit.seal()` builds the canonical JSON (sorted keys, no spaces) and its sha256 | `app.save_sealed()`, `audit.py` |
+| Stored once in `wage_cases.case_json` / `case_hash`; later saves never overwrite them | `database.save_case()` (`COALESCE`) |
+| The card shows `case_hash[:12]`; `GET /state` recomputes the hash (`hash_verified`) | `static/app.js`, `app.state_route()` |
+| Send → `POST /mark-sent` → `sent_at` | `database.mark_sent()` |
+| Next visit, case sent over 24 h ago (`FOLLOWUP_AFTER_H`) → follow-up question → `followup_log`, `commitment_date` | `app.due_followup()`, `conversation.followup_reply()`, `audit.commitment_from()` |
+| Escalate → complaint draft with the hash; Share → `/case/<id>/share` | `audit.escalation_draft()`, `audit.share_text()` |
+| "mera case delete karo" → spoken "haan" → `DELETE` | `conversation.handle_command()`, `database.delete_case()` |
 
 ## `/health`
 

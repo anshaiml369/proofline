@@ -1,6 +1,8 @@
 # PagarSaathi
 
-**Bolo, hisaab pao.** A daily-wage worker tells PagarSaathi what happened, by voice through Wispr Flow. A Hinglish agent asks four questions, reads the facts back, and Python works out exactly how much is still owed. With one tap, a payment request opens in WhatsApp, ready to send to the contractor.
+**Bolo, hisaab pao.** A daily-wage worker tells PagarSaathi what happened, by voice through Wispr Flow. A Hinglish agent collects four numbers, reads them back, and Python works out exactly how much is still owed. The case is sealed with a sha256 hash. The worker then chooses: send a payment request on WhatsApp, draft a complaint for the labour office, or just save the case. A day after sending, the agent asks what the contractor said.
+
+What PagarSaathi does not claim is in [`LIMITATIONS.md`](LIMITATIONS.md).
 
 Built for the *India Runs on Voice* hackathon (Scaler × Wispr Flow).
 
@@ -22,13 +24,17 @@ A daily-wage worker who speaks Hindi or Hinglish, has a phone, and may not be co
 
 ```
 Worker speaks (Wispr Flow) → text box → agent asks: days? rate? advance? paid so far?
-→ agent reads all four back: "Sahi hai?" → "Haan" → Python calculates
-→ agent says what is owed → "Payment request bhejun?" → "Haan"
-→ message preview → green "Send to contractor" → WhatsApp opens, message pre-filled
+→ agent reads all four back: "Sahi hai? Overtime ya katauti thi to woh bhi bataiye." → "Haan"
+→ Python calculates and seals the case (sha256) → agent reads every line, then:
+  "Message bhejun, escalate karun, ya sirf case save karun?"
+     message  → preview → green "WhatsApp par bhejein" → card shows "Bheja gaya: <time>"
+     escalate → a Hinglish complaint draft with the hash, for SAMADHAN or the labour office
+     save     → the case stays on the card with its hash
+→ 24 h after sending: "Pichhle case ke baare mein: thekedar ya manager ne kya kaha?"
 ```
 
 - **Python does all the arithmetic** in [`wage_math.py`](wage_math.py):
-  - `expected = days × rate`
+  - `expected = days × rate + overtime_hours × overtime_rate − deductions` (overtime and deductions are optional, and only if the worker mentions them at the read-back)
   - `received = advance + payments`
   - `outstanding = max(0, expected − received)`
   - No model ever calculates.
@@ -135,6 +141,46 @@ Open http://localhost:5000. On a Mac, macOS AirPlay already holds port 5000. Use
 HOST_PORT=5050 docker compose up
 ```
 
+## The audit layer
+
+A finished case is a record that a union volunteer or a labour officer can check.
+
+- **Sealed at the result.** When Python calculates, the case becomes one canonical JSON record: the slots, expected, received, outstanding, the full transcript with a timestamp on every turn, the language, `created_at`, `policy_source` (LLM or fallback) and `node_path` (the states the conversation went through). Its **sha256** is stored with it in `wage_cases` (`case_json`, `case_hash`) and is never overwritten.
+- **The card shows the first 12 characters** of the hash. The caption is honest: a hash does not stop anyone editing the database, but any edit makes the hash stop matching, so the change can be detected. `GET /state` recomputes it (`hash_verified`).
+- **Three choices, by voice:** "Message bhejun, escalate karun, ya sirf case save karun?" Python reads the choice words ("bhejo", "escalate", "sirf save") before the LLM.
+- **Sent.** Tapping the WhatsApp button calls `POST /mark-sent`, which stores `sent_at`. The card shows "Bheja gaya: <time>".
+- **Follow-up.** The browser keeps the last case id (localStorage). If that case was sent more than 24 hours ago (`FOLLOWUP_AFTER_H`), the next visit opens with "Pichhle case ke baare mein: thekedar ya manager ne kya kaha?". The reply goes into `followup_log`. "Kal dega", "parson", "agle hafte" set `commitment_date`, and the card shows a reminder chip.
+- **Escalate.** A Hinglish complaint draft with the days, rate, amounts, the send date, follow-ups and the full hash, addressed to the Labour Commissioner / SAMADHAN portal. It is text to copy. **Nothing is submitted for the worker; there is no complaint API.**
+- **Share with a union or legal aid.** `GET /case/<id>/share` is one printable page (Print → PDF) with the case, the hash, the calculation, the transcript, follow-ups and the draft, plus a copy button.
+
+## Privacy
+
+- **Local SQLite only.** Finished cases are in one SQLite file on the server (`pagarsaathi.db`). There are no accounts, no analytics, no tracking scripts and no third-party logging of cases.
+- **Outside calls, only with keys:** the worker's text goes to the LLM provider (OpenAI or OpenRouter) to decide the next line, and the agent's line goes to Sarvam to be spoken. The scripted demo makes no outside call.
+- **The worker can delete the case.** Say "mera case delete karo" (or tap "Case delete"). The agent asks "Pakka case delete karun? Yeh wapas nahi aayega." and deletes only after a spoken "haan". The row is removed from SQLite (a hard `DELETE`, not a flag).
+- On Railway the SQLite file lives on the service's disk. A redeploy without a volume starts a new file.
+
+## Languages
+
+The first message decides the language (`language.py`, from the script and a few common words); when unsure it stays Hindi. The worker can also pick one with the toggle at the top right, which switches the voice and the page's labels.
+
+| Language | Status | Agent lines | Voice (Sarvam Bulbul v4 flash) |
+|---|---|---|---|
+| Hindi / Hinglish | Full | All | `shubh_enhi_companion` |
+| Marathi | Full | Every fixed line, the read-back and the result are translated; the LLM replies in Marathi | `nilesh_mr_conversation` |
+| Bengali, Tamil, Telugu | **Beta** | The LLM replies in the language; the read-back, result and choices stay Hindi in the Hindi voice | `arnab_bn_conversation`, `gokul_ta_narration`, `kavitha_te_conversation` |
+| Bhojpuri | **Beta** | The LLM replies in Bhojpuri; fixed lines are Hindi | The Hindi voice: Sarvam has no Bhojpuri voice |
+| English mix | **Beta** | The LLM replies in the worker's mix; fixed lines are Hinglish | The Hindi voice |
+
+Each voice was checked by sending its audio of a test line, including "700 rupaye", back through Sarvam Saaras speech-to-text, offline. The Bengali, Tamil, Telugu and Marathi voices came back with the right words and the right amount. The Hindi voice reading Telugu text misheard 700 as 200, which is why each language has its own voice. **The app itself never uses speech-to-text**: the worker's words always come from Wispr Flow.
+
+## Help lines
+
+The result card has tap-to-call links. Only numbers we could source are used:
+- **India Labourline 1800 1800 999** (`tel:18001800999`), a helpline for informal workers that helps recover unpaid wages ([The Leaflet](https://theleaflet.in/india-labourline-launched-a-new-national-labour-helpline-to-serve-indias-informal-workers), [The Mooknayak](https://en.themooknayak.com/labourer/india-labour-line-helps-788-laborers-to-claim-outstanding-wages-of-rs-1-crore-34-lakhs)).
+- **SAMADHAN portal** (https://samadhan.labour.gov.in), the Ministry of Labour's portal for wage claims.
+- **Not used: 1916.** It was suggested as a labour helpline. A web search found no national 1916 labour line; listings tie the number to local services instead, for example a Deccan Herald list of Bengaluru SOS numbers gives 1916 as the water board's (BWSSB) ([Deccan Herald](https://www.deccanherald.com/india/karnataka/bengaluru/no-one-picks-up-sos-numbers-760942.html)).
+
 ## What happens without keys
 
 Everything in the core flow works:
@@ -151,15 +197,17 @@ Everything in the core flow works:
 
 - `/`: normal use. Dictate with Wispr Flow, or type, then press **Continue**.
 - `/?mode=text`: the same flow, labelled "Text mode", for a judge who will type rather than dictate.
-- `?debug=1` (with any mode): logs every audio play, pause, end and error in the browser console.
+- `?debug=1` (with any mode): shows the `node_path` (the states this conversation went through), the policy source, the language and the full hash under the card, and logs every audio event in the console.
 - `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself: the worker mentions three years at the site and an illness (the agent acknowledges it), then gives three facts in one sentence, and it ends at ₹700. It always uses the built-in rules and pre-recorded voice, so it calls no outside service and runs the same every time.
 
 ## API
 
-`POST /turn` with JSON `{session_id, text}` returns `{agent_text, speak_text, state, done, case_data, facts, context_notes, action, policy_source}`.
-- Leave out `session_id` to start a conversation; the agent speaks first.
-- Send `{session_id, event: "sent"}` when the worker taps Send.
-- States: `START → ASK_DAYS → ASK_RATE → ASK_ADVANCE → ASK_PAYMENTS → CONFIRM → CALCULATE → READ_RESULT → ASK_SEND → SHOW_PREVIEW → DONE`.
+`POST /turn` with JSON `{session_id, text}` returns `{agent_text, speak_text, state, done, case_data, facts, context_notes, action, policy_source, node_path, language, voice_lang, case_hash, case_hash_short, sent_at, choice, conflict, prior_case}`.
+- Leave out `session_id` to start a conversation; the agent speaks first. Add `prior_session` to get the follow-up question when that case was sent more than 24 hours ago, and `language` to fix the language.
+- `POST /mark-sent {session_id}`: the worker tapped Send; stores `sent_at` (`{session_id, event: "sent"}` on `/turn` still works).
+- `GET /state?session_id=`: live state, `node_path`, the transcript, and the sealed case with `hash_verified`.
+- `POST /escalate {session_id}`: the complaint draft. `GET /case/<session_id>/share`: the one-page share sheet.
+- States: `START → ASK_DAYS → ASK_RATE → ASK_ADVANCE → ASK_PAYMENTS → CONFIRM [→ ASK_EXTRAS → CONFIRM] → CALCULATE → READ_RESULT → ASK_SEND → SHOW_PREVIEW → DONE`, plus `FOLLOWUP` and `CONFIRM_DELETE`.
 
 ## Tests
 
@@ -171,7 +219,7 @@ pip3 install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-There are 82 tests. They need no network or keys (the LLM is faked). They cover:
+There are 109 tests. They need no network or keys (the LLM is faked). They cover:
 - the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
 - the demo conversation and Wispr-style text (digits, ₹, Devanagari);
 - the mandatory confirm step;
@@ -181,10 +229,14 @@ There are 82 tests. They need no network or keys (the LLM is faked). They cover:
 - the nothing-owed path;
 - the LLM policy path: hospital, loan and "3 saal" handled as context, off-topic questions, a number the worker never said being refused, a total never spoken, no line repeated, Python stepping in when stuck, several facts in one sentence, corrections at the read-back, Python adding amounts, "haan" never read as ₹0, falling back to rules when the LLM fails;
 - the rules path without keys: "3 saal" and "ek hafta" not stored as days, "teen saal" never read as money, hospital and loan acknowledged, no line repeated;
-- the v3 guarantees: two rephrases then move on, the 12-turn cap with the help line, no repeated question, the backstop for tagged numbers, the acknowledgement kept before the read-back, the scripted demo ending at ₹700;
+- the v3 guards: two rephrases then move on, the 12-turn cap with the help line, no repeated question, the backstop for tagged numbers, the acknowledgement kept before the read-back, the scripted demo ending at ₹700;
 - "so far" not being read as "sau";
 - several amounts in one answer without keys ("6 din, 700 roz" is 6 days and ₹700, not 706);
-- Hinglish error pages, and the `/health` fields.
+- Hinglish error pages, and the `/health` fields;
+- the audit layer: the hash is stored, verifies, and is never overwritten, and an edited record fails; `/mark-sent` and `/state`; the follow-up after a simulated 25 hours (and none after 2), with "kal dega" setting tomorrow's date; the escalation draft and share page carrying the hash; delete only after a spoken yes, and the row really gone;
+- the three choices; a contradiction ("6 din", later "5 din") asked about with both values kept, and an explicit "nahi nahi, 5 din" taken without a question;
+- language detection for all seven codes, Marathi switching the voice and the lines, Hindi staying Hindi, the toggle;
+- overtime and deductions: the maths, the read-back again, and the four-number path unchanged.
 
 ## Built with
 
@@ -192,10 +244,10 @@ There are 82 tests. They need no network or keys (the LLM is faked). They cover:
 - **Wispr Flow**: the voice layer (OS-level dictation)
 - **Browser SpeechSynthesis**: the agent's voice
 - **OpenAI `gpt-4.1-mini`**, with **OpenRouter** as backup: the optional conversational layer; it never calculates
-- **Sarvam Bulbul `bulbul:v4-flash`**: the agent's natural Hindi voice (live, and the 9 recorded clips)
-- **Sarvam Saaras v4**: used offline only, to check that every recorded clip says the right words. The app has no speech-to-text; Wispr Flow does that on the device.
+- **Sarvam Bulbul `bulbul:v4-flash`**: the agent's voice, one speaker per language (live, and the 7 recorded clips of the scripted demo)
+- **Sarvam Saaras v3**: used offline only, to check that every recorded clip and every language's voice says the right words. The app has no speech-to-text; Wispr Flow does that on the device.
 - **Railway**: hosting
-- **SQLite**: finished cases, in the `wage_cases` table
+- **SQLite**: finished cases, in the `wage_cases` table, with the sealed JSON and its sha256
 - **Tailwind CSS**: compiled to a static file, so pages need no CDN
 - **Docker**
 - Built with **Wispr Flow + Claude Code**
@@ -220,8 +272,9 @@ The **Hugging Face Inference API** is a documented alternative LLM provider: any
 ## Honest limits
 
 - **It calculates; it does not enforce.** The message is sent by the worker, if they choose to.
-- **Simple cases only:** one daily rate. Overtime, half days and deductions are not handled yet.
-- **No accounts.** Conversations in progress live in server memory (one gunicorn worker); finished cases go to SQLite.
+- **Simple cases only:** one daily rate. Overtime and deductions are optional extras at the read-back; half days and a bonus are not handled.
+- **No accounts.** Conversations in progress live in server memory (one gunicorn worker); finished cases go to SQLite. The follow-up depends on the same browser keeping the case id.
+- More in [`LIMITATIONS.md`](LIMITATIONS.md).
 - **Not yet tested with real workers.** Real dictation will bring new phrasings. The LLM handles more of them than the built-in rules, and the read-back catches what either gets wrong.
 - **With keys, each conversation costs a little:** a few LLM calls and short Sarvam clips.
 
@@ -229,7 +282,10 @@ The **Hugging Face Inference API** is a documented alternative LLM provider: any
 
 | Path | What it is |
 |---|---|
-| `app.py` | Flask: `GET /`, `POST /turn`, `GET /health` |
+| `app.py` | Flask: `GET /`, `POST /turn`, `POST /mark-sent`, `POST /escalate`, `GET /state`, `GET /case/<id>/share`, `GET /health` |
+| `audit.py` | Canonical case JSON, sha256 seal and verify, follow-up dates, escalation draft, share text |
+| `language.py`, `i18n.py` | Language detection; Marathi lines and the beta-language rules |
+| `LIMITATIONS.md` | What PagarSaathi does not claim |
 | `conversation.py` | The frame and states, the built-in Hinglish reader, and the guarded LLM policy turn (`step_policy`) |
 | `agent_llm.py`, `prompts/policy.txt` | The optional LLM dialogue policy: chooses the next move and writes the line |
 | `PIPELINE.md` | Exactly where each line's text and voice come from, in each mode |
@@ -239,7 +295,7 @@ The **Hugging Face Inference API** is a documented alternative LLM provider: any
 | `wage_math.py` | All arithmetic, as pure functions |
 | `hinglish_numbers.py` | Number words, both ways (4200 ⇄ "chaar hazaar do sau") |
 | `sarvam_tts.py` | Sarvam voice |
-| `database.py` | SQLite `wage_cases`: `save_case()`, `get_case()` |
+| `database.py` | SQLite `wage_cases`: `save_case()`, `get_case()`, `mark_sent()`, `add_followup()`, `delete_case()` |
 | `templates/index.html`, `static/app.js` | The one screen |
 | `WISPR_FLOW_SETUP.md` | Mac and iPhone setup |
 | `PITCH_DECK.md`, `DEMO_SCRIPT.md` | Pitch and demo |

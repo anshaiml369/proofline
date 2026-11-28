@@ -21,6 +21,59 @@
     'Haan.',
   ];
 
+  // UI strings per language. Agent lines come from the server; these are the page's own labels.
+  const UI = {
+    hi: { tagline: 'Mazdoori ka hisaab, aawaz se', start: 'Shuru karein', continue: 'Continue', hisaab: 'Hisaab', baaki: 'Baaki',
+      nodue: 'Hisaab ke hisaab se koi paisa baaki nahi hai.', case_id: 'Case ID',
+      hash_caption: 'Yeh hash case ka fingerprint hai. Case mein koi badlav hua to hash mel nahi khayega, isse badlav pakda ja sakta hai.',
+      escalate: 'Escalate', share: 'Union / legal aid', delete: 'Case delete', draft: 'Shikayat ka draft (copy karke SAMADHAN par dijiye)',
+      copy: 'Copy karein', copied: 'Copy ho gaya', msg: 'Thekedar ko message', send: 'WhatsApp par bhejein', again: 'Naya hisaab', log: 'Baatcheet',
+      notes: 'Aapne bataya', f_days: 'Din', f_rate: 'Roz', f_advance: 'Advance', f_payments: 'Mila', sent: 'Bheja gaya',
+      reminder: 'Thekedar ka vaada', followup: 'Pichhla case', beta: '' },
+    mr: { tagline: 'मजुरीचा हिशोब, आवाजाने', start: 'सुरू करा', continue: 'पुढे', hisaab: 'हिशोब', baaki: 'बाकी',
+      nodue: 'हिशोबानुसार कोणतेही पैसे बाकी नाहीत.', case_id: 'केस आयडी',
+      hash_caption: 'हा हॅश केसचा फिंगरप्रिंट आहे. केसमध्ये बदल झाला तर हॅश जुळणार नाही, त्यामुळे बदल पकडता येतो.',
+      escalate: 'तक्रार', share: 'युनियन / कायदेशीर मदत', delete: 'केस डिलीट', draft: 'तक्रारीचा मसुदा (कॉपी करून समाधानवर द्या)',
+      copy: 'कॉपी करा', copied: 'कॉपी झाले', msg: 'ठेकेदाराला मेसेज', send: 'व्हॉट्सॲपवर पाठवा', again: 'नवीन हिशोब', log: 'संवाद',
+      notes: 'तुम्ही सांगितले', f_days: 'दिवस', f_rate: 'रोज', f_advance: 'ॲडव्हान्स', f_payments: 'मिळाले', sent: 'पाठवले',
+      reminder: 'ठेकेदाराचे वचन', followup: 'मागची केस', beta: '' },
+    en: { tagline: 'Your wages, worked out by voice', start: 'Start', continue: 'Continue', hisaab: 'Calculation', baaki: 'Owed',
+      nodue: 'By this calculation nothing is owed.', case_id: 'Case ID',
+      hash_caption: "This hash is the case's fingerprint. If the case is changed, the hash will no longer match, so the change can be detected.",
+      escalate: 'Escalate', share: 'Union / legal aid', delete: 'Delete case', draft: 'Complaint draft (copy it to SAMADHAN)',
+      copy: 'Copy', copied: 'Copied', msg: 'Message to contractor', send: 'Send on WhatsApp', again: 'New calculation', log: 'Conversation',
+      notes: 'You told us', f_days: 'Days', f_rate: 'Daily', f_advance: 'Advance', f_payments: 'Paid', sent: 'Sent',
+      reminder: "Contractor's promise", followup: 'Earlier case',
+      beta: 'Beta: the agent replies in your language, but the read-back and the result are in Hindi.' },
+    bn: { tagline: 'মজুরির হিসাব, কণ্ঠে', start: 'শুরু করুন', continue: 'এগিয়ে যান', hisaab: 'হিসাব', baaki: 'বাকি',
+      f_days: 'দিন', f_rate: 'রোজ', f_advance: 'অগ্রিম', f_payments: 'পেয়েছি', again: 'নতুন হিসাব', log: 'কথোপকথন',
+      beta: 'বেটা: এজেন্ট বাংলায় উত্তর দেয়, কিন্তু পড়ে শোনানো হিসাব ও ফল হিন্দিতে।' },
+    ta: { tagline: 'கூலி கணக்கு, குரலில்', start: 'தொடங்கு', continue: 'தொடர்', hisaab: 'கணக்கு', baaki: 'பாக்கி',
+      f_days: 'நாள்', f_rate: 'தினக்கூலி', f_advance: 'முன்பணம்', f_payments: 'பெற்றது', again: 'புதிய கணக்கு', log: 'உரையாடல்',
+      beta: 'பீட்டா: முகவர் தமிழில் பதில் தருவார், ஆனால் சரிபார்ப்பும் முடிவும் இந்தியில்.' },
+    te: { tagline: 'కూలీ లెక్క, గొంతుతో', start: 'ప్రారంభించండి', continue: 'కొనసాగించు', hisaab: 'లెక్క', baaki: 'బాకీ',
+      f_days: 'రోజులు', f_rate: 'రోజు కూలీ', f_advance: 'అడ్వాన్స్', f_payments: 'అందింది', again: 'కొత్త లెక్క', log: 'సంభాషణ',
+      beta: 'బీటా: ఏజెంట్ తెలుగులో జవాబిస్తారు, కానీ చదివి వినిపించే లెక్క, ఫలితం హిందీలో.' },
+    bho: { tagline: 'मजूरी के हिसाब, आवाज से', start: 'सुरू करीं', again: 'नया हिसाब',
+      beta: 'Beta: Bhojpuri mein jawab, lekin read-back aur nateeja Hindi mein, Hindi aawaz se.' },
+  };
+  UI['en-mix'] = UI.en;
+  const BETA = new Set(['bho', 'bn', 'ta', 'te', 'en-mix']);
+  const VOICE_BCP = { hi: 'hi-IN', mr: 'mr-IN', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN' };
+  let lang = 'hi';
+  try { lang = localStorage.getItem('ps_lang') || 'hi'; } catch { /* storage blocked */ }
+  let langChosen = false;       // the worker picked it on the toggle (sent to the server)
+  const t = (key) => (UI[lang] && UI[lang][key]) || UI.hi[key] || (UI.en[key] || '');
+
+  function applyLang() {
+    document.documentElement.lang = lang === 'en-mix' ? 'en' : lang;
+    document.querySelectorAll('[data-i18n]').forEach((n) => { const v = t(n.dataset.i18n); if (v) n.textContent = v; });
+    const note = document.getElementById('beta-note');
+    note.textContent = BETA.has(lang) ? (UI[lang].beta || UI.en.beta) : '';
+    show(note, BETA.has(lang));
+    document.getElementById('lang').value = lang;
+  }
+
   const $ = (id) => document.getElementById(id);
   const el = {
     agent: $('agent-text'), speaking: $('speaking'), replay: $('replay'), start: $('start'),
@@ -53,7 +106,8 @@
   const loadVoices = () => { voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; };
   loadVoices();
   if (window.speechSynthesis) speechSynthesis.onvoiceschanged = loadVoices;
-  const hindiVoice = () => voices.find((v) => /^hi(-|_|$)/i.test(v.lang));
+  const voiceFor = (code) => voices.find((v) => v.lang.replace('_', '-').toLowerCase().startsWith(code.toLowerCase()));
+  const hindiVoice = () => voiceFor('hi');
 
   function stopSpeaking() {
     if (window.speechSynthesis) speechSynthesis.cancel();
@@ -100,8 +154,10 @@
     const clean = (t) => t.replace(/\s*[?？]+/g, '।').replace(/।\s*।/g, '।');
     try {
       if (reply.agent_audio_url && await playClip(reply.agent_audio_url)) return reply.audio_source || 'recorded';
-      const hi = window.speechSynthesis && hindiVoice();
-      if (hi) { await utter(clean(reply.speak_text), hi, 'hi-IN'); return 'browser'; }
+      const bcp = VOICE_BCP[reply.voice_lang] || 'hi-IN';
+      // the line's own language voice; Marathi (Devanagari) can fall back to a Hindi voice
+      const own = window.speechSynthesis && (voiceFor(bcp.slice(0, 2)) || (['hi-IN', 'mr-IN'].includes(bcp) && hindiVoice()));
+      if (own) { await utter(clean(reply.speak_text), own, own.lang || bcp); return 'browser'; }
       if (window.speechSynthesis && voices.length) { await utter(clean(reply.agent_text), null, 'en-IN'); return 'browser'; }
       await sleep(Math.min(3500, 600 + reply.agent_text.length * 30));       // no voice at all: reading time
       return 'none';
@@ -124,7 +180,7 @@
   function badge(li, text) {
     const b = document.createElement('li');
     b.setAttribute('role', 'note');
-    b.className = 'prov mt-1 text-[11px] font-medium tracking-wide ' + (li.classList.contains('self-end') ? 'text-right text-indigo-300/80' : 'text-slate-400');
+    b.className = 'prov mt-1 text-sm font-medium tracking-wide ' + (li.classList.contains('self-end') ? 'text-right text-indigo-300/80' : 'text-slate-400');
     b.textContent = text;
     li.after(b);
     b.classList.add(li.classList.contains('self-end') ? 'self-end' : 'self-start');
@@ -141,7 +197,7 @@
     li.textContent = text;
     if (tag) {
       const t = document.createElement('span');
-      t.className = 'ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold';
+      t.className = 'ml-2 rounded-full bg-white/20 px-2 py-0.5 text-sm font-bold';
       t.textContent = tag;
       li.append(t);
     }
@@ -169,7 +225,7 @@
     list.replaceChildren();
     for (const n of notes || []) {
       const li = document.createElement('li');
-      li.className = 'rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-0.5 text-xs text-sky-200';
+      li.className = 'rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-0.5 text-sm text-sky-200';
       li.textContent = n;
       list.append(li);
     }
@@ -190,11 +246,18 @@
     return (parsed.field === 'days' ? `${parsed.value} din` : inr(parsed.value)) + (parsed.assumed ? ' (maana)' : '');
   }
 
+  const ICONS = { calendar: '📅', clock: '⏱️', minus: '➖', rupee: '₹', wallet: '👛', check: '✅' };
   function renderCase(c) {
     el.calc.replaceChildren();
+    $('outstanding').textContent = inr(Math.max(0, c.outstanding));
+    $('outstanding').className = 'text-[64px] font-black leading-none tabular-nums ' + (c.outstanding > 0 ? 'text-amber-300' : 'text-emerald-300');
     for (const line of c.breakdown) {
       const row = document.createElement('div');
-      row.className = 'flex items-baseline justify-between gap-4 py-3.5';
+      row.className = 'flex items-center justify-between gap-3 py-3.5';
+      const icon = document.createElement('span');
+      icon.className = 'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-lg';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = ICONS[line.icon] || '•';
       const left = document.createElement('div');
       left.className = line.total ? 'text-2xl font-extrabold text-white' : 'text-[17px] text-slate-200';
       left.textContent = line.label;
@@ -208,11 +271,39 @@
       amt.className = 'whitespace-nowrap font-semibold tabular-nums ' +
         (line.total ? (c.outstanding > 0 ? 'text-2xl font-extrabold text-amber-300' : 'text-2xl font-extrabold text-emerald-300') : 'text-[17px] text-slate-100');
       amt.textContent = line.amount;
-      row.append(left, amt);
+      left.classList.add('min-w-0', 'flex-1');
+      row.append(icon, left, amt);
       el.calc.append(row);
     }
     show(el.nodue, c.outstanding <= 0);
     show(el.result, true);
+  }
+
+  const when = (iso) => new Date(iso).toLocaleString(lang === 'mr' ? 'mr-IN' : 'en-IN',
+    { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+
+  function renderAudit(d) {
+    if (!d.case_hash_short) return;
+    show($('audit'), true);
+    $('hash').textContent = d.case_hash_short;
+    $('hash').title = d.case_hash;
+    $('share').href = '/case/' + d.session_id + '/share';
+    if (d.sent_at) { $('sent-at').textContent = t('sent') + ': ' + when(d.sent_at); show($('sent-at'), true); }
+    if (d.commitment_date) { $('reminder').textContent = '⏰ ' + t('reminder') + ': ' + d.commitment_date; show($('reminder'), true); }
+    if (d.escalation_draft) showDraft(d.escalation_draft);
+  }
+
+  function showDraft(text) {
+    $('draft').textContent = text;
+    show($('draft-wrap'), true);
+  }
+
+  function renderDebug(d) {
+    if (!debug) return;
+    show($('debug'), true);
+    $('debug').textContent = 'node_path: ' + (d.node_path || []).join(' → ') + '\npolicy: ' + d.policy_source +
+      ' · action: ' + (d.action || '-') + ' · lang: ' + d.language + ' · voice: ' + d.voice_lang +
+      (d.case_hash ? '\nsha256: ' + d.case_hash : '');
   }
 
   // ---------- server ----------
@@ -220,7 +311,8 @@
     const resp = await fetch('/turn', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, session_id: sessionId, mode: scripted ? 'scripted' : '' }),
+      body: JSON.stringify({ ...body, session_id: sessionId, mode: scripted ? 'scripted' : '',
+        ...(langChosen ? { language: lang } : {}) }),
     });
     let data = {};
     try { data = await resp.json(); } catch { /* non-JSON error page */ }
@@ -236,6 +328,17 @@
     if (data.facts) showFacts(data.facts); else showFact(data.parsed);
     if (data.parsed && data.parsed.assumed) showFact(data.parsed);
     showNotes(data.context_notes);
+    if (data.language && data.language !== lang && !langChosen) { lang = data.language; applyLang(); }
+    if (data.prior_case) {
+      const chip = $('followup-chip');
+      chip.textContent = t('followup') + ': ' + inr(data.prior_case.outstanding) + ' · ' + (data.prior_case.case_hash_short || '') +
+        (data.prior_case.commitment_date ? ' · ⏰ ' + data.prior_case.commitment_date : '');
+      show(chip, true);
+    }
+    if (data.deleted) {
+      show($('audit'), false); show($('draft-wrap'), false); show(el.result, false); show($('followup-chip'), false);
+      try { localStorage.removeItem('ps_last_case'); } catch { /* storage blocked */ }
+    }
 
     last = data;
     el.agent.textContent = data.agent_text;
@@ -245,6 +348,11 @@
     show(el.assist, !!data.needs_assistance && !data.case_data);
     setStatus('');
     if (data.case_data) renderCase(data.case_data);
+    renderAudit(data);
+    renderDebug(data);
+    if (data.case_hash_short) {
+      try { localStorage.setItem('ps_last_case', JSON.stringify({ session_id: data.session_id, at: Date.now() })); } catch { /* storage blocked */ }
+    }
 
     const finished = data.done;
     const preview = data.state === 'SHOW_PREVIEW' && data.case_data && data.case_data.payment_request;
@@ -325,7 +433,9 @@
     show($('wispr-hint'), false);   // the answer box carries the Wispr Flow label from here on
     setStatus('Shuru ho raha hai…');
     try {
-      const ok = await handle(await post({}));
+      let prior = null;
+      try { prior = scripted ? null : JSON.parse(localStorage.getItem('ps_last_case') || 'null'); } catch { /* storage blocked */ }
+      const ok = await handle(await post(prior ? { prior_session: prior.session_id } : {}));
       if (ok && scripted) runScript();
     } catch {
       show(el.start, true);
@@ -344,9 +454,14 @@
     // Plain deep link, no WhatsApp API: the worker picks the contractor's chat and presses send.
     window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener');
     try {
-      const data = await post({ event: 'sent' });
+      const resp = await fetch('/mark-sent', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, mode: scripted ? 'scripted' : '' }) });
+      const data = await resp.json();
       if (!data.error) {
         last = data;
+        renderAudit(data);
+        renderDebug(data);
+        el.send.classList.add('hidden'); el.send.classList.remove('flex');
         el.agent.textContent = data.agent_text;
         const prov = badge(bubble(data.agent_text, 'agent'), TEXT_LABEL[data.text_source] || 'Text: Rules');
         show(el.again, true);
@@ -356,6 +471,29 @@
   });
 
   el.again.addEventListener('click', () => location.reload());
+
+  $('escalate').addEventListener('click', async () => {
+    const r = await fetch('/escalate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId }) });
+    const d = await r.json();
+    if (d.escalation_draft) { showDraft(d.escalation_draft); $('draft-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+  $('copy-draft').addEventListener('click', () => {
+    const b = $('copy-draft');
+    (navigator.clipboard ? navigator.clipboard.writeText($('draft').textContent) : Promise.reject())
+      .then(() => { b.textContent = t('copied'); }, () => {});
+  });
+  // Delete goes through the agent: it asks "Pakka?" and deletes only after a spoken (dictated) yes.
+  $('delete').addEventListener('click', () => { show(el.form, true); submit('mera case delete karo'); });
+
+  $('lang').addEventListener('change', (e) => {
+    lang = e.target.value;
+    langChosen = true;
+    try { localStorage.setItem('ps_lang', lang); } catch { /* storage blocked */ }
+    applyLang();
+  });
+  try { langChosen = !!localStorage.getItem('ps_lang'); } catch { /* storage blocked */ }
+  applyLang();
   if (scripted) show(el.chip, true);
   if (textMode) { el.chip.textContent = 'Text mode'; show(el.chip, true); }
 

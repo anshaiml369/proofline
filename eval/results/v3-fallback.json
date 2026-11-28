@@ -2,8 +2,8 @@
  "summary": {
   "version": "v3-fallback",
   "cases": 32,
-  "slot_accuracy": 86.7,
-  "math_correct": 75.0,
+  "slot_accuracy": 93.0,
+  "math_correct": 84.4,
   "completed": 90.6,
   "repetition_rate": 0.0,
   "cases_with_repeat": 0,
@@ -104,7 +104,7 @@
     },
     {
      "worker": "teen hazaar",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -117,7 +117,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -216,7 +216,7 @@
     },
     {
      "worker": "teen hazaar",
-     "agent": "Confirm karta hoon: das din, paanch sau roz, do sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: das din, paanch sau roz, do sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 10,
@@ -229,7 +229,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai paanch hazaar. Mila teen hazaar do sau. Baaki ek hazaar aath sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai paanch hazaar. Advance do sau, ab tak mila teen hazaar, kul mila teen hazaar do sau. Baaki ek hazaar aath sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 10,
@@ -283,7 +283,7 @@
     },
     {
      "worker": "Chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -296,7 +296,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -359,7 +359,7 @@
     },
     {
      "worker": "8 din kaam, 650 roz, advance 1000, 3000 mile",
-     "agent": "Confirm karta hoon: aath din, chhe sau pachaas roz, ek hazaar advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: aath din, chhe sau pachaas roz, ek hazaar advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 8,
@@ -372,7 +372,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai paanch hazaar do sau. Mila chaar hazaar. Baaki ek hazaar do sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai paanch hazaar do sau. Advance ek hazaar, ab tak mila teen hazaar, kul mila chaar hazaar. Baaki ek hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 8,
@@ -429,7 +429,7 @@
     },
     {
      "worker": "Teen saal se is kaam par hoon, pichhle hafte hospital tha, chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila",
-     "agent": "Yeh sunkar dukh hua. Sirf jin dino kaam kiya, wahi ginenge. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Yeh sunkar dukh hua. Sirf jin dino kaam kiya, wahi ginenge. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -442,7 +442,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -612,7 +612,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -625,7 +625,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -746,7 +746,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -759,7 +759,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -867,7 +867,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -880,7 +880,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -990,7 +990,7 @@
     },
     {
      "worker": "1000 mile",
-     "agent": "Confirm karta hoon: paanch din, nau sau roz, koi advance nahi, ek hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: paanch din, nau sau roz, koi advance nahi, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 5,
@@ -1003,7 +1003,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar paanch sau. Mila ek hazaar. Baaki teen hazaar paanch sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar paanch sau. Advance shunya, ab tak mila ek hazaar, kul mila ek hazaar. Baaki teen hazaar paanch sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 5,
@@ -1115,7 +1115,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -1128,7 +1128,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -1236,7 +1236,7 @@
     },
     {
      "worker": "2000",
-     "agent": "Confirm karta hoon: saat din, chhe sau roz, koi advance nahi, do hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: saat din, chhe sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 7,
@@ -1249,7 +1249,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila do hazaar. Baaki do hazaar do sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki do hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 7,
@@ -1348,7 +1348,7 @@
     },
     {
      "worker": "2000",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, do hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -1373,14 +1373,14 @@
    "id": "G2",
    "category": "G contradiction",
    "slots": {
-    "days": false,
+    "days": true,
     "rate": true,
-    "advance": false,
-    "payments": false
+    "advance": true,
+    "payments": true
    },
-   "math_ok": false,
+   "math_ok": true,
    "completed": true,
-   "outstanding": 4795,
+   "outstanding": 3000,
    "expected": {
     "days": 5,
     "rate": 800,
@@ -1389,10 +1389,10 @@
     "outstanding": 3000
    },
    "final_facts": {
-    "days": 6,
+    "days": 5,
     "rate": 800,
-    "advance": 5,
-    "payments": 0
+    "advance": 0,
+    "payments": 1000
    },
    "agent_lines": 7,
    "repeats": 0,
@@ -1444,51 +1444,49 @@
     },
     {
      "worker": "nahi nahi, 5 din kaam kiya tha",
-     "agent": "Ab tak kitne paise mile?",
-     "state": "ASK_PAYMENTS",
+     "agent": "Theek hai, din paanch kar diya. Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
      "facts": {
-      "days": 6,
-      "rate": 800,
-      "advance": 5
+      "days": 5,
+      "rate": 800
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "advance nahi",
-     "agent": "Confirm karta hoon: chhe din, aath sau roz, paanch advance, abhi tak kuch nahi mila. Sahi hai?",
-     "state": "CONFIRM",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
      "facts": {
-      "days": 6,
+      "days": 5,
       "rate": 800,
-      "advance": 5,
-      "payments": 0
+      "advance": 0
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "1000 mile",
-     "agent": "Kya yeh sab sahi hai? Haan ya nahi boliye.",
+     "agent": "Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
-      "days": 6,
+      "days": 5,
       "rate": 800,
-      "advance": 5,
-      "payments": 0
+      "advance": 0,
+      "payments": 1000
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar aath sau. Mila paanch. Baaki chaar hazaar saat sau pachaanave rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar. Advance shunya, ab tak mila ek hazaar, kul mila ek hazaar. Baaki teen hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
-      "days": 6,
+      "days": 5,
       "rate": 800,
-      "advance": 5,
-      "payments": 0
+      "advance": 0,
+      "payments": 1000
      },
      "source": "fallback",
      "action": null
@@ -1581,7 +1579,7 @@
     },
     {
      "worker": "poora paisa mil gaya, 4000",
-     "agent": "Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, chaar hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 5,
@@ -1594,7 +1592,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar. Mila chaar hazaar. Hisaab ke hisaab se koi paisa baaki nahi hai.",
+     "agent": "Kul kamaai chaar hazaar. Advance shunya, ab tak mila chaar hazaar, kul mila chaar hazaar. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya.",
      "state": "DONE",
      "facts": {
       "days": 5,
@@ -1693,7 +1691,7 @@
     },
     {
      "worker": "1500 mile",
-     "agent": "Confirm karta hoon: chaar din, paanch sau roz, paanch sau advance, ek hazaar paanch sau paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chaar din, paanch sau roz, paanch sau advance, ek hazaar paanch sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 4,
@@ -1706,7 +1704,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai do hazaar. Mila do hazaar. Hisaab ke hisaab se koi paisa baaki nahi hai.",
+     "agent": "Kul kamaai do hazaar. Advance paanch sau, ab tak mila ek hazaar paanch sau, kul mila do hazaar. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya.",
      "state": "DONE",
      "facts": {
       "days": 4,
@@ -1818,7 +1816,7 @@
     },
     {
      "worker": "8000 mile",
-     "agent": "Confirm karta hoon: tees din, chhe sau roz, paanch hazaar advance, aath hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: tees din, chhe sau roz, paanch hazaar advance, aath hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 30,
@@ -1831,7 +1829,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai athaarah hazaar. Mila terah hazaar. Baaki paanch hazaar rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai athaarah hazaar. Advance paanch hazaar, ab tak mila aath hazaar, kul mila terah hazaar. Baaki paanch hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 30,
@@ -1932,7 +1930,7 @@
     },
     {
      "worker": "4000 mile",
-     "agent": "Confirm karta hoon: das din, saat sau roz, do hazaar advance, chaar hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: das din, saat sau roz, do hazaar advance, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 10,
@@ -1945,7 +1943,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai saat hazaar. Mila chhe hazaar. Baaki ek hazaar rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai saat hazaar. Advance do hazaar, ab tak mila chaar hazaar, kul mila chhe hazaar. Baaki ek hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 10,
@@ -2044,7 +2042,7 @@
     },
     {
      "worker": "teen hazaar",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2057,7 +2055,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -2156,7 +2154,7 @@
     },
     {
      "worker": "तीन हज़ार",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2169,7 +2167,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -2268,7 +2266,7 @@
     },
     {
      "worker": "₹3,000",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2281,7 +2279,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -2380,7 +2378,7 @@
     },
     {
      "worker": "4,000",
-     "agent": "Confirm karta hoon: baarah din, paanch sau pachaas roz, koi advance nahi, chaar hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: baarah din, paanch sau pachaas roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 12,
@@ -2393,7 +2391,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chhe hazaar chhe sau. Mila chaar hazaar. Baaki do hazaar chhe sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chhe hazaar chhe sau. Advance shunya, ab tak mila chaar hazaar, kul mila chaar hazaar. Baaki do hazaar chhe sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 12,
@@ -2481,7 +2479,7 @@
     },
     {
      "worker": "received 3000",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2494,7 +2492,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -2593,7 +2591,7 @@
     },
     {
      "worker": "got 5000 so far",
-     "agent": "Confirm karta hoon: nau din, saat sau pachaas roz, koi advance nahi, paanch hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: nau din, saat sau pachaas roz, koi advance nahi, paanch hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 9,
@@ -2606,7 +2604,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chhe hazaar saat sau pachaas. Mila paanch hazaar. Baaki ek hazaar saat sau pachaas rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chhe hazaar saat sau pachaas. Advance shunya, ab tak mila paanch hazaar, kul mila paanch hazaar. Baaki ek hazaar saat sau pachaas rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 9,
@@ -2660,7 +2658,7 @@
     },
     {
      "worker": "Dekho bhai, Somvaar se Shanivaar tak chhe din kaam kiya site pe, thekedar ne saat sau roz bola tha, shuru mein paanch sau advance diya aur kal teen hazaar diye, baaki nahi diya",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2673,7 +2671,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -2736,7 +2734,7 @@
     },
     {
      "worker": "humne pichhle mahine 20 din kaam kiya tha aur 600 roz pe baat hui thi, beech mein 2000 advance liya aur abhi 6000 mile hain",
-     "agent": "Confirm karta hoon: bees din, chhe sau roz, do hazaar advance, chhe hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: bees din, chhe sau roz, do hazaar advance, chhe hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 20,
@@ -2749,7 +2747,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai baarah hazaar. Mila aath hazaar. Baaki chaar hazaar rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai baarah hazaar. Advance do hazaar, ab tak mila chhe hazaar, kul mila aath hazaar. Baaki chaar hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 20,
@@ -2845,7 +2843,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Confirm karta hoon: chhe din, paanch sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, paanch sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2858,7 +2856,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai teen hazaar. Mila teen hazaar paanch sau. Hisaab ke hisaab se koi paisa baaki nahi hai.",
+     "agent": "Kul kamaai teen hazaar. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya.",
      "state": "DONE",
      "facts": {
       "days": 6,
@@ -2969,13 +2967,13 @@
    "category": "O correction",
    "slots": {
     "days": true,
-    "rate": false,
-    "advance": false,
-    "payments": false
+    "rate": true,
+    "advance": true,
+    "payments": true
    },
-   "math_ok": false,
+   "math_ok": true,
    "completed": true,
-   "outstanding": 2900,
+   "outstanding": 1300,
    "expected": {
     "days": 6,
     "rate": 800,
@@ -2985,9 +2983,9 @@
    },
    "final_facts": {
     "days": 6,
-    "rate": 700,
-    "advance": 800,
-    "payments": 500
+    "rate": 800,
+    "advance": 500,
+    "payments": 3000
    },
    "agent_lines": 7,
    "repeats": 0,
@@ -3039,51 +3037,49 @@
     },
     {
      "worker": "nahi nahi, roz 800 tha",
-     "agent": "Ab tak kitne paise mile?",
-     "state": "ASK_PAYMENTS",
+     "agent": "Theek hai, roz aath sau kar diya. Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
-      "rate": 700,
-      "advance": 800
+      "rate": 800
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "500 advance",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, aath sau advance, paanch sau paid. Sahi hai?",
-     "state": "CONFIRM",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
-      "rate": 700,
-      "advance": 800,
-      "payments": 500
+      "rate": 800,
+      "advance": 500
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "3000 mile",
-     "agent": "Kya yeh sab sahi hai? Haan ya nahi boliye.",
+     "agent": "Confirm karta hoon: chhe din, aath sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
-      "rate": 700,
-      "advance": 800,
-      "payments": 500
+      "rate": 800,
+      "advance": 500,
+      "payments": 3000
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila ek hazaar teen sau. Baaki do hazaar nau sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar aath sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki ek hazaar teen sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
-      "rate": 700,
-      "advance": 800,
-      "payments": 500
+      "rate": 800,
+      "advance": 500,
+      "payments": 3000
      },
      "source": "fallback",
      "action": null
@@ -3096,12 +3092,12 @@
    "slots": {
     "days": true,
     "rate": true,
-    "advance": false,
-    "payments": false
+    "advance": true,
+    "payments": true
    },
-   "math_ok": false,
+   "math_ok": true,
    "completed": true,
-   "outstanding": 2700,
+   "outstanding": 700,
    "expected": {
     "days": 6,
     "rate": 700,
@@ -3112,8 +3108,8 @@
    "final_facts": {
     "days": 6,
     "rate": 700,
-    "advance": 1000,
-    "payments": 500
+    "advance": 500,
+    "payments": 3000
    },
    "agent_lines": 7,
    "repeats": 0,
@@ -3177,39 +3173,38 @@
     },
     {
      "worker": "sorry, advance 500 tha",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, ek hazaar advance, paanch sau paid. Sahi hai?",
-     "state": "CONFIRM",
+     "agent": "Theek hai, advance paanch sau kar diya. Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
       "rate": 700,
-      "advance": 1000,
-      "payments": 500
+      "advance": 500
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "3000 mile",
-     "agent": "Kya yeh sab sahi hai? Haan ya nahi boliye.",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
       "rate": 700,
-      "advance": 1000,
-      "payments": 500
+      "advance": 500,
+      "payments": 3000
      },
      "source": "fallback",
      "action": null
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila ek hazaar paanch sau. Baaki do hazaar saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
       "rate": 700,
-      "advance": 1000,
-      "payments": 500
+      "advance": 500,
+      "payments": 3000
      },
      "source": "fallback",
      "action": null
@@ -3311,7 +3306,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -3324,7 +3319,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,
@@ -3434,7 +3429,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -3447,7 +3442,7 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun?",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 6,

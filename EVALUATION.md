@@ -48,6 +48,8 @@ The last row shows every v3 turn came from the LLM: no outages, no silent fallba
 | Run 2 (table above) | after one round of fixes | 100.0% | 100.0% | 100.0% | 0.0% | 100.0% | 83.3% | none |
 | Run 3 | same code | 99.2% | 96.9% | 100.0% | 0.0% | 100.0% | 66.7% | G2 |
 | Run 4 | same code | 100.0% | 100.0% | 100.0% | 0.0% | 100.0% | 83.3% | none |
+| Run 5 | after the audit layer, languages and the contradiction question | 97.7% | 96.9% | 100.0% | 0.0% | 100.0% | 83.3% | O2 |
+| Run 6 | run 5 code + the rules-path correction fix below | 100.0% | 100.0% | 100.0% | 0.0% | 100.0% | 83.3% | none |
 
 **What the one round of fixes changed** (after reading the first-run failures):
 - **H1:** the model checked the worker's sum itself and got it wrong ("4000 nahi hota", though 5 × 800 = 4,000). The prompt now forbids checking whether numbers add up.
@@ -56,6 +58,19 @@ The last row shows every v3 turn came from the LLM: no outages, no silent fallba
 - **C1/C2:** a bundle that completed all four numbers jumped straight to Python's read-back and dropped the model's acknowledgement. The acknowledgement is now kept in front of the read-back.
 
 These are general rules, not answers to specific cases. They were still chosen after seeing this test set, so **the first-run numbers are the honest held-out score. Runs 2–4 show the variance after tuning.**
+
+### Runs 5 and 6: after the audit-layer phase
+
+**Run 5 (O2):** the LLM timed out on one turn ("sorry, advance 500 tha"), so that turn used the rules, which stored 500 as the payments being asked about. The worker's later "3000 mile" replaced it, and the read-back kept the wrong ₹1,000 advance; the harness's automatic "haan" confirmed it. The new contradiction question was not involved.
+
+**The fix (rules path):** if the worker tags a number that is already known ("advance 500") while a different question is open, the rules now treat it as a correction of that number and ask the open question again. It is general, not specific to O2, and it also changed the no-key path:
+
+| v3-fallback | Slot accuracy | Math | Failed cases |
+|---|---|---|---|
+| Before (run 2 table above) | 86.7% | 75.0% | C2, G1, G2, I2, N1, N2, O1, O2 |
+| After the correction fix | 93.0% | 84.4% | C2, G1, I2, N1, N2 |
+
+**Run 6** is the code that was committed. Transcripts: `eval/results/v3-run5.json`, `eval/results/v3-run6.json`, `eval/results/v3-fallback.json`. As before, this fix was made after seeing a failure on this test set, so it is tuning, not a held-out result.
 
 ## How the logic evolved
 

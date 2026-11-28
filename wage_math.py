@@ -26,17 +26,24 @@ def _whole(name, value):
     return value
 
 
-def calculate_wages(days, rate, advance=0, payments=0):
-    """expected = days × rate; received = advance + payments; outstanding = max(0, expected − received)."""
+def calculate_wages(days, rate, advance=0, payments=0, overtime_hours=0, overtime_rate=0, deductions=0):
+    """expected = days × rate + overtime_hours × overtime_rate − deductions (never below 0);
+    received = advance + payments; outstanding = max(0, expected − received).
+    The optional fields default to 0, so the four-number case is unchanged."""
     days = _whole("days", days)
     rate = _whole("rate", rate)
     advance = _whole("advance", advance or 0)
     payments = _whole("payments", payments or 0)
+    overtime_hours = _whole("overtime_hours", overtime_hours or 0)
+    overtime_rate = _whole("overtime_rate", overtime_rate or 0)
+    deductions = _whole("deductions", deductions or 0)
 
-    expected = days * rate
+    base = days * rate
+    overtime = overtime_hours * overtime_rate
+    expected = max(0, base + overtime - deductions)
     received = advance + payments
     outstanding = max(0, expected - received)
-    return {
+    out = {
         "days": days,
         "rate": rate,
         "advance": advance,
@@ -45,30 +52,52 @@ def calculate_wages(days, rate, advance=0, payments=0):
         "received": received,
         "outstanding": outstanding,
         "overpaid": max(0, received - expected),
-        "breakdown": breakdown_lines(days, rate, advance, payments, expected, outstanding),
+        "breakdown": breakdown_lines(days, rate, advance, payments, expected, outstanding,
+                                     overtime_hours, overtime_rate, deductions),
     }
+    if overtime or deductions:
+        out.update(overtime_hours=overtime_hours, overtime_rate=overtime_rate, overtime=overtime,
+                   deductions=deductions, base=base)
+    return out
 
 
-def breakdown_lines(days, rate, advance, payments, expected, outstanding):
-    """Display strings for the calculation card; the browser only renders these, it does no maths."""
-    return [
-        {"label": "Kul kamaai", "math": f"{days} din × {format_inr(rate)}", "amount": format_inr(expected)},
-        {"label": "Advance", "math": "minus", "amount": "− " + format_inr(advance)},
-        {"label": "Ab tak mila", "math": "minus", "amount": "− " + format_inr(payments)},
-        {"label": "Baaki", "math": "", "amount": format_inr(outstanding), "total": True},
+def breakdown_lines(days, rate, advance, payments, expected, outstanding, overtime_hours=0, overtime_rate=0, deductions=0):
+    """Display strings for the calculation card; the browser only renders these, it does no maths.
+    `icon` names a small picture for each line (calendar, clock, minus, rupee, wallet, check)."""
+    lines = [{"label": "Kaam", "math": f"{days} din × {format_inr(rate)}", "amount": format_inr(days * rate), "icon": "calendar"}]
+    if overtime_hours and overtime_rate:
+        lines.append({"label": "Overtime", "math": f"{overtime_hours} ghante × {format_inr(overtime_rate)}",
+                      "amount": "+ " + format_inr(overtime_hours * overtime_rate), "icon": "clock"})
+    if deductions:
+        lines.append({"label": "Katauti", "math": "minus", "amount": "− " + format_inr(deductions), "icon": "minus"})
+    if len(lines) > 1:
+        lines.append({"label": "Kul kamaai", "math": "", "amount": format_inr(expected), "icon": "rupee"})
+    else:
+        lines[0]["label"] = "Kul kamaai"
+        lines[0]["icon"] = "rupee"
+    lines += [
+        {"label": "Advance", "math": "minus", "amount": "− " + format_inr(advance), "icon": "wallet"},
+        {"label": "Ab tak mila", "math": "minus", "amount": "− " + format_inr(payments), "icon": "wallet"},
+        {"label": "Baaki", "math": "", "amount": format_inr(outstanding), "total": True, "icon": "check"},
     ]
+    return lines
 
 
 def payment_request(result):
     """Hinglish WhatsApp message to the contractor. Only uses numbers already calculated above."""
-    return (
-        "Namaste Thekedar ji,\n"
-        "Mera mazdoori ka hisaab:\n"
-        f"• Kaam: {result['days']} din × {format_inr(result['rate'])} = {format_inr(result['expected'])}\n"
-        f"• Advance mila: {format_inr(result['advance'])}\n"
-        f"• Ab tak mila: {format_inr(result['payments'])}\n"
-        f"• Kul mila: {format_inr(result['received'])}\n"
-        f"Baaki: {format_inr(result['outstanding'])}\n\n"
-        f"Kripya baaki {format_inr(result['outstanding'])} jaldi de dijiye. Dhanyavaad.\n"
-        "(PagarSaathi se hisaab)"
-    )
+    lines = ["Namaste Thekedar ji,", "Mera mazdoori ka hisaab:",
+             f"• Kaam: {result['days']} din × {format_inr(result['rate'])} = {format_inr(result['days'] * result['rate'])}"]
+    if result.get("overtime"):
+        lines.append(f"• Overtime: {result['overtime_hours']} ghante × {format_inr(result['overtime_rate'])}"
+                     f" = {format_inr(result['overtime'])}")
+    if result.get("deductions"):
+        lines.append(f"• Katauti: {format_inr(result['deductions'])}")
+    if result.get("overtime") or result.get("deductions"):
+        lines.append(f"• Kul kamaai: {format_inr(result['expected'])}")
+    lines += [f"• Advance mila: {format_inr(result['advance'])}",
+              f"• Ab tak mila: {format_inr(result['payments'])}",
+              f"• Kul mila: {format_inr(result['received'])}",
+              f"Baaki: {format_inr(result['outstanding'])}", "",
+              f"Kripya baaki {format_inr(result['outstanding'])} jaldi de dijiye. Dhanyavaad.",
+              "(PagarSaathi se hisaab)"]
+    return "\n".join(lines)

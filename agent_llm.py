@@ -108,7 +108,8 @@ def frame(session):
             "context_notes": session.get("context_notes", []),
             "unresolved": session.get("unresolved", []),
             "last_question": session.get("last_agent_text", ""),
-            "turn_count": session.get("turn_count", 0)}
+            "turn_count": session.get("turn_count", 0),
+            "language": session.get("language", "hi")}
 
 
 def build_user_message(session, text):
