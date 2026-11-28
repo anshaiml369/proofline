@@ -4,7 +4,7 @@
 
 Built for the *India Runs on Voice* hackathon (Scaler × Wispr Flow).
 
-> Demo video: _link to be added_ · Pitch deck: [`PITCH_DECK.md`](PITCH_DECK.md) · Live app: _link to be added_
+> Demo video: _link to be added_ · Pitch deck: [`PITCH_DECK.md`](PITCH_DECK.md) · Live app: [pagarsaathi.up.railway.app](https://pagarsaathi.up.railway.app)
 
 ## The problem
 
