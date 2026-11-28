@@ -58,7 +58,7 @@ Setup steps are in [`WISPR_FLOW_SETUP.md`](WISPR_FLOW_SETUP.md).
 
 **Every line shows its source.** A small grey badge under each agent line reads, for example, `Text: LLM · Voice: Sarvam` or `Text: Rules · Voice: Recorded`. Worker lines read `Wispr Flow / typed`. The full pipeline, with the exact model and voice names, is in [`PIPELINE.md`](PIPELINE.md).
 
-**The LLM decides the conversation, never the money.** Each turn it returns an action, the line to say, the numbers it heard and any new context, as JSON. Python stores a number only if the worker actually said it, adds multiple amounts, blocks any line that states an amount the worker did not say, never lets the same line repeat, steps in after three turns going nowhere, and always runs the "Sahi hai?" read-back before the maths. If the LLM fails or takes over 8 seconds, that turn uses the built-in rules. The full contract and guards are in [`PIPELINE.md`](PIPELINE.md#the-dialogue-policy-llm-path).
+**The LLM decides the conversation, never the money.** Each turn it returns an action, the line to say, the numbers it heard and any new context, as JSON. Python stores a number only if the worker actually said it, adds multiple amounts, blocks any line that states an amount the worker did not say, never lets the same line repeat, moves on after one ask and two rephrases of a number, stops at 12 turns, and always runs the "Sahi hai?" read-back before the maths. If the LLM fails or takes over 8 seconds, that turn uses the built-in rules. The full contract and guards are in [`PIPELINE.md`](PIPELINE.md#the-dialogue-policy-llm-path).
 
 ### A real conversation (LLM path)
 
@@ -72,6 +72,42 @@ Agent:  Achha, aapne Monday se Saturday tak 6 din kaam kiya. Roz ki mazdoori kit
 Worker: Nahi, rate 800 tha
 Agent:  Theek hai, aapka roz ka rate 800 rupaye hai. Confirm karta hoon: chhe din, aath sau roz, ... Sahi hai?
 ```
+
+## How the agent decides what to ask
+
+**Measured improvement** ([EVALUATION.md](EVALUATION.md), 32 held-out cases): slot accuracy **86.7% → 100.0%**, math correctness **75.0% → 100.0%**, context acknowledgement **0% → 83.3%** (v2 → v3, the same run). The first held-out v3 run, before one round of fixes, scored 97.7% slots and 90.6% math; repetition stayed at 0.0%. Architecture choice: [ARCHITECTURE.md](ARCHITECTURE.md).
+
+There is no fixed question order. Each turn the LLM gets the **frame** (the four numbers, `context_notes`, `unresolved`, `last_question`, `turn_count`) and the whole conversation, and returns:
+
+```json
+{"action": "ask_slot | follow_up | clarify | acknowledge_context | handle_off_topic | rephrase | conclude",
+ "target_slot": "days | rate | advance | payments | none",
+ "agent_text": "...", "agent_text_hi": "...",
+ "extracted": [{"slot": "rate", "value": 650, "confidence": "high"}],
+ "context_delta": "4 days in hospital", "intent": "yes | no | other"}
+```
+
+| Action | Worker said | Agent replied |
+|---|---|---|
+| `ask_slot` | "roz ke 650 bole the" | "Rozana 650 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?" |
+| `follow_up` | "pichhle mahine ka baaki hai" | "Samajh gaya, pichhle mahine ka paisa baaki hai. Us mahine mein kitne din kaam kiya tha?" |
+| `clarify` | "manager se 2000 ka loan liya tha" | "Samajh gaya. Kya woh 2000 rupaye aapki mazdoori mein se kaate gaye hain?" |
+| `acknowledge_context` | "maine wahan 3 saal kaam kiya" | "Teen saal ka saath hai. Jis time ka paisa baaki hai, jaise pichhla hafta ya mahina, usme kitne din kaam kiya?" |
+| `handle_off_topic` | "aap kaun ho waise?" | "Main PagarSaathi hoon, aapki madad ke liye. Ab bataye, aapko ab tak kitna payment mila hai?" |
+| `rephrase` | "samjha nahi" | "Main aapki madad karna chahta hoon. Aapne kitne din kaam kiya tha? Sirf din ka number batayein, jaise 6 din." |
+| `conclude` | "teen hazaar" (the last number) | "Aapko ab tak 3000 rupaye aur mile hain." + Python's read-back: "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai?" |
+
+These are real replies from live and evaluation runs, so the exact words vary from run to run.
+
+**What Python enforces** (`conversation.step_policy`):
+- A number is stored only if the worker said it, and Python adds multiple amounts.
+- A line is blocked if it states an amount the worker didn't say.
+- The same line, or the same question with nothing new, never comes twice in a row.
+- Each number gets 1 ask and 2 rephrases, then Python moves on and marks it `unresolved`. Advance and payments are then assumed ₹0 and flagged.
+- After 12 turns the agent stops and points to a union or India Labourline (1800 1800 999).
+- The read-back always comes before the maths.
+
+Each `/turn` reply carries `action` and `policy_source` (`llm` or `fallback`).
 
 ## Run locally
 
@@ -116,11 +152,11 @@ Everything in the core flow works:
 - `/`: normal use. Dictate with Wispr Flow, or type, then press **Continue**.
 - `/?mode=text`: the same flow, labelled "Text mode", for a judge who will type rather than dictate.
 - `?debug=1` (with any mode): logs every audio play, pause, end and error in the browser console.
-- `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself, in about 55 seconds. It always uses the built-in rules and pre-recorded voice, so it calls no outside service and runs the same every time.
+- `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself: the worker mentions three years at the site and an illness (the agent acknowledges it), then gives three facts in one sentence, and it ends at ₹700. It always uses the built-in rules and pre-recorded voice, so it calls no outside service and runs the same every time.
 
 ## API
 
-`POST /turn` with JSON `{session_id, text}` returns `{agent_text, speak_text, state, done, case_data}`.
+`POST /turn` with JSON `{session_id, text}` returns `{agent_text, speak_text, state, done, case_data, facts, context_notes, action, policy_source}`.
 - Leave out `session_id` to start a conversation; the agent speaks first.
 - Send `{session_id, event: "sent"}` when the worker taps Send.
 - States: `START → ASK_DAYS → ASK_RATE → ASK_ADVANCE → ASK_PAYMENTS → CONFIRM → CALCULATE → READ_RESULT → ASK_SEND → SHOW_PREVIEW → DONE`.
@@ -135,7 +171,7 @@ pip3 install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-There are 72 tests. They need no network or keys (the LLM is faked). They cover:
+There are 82 tests. They need no network or keys (the LLM is faked). They cover:
 - the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
 - the demo conversation and Wispr-style text (digits, ₹, Devanagari);
 - the mandatory confirm step;
@@ -144,7 +180,8 @@ There are 72 tests. They need no network or keys (the LLM is faked). They cover:
 - "pata nahi" not being read as ₹0;
 - the nothing-owed path;
 - the LLM policy path: hospital, loan and "3 saal" handled as context, off-topic questions, a number the worker never said being refused, a total never spoken, no line repeated, Python stepping in when stuck, several facts in one sentence, corrections at the read-back, Python adding amounts, "haan" never read as ₹0, falling back to rules when the LLM fails;
-- the rules path without keys: "3 saal" and "ek hafta" not stored as days, hospital and loan acknowledged, no line repeated;
+- the rules path without keys: "3 saal" and "ek hafta" not stored as days, "teen saal" never read as money, hospital and loan acknowledged, no line repeated;
+- the v3 guarantees: two rephrases then move on, the 12-turn cap with the help line, no repeated question, the backstop for tagged numbers, the acknowledgement kept before the read-back, the scripted demo ending at ₹700;
 - "so far" not being read as "sau";
 - several amounts in one answer without keys ("6 din, 700 roz" is 6 days and ₹700, not 706);
 - Hinglish error pages, and the `/health` fields.
@@ -176,6 +213,7 @@ The **Hugging Face Inference API** is a documented alternative LLM provider: any
 | A government route exists for unpaid-wage claims (Payment of Wages Act, Minimum Wages Act). | SOURCED | [SAMADHAN portal](https://samadhan.labour.gov.in) |
 | Wispr Flow supports Hindi and Hinglish, including romanised Hindi output. | SOURCED | [wisprflow.ai/india](https://wisprflow.ai/india), [Wispr Flow blog](https://wisprflow.ai/post/supporting-languages) |
 | Existing wage apps are built for the employer or contractor, not the worker. PagarBook lists 10M+ downloads. | SOURCED (app listings) | [PagarBook](https://pagarbook.com/), [AppBrain listing](https://appgoblin.info/apps/com.gyantech.pagarbook) |
+| India Labourline (1800 1800 999) is a helpline for informal workers that helps recover unpaid wages. The agent names it after 12 turns. | SOURCED (one web search; check before a pilot) | [The Leaflet](https://theleaflet.in/india-labourline-launched-a-new-national-labour-helpline-to-serve-indias-informal-workers), [The Mooknayak](https://en.themooknayak.com/labourer/india-labour-line-helps-788-laborers-to-claim-outstanding-wages-of-rs-1-crore-34-lakhs) |
 | How many workers are short-paid each week, and by how much | UNVERIFIED | No reliable national figure found |
 | Speaking is faster than typing for this user | UNVERIFIED | Not measured |
 
@@ -195,6 +233,9 @@ The **Hugging Face Inference API** is a documented alternative LLM provider: any
 | `conversation.py` | The frame and states, the built-in Hinglish reader, and the guarded LLM policy turn (`step_policy`) |
 | `agent_llm.py`, `prompts/policy.txt` | The optional LLM dialogue policy: chooses the next move and writes the line |
 | `PIPELINE.md` | Exactly where each line's text and voice come from, in each mode |
+| `ARCHITECTURE.md` | Why an LLM policy plus a frame, and not a trained RNN or LSTM |
+| `evaluate.py`, `test_cases.json`, `TEST_SET.md`, `EVALUATION.md` | The 32-case test set, the harness, and the measured v1 → v2 → v3 results |
+| `legacy/` | v1 (tag `v1-original`) and v2 (tag `v2-current`) conversation logic, frozen for the evaluation only |
 | `wage_math.py` | All arithmetic, as pure functions |
 | `hinglish_numbers.py` | Number words, both ways (4200 ⇄ "chaar hazaar do sau") |
 | `sarvam_tts.py` | Sarvam voice |

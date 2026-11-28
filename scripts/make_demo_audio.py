@@ -16,8 +16,9 @@ load_dotenv()
 import conversation as c  # noqa: E402
 import sarvam_tts  # noqa: E402
 
-WORKER_LINES = ["Mujhe thekedar ne is hafte poore paise nahi diye.", "Chhe din.", "Saat sau rupaye.",
-                "Paanch sau.", "Teen hazaar.", "Haan.", "Haan."]
+# Keep in sync with SCRIPT in static/app.js.
+WORKER_LINES = ["Thekedar ne poore paise nahi diye. Teen saal se unke saath hoon, pichhle hafte bimar bhi tha.",
+                "Chhe din kaam kiya, saat sau roz, paanch sau advance mila tha.", "Teen hazaar mile.", "Haan.", "Haan."]
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static", "demo")
 
 

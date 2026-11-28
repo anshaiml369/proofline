@@ -1,0 +1,833 @@
+[
+ {
+  "id": "A1",
+  "category": "A canonical",
+  "turns": [
+   "paise nahi mile",
+   "chhe din",
+   "saat sau rupaye",
+   "paanch sau",
+   "teen hazaar"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "The demo. Ends at ₹700."
+ },
+ {
+  "id": "A2",
+  "category": "A canonical",
+  "turns": [
+   "thekedar ne poore paise nahi diye",
+   "das din",
+   "paanch sau",
+   "do sau",
+   "teen hazaar"
+  ],
+  "expected": {
+   "days": 10,
+   "rate": 500,
+   "advance": 200,
+   "payments": 3000,
+   "outstanding": 1800
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Required case (10, 500, 200, 3000) -> 1800."
+ },
+ {
+  "id": "B1",
+  "category": "B bundled",
+  "turns": [
+   "Chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": 0,
+  "bundled_slots": [
+   "days",
+   "rate",
+   "advance",
+   "payments"
+  ],
+  "notes": "All four slots in the first message."
+ },
+ {
+  "id": "B2",
+  "category": "B bundled",
+  "turns": [
+   "paise baaki hain",
+   "8 din kaam, 650 roz, advance 1000, 3000 mile"
+  ],
+  "expected": {
+   "days": 8,
+   "rate": 650,
+   "advance": 1000,
+   "payments": 3000,
+   "outstanding": 1200
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": 1,
+  "bundled_slots": [
+   "days",
+   "rate",
+   "advance",
+   "payments"
+  ],
+  "notes": "All four slots in one answer to the days question."
+ },
+ {
+  "id": "C1",
+  "category": "C bundled+context",
+  "turns": [
+   "Teen saal se is kaam par hoon, pichhle hafte hospital tha, chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": true,
+  "context_turn": 0,
+  "context_keywords": [
+   "hospital",
+   "saal",
+   "dukh",
+   "afsos",
+   "bimar",
+   "theek ho"
+  ],
+  "bundled_turn": 0,
+  "bundled_slots": [
+   "days",
+   "rate",
+   "advance",
+   "payments"
+  ],
+  "notes": "Bundle plus tenure and hospital context."
+ },
+ {
+  "id": "C2",
+  "category": "C bundled+context",
+  "turns": [
+   "Meri biwi bimar thi isliye 2 din chhutti li, baaki 5 din kaam kiya, 800 roz, advance nahi, 2000 mile"
+  ],
+  "expected": {
+   "days": 5,
+   "rate": 800,
+   "advance": 0,
+   "payments": 2000,
+   "outstanding": 2000
+  },
+  "expect_context_ack": true,
+  "context_turn": 0,
+  "context_keywords": [
+   "biwi",
+   "patni",
+   "bimar",
+   "dukh",
+   "afsos",
+   "chhutti"
+  ],
+  "bundled_turn": 0,
+  "bundled_slots": [
+   "days",
+   "rate",
+   "advance",
+   "payments"
+  ],
+  "notes": "Bundle plus a family illness; the 2 leave days must not count."
+ },
+ {
+  "id": "D1",
+  "category": "D vague",
+  "turns": [
+   "paise nahi mile",
+   "pata nahi",
+   "yaad nahi",
+   "6 din",
+   "700",
+   "500",
+   "3000"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Two vague answers on days, then the number."
+ },
+ {
+  "id": "D2",
+  "category": "D vague",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "pata nahi kitna tha",
+   "yaad nahi aa raha",
+   "700",
+   "500",
+   "3000"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Two vague answers on rate."
+ },
+ {
+  "id": "E1",
+  "category": "E refusal",
+  "turns": [
+   "paise nahi mile",
+   "nahi bataunga",
+   "achha theek hai, 6 din",
+   "700 roz",
+   "500 advance",
+   "3000 mile"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Refuses once, then cooperates."
+ },
+ {
+  "id": "E2",
+  "category": "E refusal",
+  "turns": [
+   "paise nahi mile",
+   "5 din",
+   "yeh sab kyun poochh rahe ho, nahi bataunga",
+   "theek hai, 900 roz",
+   "advance nahi mila",
+   "1000 mile"
+  ],
+  "expected": {
+   "days": 5,
+   "rate": 900,
+   "advance": 0,
+   "payments": 1000,
+   "outstanding": 3500
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Refuses the rate once, then answers."
+ },
+ {
+  "id": "F1",
+  "category": "F off-topic",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "mera beta bimar hai",
+   "700 roz",
+   "500 advance",
+   "3000 mile"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": true,
+  "context_turn": 2,
+  "context_keywords": [
+   "beta",
+   "bete",
+   "bimar",
+   "dukh",
+   "afsos",
+   "chinta"
+  ],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Off-topic personal news mid-flow."
+ },
+ {
+  "id": "F2",
+  "category": "F off-topic",
+  "turns": [
+   "paise nahi mile",
+   "aaj baarish bahut ho rahi hai",
+   "7 din",
+   "600",
+   "nahi",
+   "2000"
+  ],
+  "expected": {
+   "days": 7,
+   "rate": 600,
+   "advance": 0,
+   "payments": 2000,
+   "outstanding": 2200
+  },
+  "expect_context_ack": true,
+  "context_turn": 1,
+  "context_keywords": [
+   "baarish",
+   "barish",
+   "mausam",
+   "barsaat"
+  ],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Weather small talk before the first answer."
+ },
+ {
+  "id": "G1",
+  "category": "G contradiction",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "700",
+   "500",
+   "2000",
+   "nahi, 5 din the"
+  ],
+  "expected": {
+   "days": 5,
+   "rate": 700,
+   "advance": 500,
+   "payments": 2000,
+   "outstanding": 1000
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Corrects days at the read-back."
+ },
+ {
+  "id": "G2",
+  "category": "G contradiction",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "800 roz",
+   "nahi nahi, 5 din kaam kiya tha",
+   "advance nahi",
+   "1000 mile"
+  ],
+  "expected": {
+   "days": 5,
+   "rate": 800,
+   "advance": 0,
+   "payments": 1000,
+   "outstanding": 3000
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Corrects days while being asked about the advance."
+ },
+ {
+  "id": "H1",
+  "category": "H zero owed",
+  "turns": [
+   "paise ka hisaab dekhna hai",
+   "5 din",
+   "800",
+   "advance nahi",
+   "poora paisa mil gaya, 4000"
+  ],
+  "expected": {
+   "days": 5,
+   "rate": 800,
+   "advance": 0,
+   "payments": 4000,
+   "outstanding": 0
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Required case (5, 800, 0, 4000) -> 0."
+ },
+ {
+  "id": "H2",
+  "category": "H zero owed",
+  "turns": [
+   "bas confirm karna hai",
+   "4 din",
+   "500 roz",
+   "500 advance",
+   "1500 mile"
+  ],
+  "expected": {
+   "days": 4,
+   "rate": 500,
+   "advance": 500,
+   "payments": 1500,
+   "outstanding": 0
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Fully paid: ₹0 owed."
+ },
+ {
+  "id": "I1",
+  "category": "I loan vs advance",
+  "turns": [
+   "paise nahi mile",
+   "30 din",
+   "600 roz",
+   "manager se paanch hazaar liya",
+   "haan, pagar mein se kaat liya",
+   "8000 mile"
+  ],
+  "expected": {
+   "days": 30,
+   "rate": 600,
+   "advance": 5000,
+   "payments": 8000,
+   "outstanding": 5000
+  },
+  "expect_context_ack": true,
+  "context_turn": 3,
+  "context_keywords": [
+   "loan",
+   "kaat",
+   "kata",
+   "udhaar",
+   "manager",
+   "mazdoori se"
+  ],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "A loan cut from wages is advance."
+ },
+ {
+  "id": "I2",
+  "category": "I loan vs advance",
+  "turns": [
+   "paise nahi mile",
+   "10 din",
+   "700",
+   "dost se 2000 udhaar liya tha, woh alag hai, advance nahi mila",
+   "4000 mile"
+  ],
+  "expected": {
+   "days": 10,
+   "rate": 700,
+   "advance": 0,
+   "payments": 4000,
+   "outstanding": 3000
+  },
+  "expect_context_ack": true,
+  "context_turn": 3,
+  "context_keywords": [
+   "udhaar",
+   "loan",
+   "dost",
+   "alag"
+  ],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "A private loan is NOT advance."
+ },
+ {
+  "id": "J1",
+  "category": "J Hindi words",
+  "turns": [
+   "paise nahi mile",
+   "chhe",
+   "saat sau",
+   "paanch sau",
+   "teen hazaar"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Roman Hindi number words."
+ },
+ {
+  "id": "J2",
+  "category": "J Hindi words",
+  "turns": [
+   "पैसे नहीं मिले",
+   "छह दिन",
+   "सात सौ",
+   "पाँच सौ",
+   "तीन हज़ार"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Devanagari number words."
+ },
+ {
+  "id": "K1",
+  "category": "K digits",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "700 rate",
+   "₹500",
+   "₹3,000"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Digits and ₹ signs."
+ },
+ {
+  "id": "K2",
+  "category": "K digits",
+  "turns": [
+   "paise nahi mile",
+   "12",
+   "550",
+   "0",
+   "4,000"
+  ],
+  "expected": {
+   "days": 12,
+   "rate": 550,
+   "advance": 0,
+   "payments": 4000,
+   "outstanding": 2600
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Bare digits, a 0 advance, comma thousands."
+ },
+ {
+  "id": "L1",
+  "category": "L code-mix",
+  "turns": [
+   "My contractor did not pay me",
+   "I worked 6 days, rate 700",
+   "advance 500",
+   "received 3000"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": 1,
+  "bundled_slots": [
+   "days",
+   "rate"
+  ],
+  "notes": "English code-mix, two facts in one answer."
+ },
+ {
+  "id": "L2",
+  "category": "L code-mix",
+  "turns": [
+   "payment pending hai",
+   "worked 9 days",
+   "daily 750",
+   "no advance",
+   "got 5000 so far"
+  ],
+  "expected": {
+   "days": 9,
+   "rate": 750,
+   "advance": 0,
+   "payments": 5000,
+   "outstanding": 1750
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Hinglish with English phrasing."
+ },
+ {
+  "id": "M1",
+  "category": "M long multi-fact",
+  "turns": [
+   "Dekho bhai, Somvaar se Shanivaar tak chhe din kaam kiya site pe, thekedar ne saat sau roz bola tha, shuru mein paanch sau advance diya aur kal teen hazaar diye, baaki nahi diya"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": 0,
+  "bundled_slots": [
+   "days",
+   "rate",
+   "advance",
+   "payments"
+  ],
+  "notes": "One long sentence with all four facts."
+ },
+ {
+  "id": "M2",
+  "category": "M long multi-fact",
+  "turns": [
+   "paise nahi mile",
+   "humne pichhle mahine 20 din kaam kiya tha aur 600 roz pe baat hui thi, beech mein 2000 advance liya aur abhi 6000 mile hain"
+  ],
+  "expected": {
+   "days": 20,
+   "rate": 600,
+   "advance": 2000,
+   "payments": 6000,
+   "outstanding": 4000
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": 1,
+  "bundled_slots": [
+   "days",
+   "rate",
+   "advance",
+   "payments"
+  ],
+  "notes": "A long answer to the days question with all four facts."
+ },
+ {
+  "id": "N1",
+  "category": "N skip ahead",
+  "turns": [
+   "paise nahi mile",
+   "700 roz milta tha",
+   "6 din",
+   "500 advance",
+   "3000 mile"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Gives the rate when asked for days."
+ },
+ {
+  "id": "N2",
+  "category": "N skip ahead",
+  "turns": [
+   "paise nahi mile",
+   "3000 mile hain bas",
+   "6 din",
+   "700",
+   "500 advance"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Gives payments first."
+ },
+ {
+  "id": "O1",
+  "category": "O correction",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "700",
+   "nahi nahi, roz 800 tha",
+   "500 advance",
+   "3000 mile"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 800,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 1300
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Corrects the rate mid-stream."
+ },
+ {
+  "id": "O2",
+  "category": "O correction",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "700",
+   "1000 advance",
+   "sorry, advance 500 tha",
+   "3000 mile"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Corrects the advance mid-stream."
+ },
+ {
+  "id": "P1",
+  "category": "P silence",
+  "turns": [
+   "...",
+   "hmm",
+   "6 din",
+   "700",
+   "500",
+   "3000"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Near-silent dictation (dots, a hum)."
+ },
+ {
+  "id": "P2",
+  "category": "P silence",
+  "turns": [
+   "paise nahi mile",
+   "6 din",
+   "...",
+   "700",
+   "500",
+   "3000"
+  ],
+  "expected": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000,
+   "outstanding": 700
+  },
+  "expect_context_ack": false,
+  "context_turn": null,
+  "context_keywords": [],
+  "bundled_turn": null,
+  "bundled_slots": [],
+  "notes": "Silence after the rate question."
+ }
+]

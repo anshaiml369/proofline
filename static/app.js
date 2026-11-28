@@ -12,12 +12,11 @@
   const dlog = (...a) => { if (debug) console.log('[PagarSaathi]', new Date().toISOString().slice(11, 23), ...a); };
 
   // The demo conversation: what the worker says (via Wispr Flow) at each turn.
+  // Keep in sync with scripts/make_demo_audio.py. A context line and a three-fact bundle, ending at ₹700.
   const SCRIPT = [
-    'Mujhe thekedar ne is hafte poore paise nahi diye.',
-    'Chhe din.',
-    'Saat sau rupaye.',
-    'Paanch sau.',
-    'Teen hazaar.',
+    'Thekedar ne poore paise nahi diye. Teen saal se unke saath hoon, pichhle hafte bimar bhi tha.',
+    'Chhe din kaam kiya, saat sau roz, paanch sau advance mila tha.',
+    'Teen hazaar mile.',
     'Haan.',
     'Haan.',
   ];

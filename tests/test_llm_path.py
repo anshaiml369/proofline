@@ -310,3 +310,79 @@ def test_rules_never_repeat_the_same_line_twice_in_a_row():
     c.step(s, "hello", c.local_extract)
     said = [c.step(s, "kuch", c.local_extract)["agent_text"] for _ in range(6)]
     assert all(a != b for a, b in zip(said, said[1:]))
+
+
+# ---------- v3 guarantees from the evaluation brief ----------
+
+def test_turn_cap_ends_with_help_line():
+    s = started()
+    s["state"] = c.ASK_DAYS
+    for _ in range(c.TURN_CAP):
+        r = c.step_policy(s, "hmm", decided(text="Kuch bataiye?"))
+    assert r["state"] == c.DONE and "1800 1800 999" in r["agent_text"] and r["capped"]
+    assert set(s["unresolved"]) == {"days", "rate", "advance", "payments"} and s["case"] is None
+
+
+def test_two_rephrases_then_move_on_and_mark_unresolved():
+    s = started()
+    s["state"] = c.ASK_DAYS
+    for i in range(c.STALL_LIMIT):
+        r = c.step_policy(s, "hmm", decided("rephrase", f"Din ke baare mein, tareeka {i}?"))
+    assert r["state"] == c.ASK_RATE and "days" in s["unresolved"] and r["moved_on"] == "days"
+
+
+def test_same_question_twice_without_progress_is_rephrased():
+    s = started()
+    s["state"] = c.ASK_DAYS
+    c.step_policy(s, "hmm", decided(text="Achha. Aapne kitne din kaam kiya?"))
+    r = c.step_policy(s, "hmm", decided(text="Theek hai. Aapne kitne din kaam kiya?"))
+    assert "Aapne kitne din kaam kiya?" not in r["agent_text"]
+
+
+def test_backstop_keeps_a_tagged_number_the_policy_missed():
+    s = started()
+    s["state"] = c.ASK_DAYS
+    c.step_policy(s, "I worked 6 days, rate 700", decided(text="Achha, 6 din. Roz kitna?", extracted=[x("days", 6)]))
+    assert s["facts"] == {"days": 6, "rate": 700}
+
+
+def test_advance_nahi_next_to_a_private_loan_is_zero():
+    s = started()
+    s["state"], s["facts"] = c.ASK_ADVANCE, {"days": 10, "rate": 700}
+    c.step_policy(s, "dost se 2000 udhaar liya tha, woh alag hai, advance nahi mila",
+                  decided(text="Samajh gaya. Ab tak kitne mile?", context="Private loan of 2000"))
+    assert s["facts"]["advance"] == 0
+
+
+def test_bundle_with_context_keeps_the_acknowledgement_before_read_back():
+    s = started()
+    r = c.step_policy(s, "pichhle hafte hospital tha, 6 din kaam kiya, 700 roz, 500 advance, 3000 mile", decided(
+        "acknowledge_context", "Yeh sunkar dukh hua. Sab note kar liya. Kuch aur?", context="Was in hospital last week",
+        extracted=[x("days", 6), x("rate", 700), x("advance", 500), x("payments", 3000)]))
+    assert r["state"] == c.CONFIRM and r["agent_text"].startswith("Yeh sunkar dukh hua. Sab note kar liya. Confirm karta hoon")
+
+
+def test_rules_first_message_with_context_is_acknowledged():
+    s = started()
+    r = c.step(s, "Teen saal se kaam kar raha hoon, pichhle hafte bimar tha", c.local_extract)
+    assert "dukh" in r["agent_text"] and r["state"] == c.ASK_DAYS
+    assert "Has worked there for years" in s["context_notes"]
+
+
+def test_rules_hospital_with_named_work_days_is_ack_not_block():
+    s = started()
+    c.step(s, "paise nahi mile", c.local_extract)
+    r = c.step(s, "hospital mein tha, phir 5 din kaam kiya", c.local_extract)
+    assert s["facts"]["days"] == 5 and "dukh" in r["agent_text"]
+
+
+def test_years_after_a_number_is_never_money():
+    assert c.tagged_facts("Thekedar ne paise nahi diye. Teen saal se unke saath hoon") == {}
+
+
+def test_scripted_demo_bundle_and_context_ends_at_700():
+    s = started()
+    for w in ["Thekedar ne poore paise nahi diye. Teen saal se unke saath hoon, pichhle hafte bimar bhi tha.",
+              "Chhe din kaam kiya, saat sau roz, paanch sau advance mila tha.", "Teen hazaar mile.", "Haan."]:
+        r = c.step(s, w, c.local_extract)
+    assert s["case"]["outstanding"] == 700 and len(s["context_notes"]) == 2

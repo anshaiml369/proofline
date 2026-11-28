@@ -90,7 +90,7 @@ def new_session():
     return {"id": uuid.uuid4().hex, "state": START, "facts": {}, "failures": 0, "case": None,
             "case_id": None, "needs_assistance": [], "turns": [], "last_agent_text": "",
             # the frame the dialogue policy reads, beyond the four numbers
-            "context_notes": [], "unresolved": [], "turn_count": 0}
+            "context_notes": [], "unresolved": [], "turn_count": 0, "misses": {}}
 
 
 def _reply(session, line, **extra):
@@ -178,7 +178,11 @@ def step(session, text, extract):
 
     if state == START:
         stored = _merge_tagged(session, text)           # "6 din, 700 roz" in the first message counts
-        return _reply(session, _ask(session, _next_missing(session)),
+        ctx = rules_context(None, text)                 # "pichhle hafte bimar tha": say something human
+        for note in rules_notes(text):
+            _note(session, note)
+        line = _ask(session, _next_missing(session))
+        return _reply(session, _join(ctx["line"], line) if ctx and ctx["line"] else line,
                       **({"facts": dict(session["facts"])} if stored else {}))
 
     if state in (ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS):
@@ -257,7 +261,14 @@ ASK_STATE = dict(ORDER)
 WHAT_WRONG = ("Kya galat hai? Din, roz ki mazdoori, advance ya mila hua paisa: sahi number boliye.",
               "क्या गलत है? दिन, रोज़ की मज़दूरी, एडवांस या मिला हुआ पैसा: सही नंबर बोलिए।")
 SORRY = ("Maaf kijiye, theek se samajh nahi aaya. ", "माफ़ कीजिए, ठीक से समझ नहीं आया। ")
-STALL_LIMIT = 3        # turns in a row with no new number and no new context -> Python steps in
+STALL_LIMIT = 3        # one ask + two rephrases of the same number with nothing new -> Python moves on
+TURN_CAP = 12          # worker turns; after this the agent stops collecting and points to help
+HELPLINE = ("Abhi poora hisaab nahi ban paaya. Jo aapne bataya woh screen par hai. Kisi saathi, union ya "
+            "India Labourline 1800 1800 999 se madad lijiye.",
+            "अभी पूरा हिसाब नहीं बन पाया। जो आपने बताया वह स्क्रीन पर है। किसी साथी, यूनियन या "
+            "इंडिया लेबरलाइन 1800 1800 999 से मदद लीजिए।")
+_NO_ADVANCE = re.compile(r"\b(advance|एडवांस)\s+(nahi|nahin|nai|no|नहीं|नही)\b|\bno\s+advance\b|"
+                         r"\b(koi|kuch)\s+advance\s+(nahi|nahin|नहीं)\b", re.I)
 
 
 def _next_missing(session):
@@ -321,7 +332,7 @@ def guard_line(session, text, decision):
     """The policy's line, if it is safe to say: not empty, not a word-for-word repeat of the last
     question, and no amount the worker did not say (so never a total or an amount owed)."""
     shown, spoken = decision["agent_text"], decision["agent_text_hi"]
-    if not shown or _norm(shown) == _norm(session["last_agent_text"]):
+    if not shown or _norm(shown) in {_norm(a) for a in _last_agent_lines(session)}:
         return None
     allowed = _recently_said(session, text) | set(session["facts"].values())
     digits = {int(d) for d in re.findall(r"\d+", (shown + " " + spoken).replace(",", ""))}
@@ -330,6 +341,43 @@ def guard_line(session, text, decision):
     if any(n > 31 and n not in allowed for n in digits | words):
         return None
     return (shown, spoken)
+
+
+def _last_agent_lines(session, n=2):
+    """The agent's last n lines before this turn (the repetition detector compares against them)."""
+    lines = [t["agent"] for t in session["turns"][-n:] if t.get("agent")]
+    return lines or [session["last_agent_text"]]
+
+
+def _question_of(line):
+    parts = [p for p in re.split(r"(?<=[.!?।])\s+", line.strip()) if p]
+    return _norm(parts[-1]) if parts else ""
+
+
+def _statements(line):
+    """The line without its question sentences: an acknowledgement to put before the read-back."""
+    if not line:
+        return None
+    keep = [[p for p in re.split(r"(?<=[.!?।])\s+", x.strip()) if p and "?" not in p
+             and not any(w in p.lower() for w in _PROMPT_WORDS)] for x in line]
+    shown, spoken = " ".join(keep[0]), " ".join(keep[1])
+    return (shown + " ", (spoken or shown) + " ") if shown and len(shown) <= 200 else None
+
+
+def backstop(session, text, decision):
+    """Facts the policy missed but the worker clearly stated with a fact word ("rate 700",
+    "advance nahi"). Only for numbers still missing that the policy did not mention at all."""
+    if decision["action"] not in ("ask_slot", "conclude"):
+        return {}                                # the policy is clarifying: trust it, do not guess
+    mentioned = {item["slot"] for item in decision["extracted"]}
+    stored = {}
+    for field, value in tagged_facts(text).items():
+        lo, hi = LIMITS[field]
+        if field not in mentioned and field not in session["facts"] and lo <= value <= hi:
+            session["facts"][field] = stored[field] = value
+    if "advance" not in mentioned and "advance" not in session["facts"] and _NO_ADVANCE.search(text):
+        session["facts"]["advance"] = stored["advance"] = 0
+    return stored
 
 
 def _reask(session, state):
@@ -361,6 +409,8 @@ def step_policy(session, text, decision):
     if decision["context_delta"]:
         _note(session, decision["context_delta"])
     stored, rejected = accept_extracted(session, text, decision)
+    if state != CONFIRM:
+        stored.update(backstop(session, text, decision))
     session["turns"][-1]["facts"] = stored
     line = None if rejected else guard_line(session, text, decision)
     if line is None:
@@ -372,30 +422,53 @@ def step_policy(session, text, decision):
     if state in (START, ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS):
         progressed = bool(stored or decision["context_delta"])
         session["failures"] = 0 if progressed else session["failures"] + 1
+        asked = STATES[state]["extract_field"] if state in STATES else None
+        if asked and asked not in session["facts"] and not decision["context_delta"]:
+            session["misses"][asked] = session["misses"].get(asked, 0) + 1
         nxt = _next_missing(session)
         if nxt == CONFIRM:                      # all four known: the read-back is Python's, always
-            ack = line if line and decision["action"] == "conclude" and not _ends_with_question(line) else None
-            return _reply(session, _with(_space(ack), _ask(session, CONFIRM)), **extra)
+            return _reply(session, _with(_statements(line), _ask(session, CONFIRM)), **extra)
+        if session["turn_count"] >= TURN_CAP:   # hard cap: stop collecting, point to help
+            _advance_to(session, DONE)
+            session["unresolved"] = sorted(set(session["unresolved"]) | {f for f, _ in ORDER if f not in session["facts"]})
+            return _reply(session, HELPLINE, **extra, capped=True)
+        prefix = None
+        if asked and asked not in session["facts"] and session["misses"].get(asked, 0) >= STALL_LIMIT:
+            # asked once and rephrased twice with nothing new: flag it and move on
+            if asked not in session["needs_assistance"]:
+                session["needs_assistance"].append(asked)
+            session["unresolved"] = sorted(set(session["unresolved"]) | {asked})
+            if asked in ("advance", "payments"):
+                session["facts"][asked] = 0      # shown as "maana" (assumed); the read-back checks it
+                session["failures"] = 0
+                if _next_missing(session) == CONFIRM:
+                    return _reply(session, _ask(session, CONFIRM, prefix=ASSIST_ZERO), action="python_assist",
+                                  parsed={"field": asked, "value": 0, "assumed": True}, facts=dict(session["facts"]))
+                extra.update(facts=dict(session["facts"]), action="python_assist",
+                             parsed={"field": asked, "value": 0, "assumed": True})
+                prefix = ASSIST_ZERO
+            else:
+                prefix = ASSIST_NUMBER           # days or rate cannot be guessed: other numbers first
+            line = None
+        open_ = [st for f, st in ORDER if f not in session["facts"] and session["misses"].get(f, 0) < STALL_LIMIT]
+        nxt = open_[0] if open_ else _next_missing(session)
         target = decision["target_slot"]
-        if target in ASK_STATE and target not in session["facts"]:
+        if prefix is None and target in ASK_STATE and ASK_STATE[target] in open_:
             nxt = ASK_STATE[target]             # the policy may choose which open number to go after
         field = STATES[nxt]["extract_field"]
-        if session["failures"] >= STALL_LIMIT:  # going round in circles: Python steps in
-            if field not in session["needs_assistance"]:
-                session["needs_assistance"].append(field)
-            if field in ("advance", "payments"):
-                session["facts"][field] = 0
-                failures, session["failures"] = session["failures"], 0
-                return _reply(session, _ask(session, _next_missing(session), prefix=ASSIST_ZERO),
-                              parsed={"field": field, "value": 0, "assumed": True},
-                              facts=dict(session["facts"]), action="python_assist", stalls=failures)
-            session["state"] = nxt
-            return _reply(session, _reask(session, nxt), reasked=True, **extra, stall=True)
+        if prefix:
+            moved = nxt != state
+            _advance_to(session, nxt)
+            q = STATES[nxt]["question_hi"] if moved else _reask(session, nxt)
+            return _reply(session, _join(prefix, q), reasked=not moved, moved_on=asked, **extra)
         session["state"] = nxt
         ctx = rules_context(field, text) if line is None and not rejected else None
         if ctx and ctx["line"]:                 # policy line unusable, but the rules know this one
             return _reply(session, ctx["line"] if ctx["block"] else _join(ctx["line"], STATES[nxt]["question_hi"]),
                           guarded=True, **extra)
+        if line and not progressed and _question_of(line[0]) in {_question_of(a) for a in _last_agent_lines(session)}:
+            line = None                         # same question again with nothing new: rephrase instead
+            session["turns"][-1]["guarded"] = "repeated question"
         if line is None:                        # unsafe or repeated line: Python's own question
             prefix = SORRY if rejected else None
             q = STATES[nxt]["question_hi"] if not session["failures"] else _reask(session, nxt)
@@ -482,6 +555,8 @@ def tagged_facts(text):
     fact cancel out (unclear), and Python never adds them here."""
     found = {}
     for value, before, after in amount_groups(text):
+        if after and after[0] in _PERIOD_KEYS:
+            continue                      # "teen saal", "do hafte": a duration, not days or money
         field = _tag(before, after)
         if field:
             found.setdefault(field, set()).add(value)
@@ -538,7 +613,10 @@ def rules_context(field, text):
             continue
         period = bool(rule["keys"] & _PERIOD_KEYS)
         if field == "days" and "days" in rule:
-            if period and words & _TAGS["days"]:
+            work_named = words & {"kaam", "work", "worked", "काम"}
+            if words & _TAGS["days"] and (period or ("ack" in rule and work_named)):
+                if "ack" in rule:            # "hospital tha, 5 din kaam kiya": the days are named
+                    return {"note": rule.get("note"), "block": False, "line": rule["ack"]}
                 continue                     # "hafte mein 6 din": the days are named, fine
             return {"note": rule.get("note"), "block": True, "line": rule["days"]}
         if "ack" in rule:
@@ -546,6 +624,12 @@ def rules_context(field, text):
         if rule.get("note"):
             return {"note": rule["note"], "block": False, "line": None}
     return None
+
+
+def rules_notes(text):
+    """Every context note the rules recognise in the text."""
+    words = set(tokens(text))
+    return [r["note"] for r in CONTEXT_RULES if r.get("note") and words & r["keys"]]
 
 
 def local_extract(field, question, text):

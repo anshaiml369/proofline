@@ -110,6 +110,7 @@ def respond(session, reply, scripted, heard=None, text_source="rules"):
         "needs_assistance": reply.get("needs_assistance", False),
         "facts": dict(session["facts"]),
         "context_notes": list(session.get("context_notes", [])),
+        "policy_source": "llm" if text_source == "llm" else "fallback",
         "action": reply.get("action"),
     })
 

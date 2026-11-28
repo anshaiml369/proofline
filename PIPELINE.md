@@ -48,11 +48,14 @@ The conversation is not a fixed list of questions. With a key set, the LLM decid
 | Several amounts come back as a list; Python adds them | The model doing arithmetic |
 | The line may not contain any amount of ₹32 or more that the worker did not say | The model stating a total or an amount owed |
 | The line may not be the same words as the last one | Asking the same question again and again |
-| Three turns in a row with no new number and no new context: Python steps in (assumes ₹0 for advance or payments and flags it, or rephrases for days and rate) | Going round in circles |
+| A number asked once and rephrased twice with nothing new: Python moves on and marks it `unresolved` (advance and payments assumed ₹0 and flagged; days and rate asked again after the others) | Going round in circles |
+| The same question twice in a row with nothing new is replaced by a rephrase; a line identical to either of the last two is never said | "question one, question one" |
+| 12 worker turns without all four numbers: the agent stops and points to a union or India Labourline (1800 1800 999) | Endless conversations |
+| A number the worker clearly tagged ("rate 700", "advance nahi") is kept if the model missed it | Lost facts in a bundle |
 | When all four numbers are known, the next line is always Python's read-back, and the maths runs only on a "haan" the rules also do not read as "nahi" | Skipping the read-back |
 | A rejected line is replaced by the rules' answer or a fixed question | Saying anything unsafe |
 
-Each `/turn` reply has `action` (what the policy chose) and `context_notes`; the server log has `action=` and `guarded=` for every turn. The page shows the notes under the four boxes as "Aapne bataya".
+Each `/turn` reply has `action` (what the policy chose), `policy_source` (`llm` or `fallback`) and `context_notes`; the server log has `action=` and `guarded=` for every turn. The page shows the notes under the four boxes as "Aapne bataya".
 
 ## The agent's voice
 

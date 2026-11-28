@@ -1,0 +1,17 @@
+v1: 32 cases in 0.0s; wrong or no result: B1, B2, C1, C2, G1, G2, I2, L1, L2, M1, M2, N1, N2, O1, O2
+v2: 32 cases in 0.0s; wrong or no result: C2, G1, G2, I2, N1, N2, O1, O2
+v2-llm: 32 cases in 65.3s; wrong or no result: C2, M1, M2
+v3-fallback: 32 cases in 0.0s; wrong or no result: C2, G1, G2, I2, N1, N2, O1, O2
+v3: 32 cases in 97.6s; wrong or no result: none
+
+| Metric | v1 | v2 | v2-llm | v3-fallback | v3 |
+|---|---|---|---|---|---|
+| Slot accuracy (%) | 64.1 | 86.7 | 94.5 | 86.7 | 100.0 |
+| Math correctness (%) | 53.1 | 75.0 | 90.6 | 75.0 | 100.0 |
+| Completed to a result (%) | 68.8 | 90.6 | 90.6 | 90.6 | 100.0 |
+| Verbatim repetition rate (% of agent lines) | 0.6 | 0.0 | 0.0 | 0.0 | 0.0 |
+| Cases with any repeat | 1 | 0 | 0 | 0 | 0 |
+| Avg worker turns to result | 6.64 | 5.83 | 6.14 | 5.83 | 5.75 |
+| Bundled-input success (%) | 0.0 | 85.7 | 57.1 | 85.7 | 100.0 |
+| Context acknowledgement (%) | 0.0 | 0.0 | 50.0 | 66.7 | 83.3 |
+| Turns: LLM / fallback / rules | 0 / 0 / 174 | 0 / 0 / 181 | 182 / 0 / 0 | 0 / 181 / 0 | 184 / 0 / 0 |
