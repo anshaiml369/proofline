@@ -175,3 +175,12 @@ def test_llm_reply_with_its_own_marker_is_left_alone():
                                                 [{"type": "context", "text": "tum kaun", "category": "question_identity"}],
                                                 "acknowledge_context"))
     assert r["agent_text"].count("PagarSaathi") == 1
+
+
+def test_llm_misread_amount_falls_back_to_python_reading():             # live A1, "nabbe hazaar teen sau mile"
+    for wrong in ([90000, 300], 90000, 9300):
+        s = started()
+        s["state"], s["facts"] = c.ASK_PAYMENTS, {"days": 130, "rate": 700, "advance": 0}
+        c.step_policy(s, "nabbe hazaar teen sau mile",
+                      decided("Theek hai.", extracted=[{"slot": "payments", "value": wrong, "confidence": "high"}]))
+        assert s["facts"]["payments"] == 90300 and s["state"] == c.CONFIRM

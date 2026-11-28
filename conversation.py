@@ -463,13 +463,22 @@ def _statements(line):
     return (shown + " ", (spoken or shown) + " ") if shown and len(shown) <= 200 else None
 
 
-def backstop(session, text, decision):
+def backstop(session, text, decision, rejected=()):
     """Facts the policy missed but the worker clearly stated with a fact word ("rate 700",
-    "advance nahi"). Only for numbers still missing that the policy did not mention at all."""
+    "advance nahi"). Only for numbers still missing that the policy did not mention at all, or
+    whose value Python rejected because the worker never said it ("nabbe hazaar teen sau" read as
+    90000 + 300): then Python's own reading of the sentence is used."""
     if decision["action"] not in ("ask_slot", "conclude"):
         return {}                                # the policy is clarifying: trust it, do not guess
-    mentioned = {item["slot"] for item in decision["extracted"]}
+    mentioned = {item["slot"] for item in decision["extracted"]} - set(rejected)
     stored = {}
+    asked = SLOT_OF.get(session["state"])
+    amounts = parse_amounts(text)
+    if asked in rejected and asked not in session["facts"] and len(amounts) == 1 and \
+            not tagged_facts(text).keys() - {asked}:
+        lo, hi = LIMITS[asked]               # one amount, the answer to the question asked
+        if lo <= amounts[0] <= hi and not (amounts[0] == 0 and asked in ("days", "rate")):
+            session["facts"][asked] = stored[asked] = amounts[0]
     for field, value in tagged_facts(text).items():
         lo, hi = LIMITS[field]
         if field not in mentioned and field not in session["facts"] and lo <= value <= hi:
@@ -579,7 +588,7 @@ def _step_policy_core(session, text, decision):
         session["facts"][resolved[0]] = resolved[1]
         stored[resolved[0]] = resolved[1]
     if state != CONFIRM:
-        stored.update(backstop(session, text, decision))
+        stored.update(backstop(session, text, decision, rejected))
     session["turns"][-1]["facts"] = stored
     line = None if rejected else guard_line(session, text, decision)
     if line is not None and not _script_ok(session, line):
