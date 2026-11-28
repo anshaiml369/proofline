@@ -79,8 +79,8 @@ LIMITS = {"days": (1, 366), "rate": (50, 20_000), "advance": (0, 10_000_000), "p
 
 RESTART = ("Theek hai, phir se shuru karte hain. Aapne kitne din kaam kiya?",
            "ठीक है, फिर से शुरू करते हैं। आपने कितने दिन काम किया?")
-PREVIEW = ("Yeh raha message. Dekh lijiye, phir hara button dabaiye.",
-           "यह रहा मैसेज। देख लीजिए, फिर हरा बटन दबाइए।")
+PREVIEW = ("Yeh raha message. Dekh lijiye, phir WhatsApp par bhejein wala button dabaiye.",
+           "यह रहा मैसेज। देख लीजिए, फिर व्हाट्सऐप पर भेजें वाला बटन दबाइए।")
 NO_SEND = ("Theek hai, message nahi bhejte. Aapka hisaab screen par hai.",
            "ठीक है, मैसेज नहीं भेजते। आपका हिसाब स्क्रीन पर है।")
 SENT = ("WhatsApp khul gaya hai. Message bhej dijiye. Dhanyavaad.",

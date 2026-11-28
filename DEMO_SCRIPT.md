@@ -27,7 +27,7 @@ The arc: a worker who was ill last week → three facts in one breath → the re
 | 47–55s | Agent | The read-back: "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye." |
 | 55–58s | Worker | **"Haan."** Continue. |
 | 58–70s | Agent + screen | Python calculates. The card shows **Baaki ₹700** in large type, every line with an icon, and **Case ID: <12 characters>** with its caption. The agent reads each line, then: "Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?" *Point at the Case ID.* |
-| 70–75s | Worker | **"Message bhej do."** Continue. *The message preview appears, then the green button.* |
+| 70–75s | Worker | **"Message bhej do."** Continue. *The message preview appears, then the lavender **WhatsApp par bhejein** button.* |
 | 75–83s | Worker | *Tap **WhatsApp par bhejein**.* WhatsApp opens with the message filled in. *Switch back:* the card now says **"Bheja gaya: <time>"**. |
 | 83–90s | Close | *Point at the Escalate and "Union / legal aid" buttons.* "PagarSaathi. Bolo, hisaab pao. Built with Wispr Flow and Claude Code." End card: **pagarsaathi.up.railway.app** |
 
