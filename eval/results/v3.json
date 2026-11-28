@@ -15,7 +15,7 @@
   "llm_turns": 184,
   "fallback_turns": 0,
   "rules_turns": 0,
-  "seconds": 94.4
+  "seconds": 97.9
  },
  "results": [
   {
@@ -63,7 +63,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, paise nahi mile. Aapne kitne din kaam kiya tha uss period mein?",
+     "agent": "Aapne kitne din kaam kiya tha jiska paisa nahi mila?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -71,7 +71,7 @@
     },
     {
      "worker": "chhe din",
-     "agent": "Theek hai, aapne chhe din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Theek hai, aapne chhe din kaam kiya. Roz ki mazdoori kitni thi?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -81,7 +81,7 @@
     },
     {
      "worker": "saat sau rupaye",
-     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "Samajh gaya, rozana 700 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -92,7 +92,7 @@
     },
     {
      "worker": "paanch sau",
-     "agent": "Achha, aapko 500 rupaye advance mile the. Ab aapko kitne paise mil chuke hain kaam ke liye?",
+     "agent": "Achha, aapko 500 rupaye advance mile the. Ab bataiye, aapko ab tak kitne paise mil chuke hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -104,7 +104,7 @@
     },
     {
      "worker": "teen hazaar",
-     "agent": "Aapko 3000 rupaye mil chuke hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye mil chuke hain. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -175,7 +175,7 @@
     },
     {
      "worker": "thekedar ne poore paise nahi diye",
-     "agent": "Samajh gaya, thekedar ne poore paise nahi diye. Aapne kitne din kaam kiya tha uss period mein?",
+     "agent": "Samajh gaya, theek hai. Pehle yeh batayein ki aapne kitne din kaam kiya tha us period mein?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -183,7 +183,7 @@
     },
     {
      "worker": "das din",
-     "agent": "Theek hai, aapne 10 din kaam kiya. Rozana kitne rupaye milte the?",
+     "agent": "Theek hai, aapne 10 din kaam kiya. Rozana ki mazdoori kitni thi?",
      "state": "ASK_RATE",
      "facts": {
       "days": 10
@@ -193,7 +193,7 @@
     },
     {
      "worker": "paanch sau",
-     "agent": "Aapko rozana 500 rupaye milte the, samajh gaya. Kya aapko koi advance mila tha ya nahi?",
+     "agent": "Rozana mazdoori 500 rupaye hai, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 10,
@@ -204,7 +204,7 @@
     },
     {
      "worker": "do sau",
-     "agent": "Samajh gaya, aapko 200 rupaye advance mile the. Ab tak aapko kitne rupaye payment ke roop mein mile hain?",
+     "agent": "Achha, aapko 200 rupaye advance mile the. Ab tak aapko kitne rupaye aur mile hain poore kaam ke liye?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 10,
@@ -216,7 +216,7 @@
     },
     {
      "worker": "teen hazaar",
-     "agent": "Aapko ab tak 3000 rupaye payment ke roop mein mile hain. Sabhi jankari mil gayi hai, main aapka hisaab taiyar karta hoon. Confirm karta hoon: das din, paanch sau roz, do sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko 3000 rupaye aur mile hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: das din, paanch sau roz, do sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 10,
@@ -283,7 +283,7 @@
     },
     {
      "worker": "Chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila",
-     "agent": "Aapne 6 din kaam kiya, roz 700 rupaye ki dar se, aur 500 rupaye advance liye. Ab tak 3000 rupaye mile hain. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapne bataya 6 din kaam kiya, roz 700 rupaye, 500 rupaye advance mila. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -351,7 +351,7 @@
     },
     {
      "worker": "paise baaki hain",
-     "agent": "Samajh gaya, aapke paise baaki hain. Pehle yeh batayein ki aapne kitne din kaam kiya tha?",
+     "agent": "Samajh gaya, paise baaki hain. Pehle yeh batayein, aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -359,7 +359,7 @@
     },
     {
      "worker": "8 din kaam, 650 roz, advance 1000, 3000 mile",
-     "agent": "Aapne 8 din kaam kiya, roz 650 rupaye, aur 1000 rupaye advance liye. Confirm karta hoon: aath din, chhe sau pachaas roz, ek hazaar advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapne 8 din kaam kiya, roz 650 rupees, 1000 rupees advance liya, aur ab tak 3000 rupees mile hain. Confirm karta hoon: aath din, chhe sau pachaas roz, ek hazaar advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 8,
@@ -428,7 +428,7 @@
     },
     {
      "worker": "Teen saal se is kaam par hoon, pichhle hafte hospital tha, chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila",
-     "agent": "Hospital ke din chhod kar, chhe din kaam kiya. Rate 700 rupaye hai, advance 500 aur ab tak 3000 rupaye mile hain. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapke hospital mein hone ka sun kar afsos hua. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -489,7 +489,7 @@
     "llm"
    ],
    "context_notes": [
-    "wife was sick, took 2 days leave"
+    "wife sick 2 days leave"
    ],
    "transcript": [
     {
@@ -497,7 +497,7 @@
     },
     {
      "worker": "Meri biwi bimar thi isliye 2 din chhutti li, baaki 5 din kaam kiya, 800 roz, advance nahi, 2000 mile",
-     "agent": "Samajh gaya, aapne 5 din kaam kiya, rozana 800 rupaye, aur advance nahi liya. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Samajh gaya, aapne 5 din kaam kiya aur roz 800 rupaye milte the, advance nahi liya. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 5,
@@ -563,14 +563,16 @@
     "llm",
     "llm"
    ],
-   "context_notes": [],
+   "context_notes": [
+    "no payment received"
+   ],
    "transcript": [
     {
      "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, aapko paise nahi mile. Pehle batayein, kitne din kaam kiya tha?",
+     "agent": "Aapko poora paisa nahi mila, yeh samajh gaya. Pehle bataiye, aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -578,7 +580,7 @@
     },
     {
      "worker": "pata nahi",
-     "agent": "Theek hai, aapko exact din yaad nahi. Kya aap mujhe bata sakte hain ki aapne kaam kab se kab tak kiya tha? Sirf dinon ki sankhya batayein, jaise 5 din.",
+     "agent": "Samajh sakta hoon, lekin din batana zaroori hai. Kitne din kaam kiya, sirf number mein batayein, jaise 5 din?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -586,7 +588,7 @@
     },
     {
      "worker": "yaad nahi",
-     "agent": "Koi baat nahi, aap mujhe bata sakte hain ki aapne kaam kitne hafte ya mahine tak kiya tha?",
+     "agent": "Agar din yaad nahi, toh kya aapko yaad hai ki hafte mein kitne din kaam karte the? Jaise chhe din ya saat din?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -594,7 +596,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Chh din kaam kiya, samajh gaya. Ab bataiye, rozana kitne rupaye milte the?",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Ab batayein, rozana kitne rupaye milte the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -604,7 +606,7 @@
     },
     {
      "worker": "700",
-     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran koi advance mila tha?",
+     "agent": "Achha, rozana 700 rupaye milte the. Ab batayein, kya aapko koi advance mila tha ya nahi?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -615,7 +617,7 @@
     },
     {
      "worker": "500",
-     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye payment ke roop mein mile hain?",
+     "agent": "Samajh gaya, aapko 500 rupaye advance mile the. Ab batayein, aapko ab tak kitne rupaye payment ke roop mein mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -627,7 +629,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Theek hai, aapko ab tak 3000 rupaye payment mile hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye payment mile hain. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -700,7 +702,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "agent": "Aapne kaam kitne din kiya tha jiske paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -708,7 +710,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Chh din kaam kiya, samajh gaya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Chh din kaam kiya, samajh gaya. Rozana kitna paisa milta tha?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -728,7 +730,7 @@
     },
     {
      "worker": "yaad nahi aa raha",
-     "agent": "Koi baat nahi, aap bata sakte hain ki aapne pichle mahine ya hafte mein kitne din kaam kiya tha aur kitna mila tha kul milakar?",
+     "agent": "Theek hai, koi baat nahi. Kya aapko yaad hai ki aapko mahine ya hafte ke hisaab se kitne paise milte the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -738,7 +740,7 @@
     },
     {
      "worker": "700",
-     "agent": "Theek hai, aapne bataya ki rozana ₹700 milte the. Ab bataiye, aapko advance mila tha ya nahi?",
+     "agent": "700 rupaye rozana ka rate hai, samajh gaya. Ab bataiye, aapko koi advance mila tha ya nahi?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -749,7 +751,7 @@
     },
     {
      "worker": "500",
-     "agent": "Achha, aapko 500 rupaye advance mile the. Ab bataiye, aapko ab tak kitne rupaye payment ke roop mein mile hain?",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab aapko ab tak kitne paise mile hain, advance ke alawa?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -761,7 +763,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Aapko ab tak 3000 rupaye payment ke roop mein mile hain, samajh gaya. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko advance ke alawa 3000 rupaye mile. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -826,16 +828,14 @@
     "llm",
     "llm"
    ],
-   "context_notes": [
-    "500 rupees advance received"
-   ],
+   "context_notes": [],
    "transcript": [
     {
      "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya ki paise nahi mile. Aapne kitne din kaam kiya tha?",
+     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -843,7 +843,7 @@
     },
     {
      "worker": "nahi bataunga",
-     "agent": "Aapke liye mushkil baat samajh sakta hoon. Sirf dinon ki sankhya batayein, jaise 5 din kaam kiya tha?",
+     "agent": "Samajh sakta hoon, par agar aap bata den to madad karna aasan hoga. Sirf dinon ki sankhya batayein, jaise 5 din.",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -851,7 +851,7 @@
     },
     {
      "worker": "achha theek hai, 6 din",
-     "agent": "Shukriya, aapne 6 din kaam kiya. Ab bataiye, rozana kitne rupaye milte the?",
+     "agent": "Shukriya, 6 din kaam kiya. Rozana kitne rupaye milne wale the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -861,7 +861,7 @@
     },
     {
      "worker": "700 roz",
-     "agent": "700 rupaye rozana the, samajh gaya. Ab bataiye, aapko kitna advance mila tha ya kaata gaya tha?",
+     "agent": "Achha, rozana 700 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -872,7 +872,7 @@
     },
     {
      "worker": "500 advance",
-     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain, advance ke alawa?",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye mil chuke hain kaam ke liye?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -884,7 +884,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Theek hai, aapko advance ke alawa 3000 rupaye mile. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye mil chuke hain. Ab main aapke hisaab ko padhunga. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -949,16 +949,14 @@
     "llm",
     "llm"
    ],
-   "context_notes": [
-    "no payment received"
-   ],
+   "context_notes": [],
    "transcript": [
     {
      "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, aapko paise nahi mile. Pehle yeh bataiye ki aapne kitne din kaam kiya tha?",
+     "agent": "Aapne kitne din kaam kiya tha jis ke paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -966,7 +964,7 @@
     },
     {
      "worker": "5 din",
-     "agent": "Theek hai, aapne 5 din kaam kiya. Rozana kitne rupaye milne wale the?",
+     "agent": "Achha, 5 din kaam kiya. Rozana kitne rupaye milte the aapko?",
      "state": "ASK_RATE",
      "facts": {
       "days": 5
@@ -986,7 +984,7 @@
     },
     {
      "worker": "theek hai, 900 roz",
-     "agent": "Shukriya, aapka rozana 900 rupaye ka rate hai. Kya aapko koi advance mila tha ya nahi?",
+     "agent": "Theek hai, rozana 900 rupaye the. Ab bataiye, aapko kitne rupaye advance mile the ya kaate gaye the?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 5,
@@ -997,7 +995,7 @@
     },
     {
      "worker": "advance nahi mila",
-     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mile hain, payments ke roop mein?",
+     "agent": "Samajh gaya, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mile hain, advance ke alawa?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 5,
@@ -1009,7 +1007,7 @@
     },
     {
      "worker": "1000 mile",
-     "agent": "Dhanyavaad, aapko ab tak 1000 rupaye mile hain. Confirm karta hoon: paanch din, nau sau roz, koi advance nahi, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko 1000 rupaye mile hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: paanch din, nau sau roz, koi advance nahi, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 5,
@@ -1083,7 +1081,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kaam kitne din kiya tha, bataiye please?",
+     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1091,7 +1089,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Chh din kaam kiya, samajh gaya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Roz kitne rupaye milne wale the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -1101,7 +1099,7 @@
     },
     {
      "worker": "mera beta bimar hai",
-     "agent": "Yeh sunkar dukh hua, aapke bete ke liye dua karta hoon. Ab bataiye, rozana kitne rupaye milte the aapko?",
+     "agent": "Yeh sunkar dukh hua, aapke bete ko jaldi sehat mile. Ab aapke 6 din ke kaam ke liye, roz kitne rupaye milne wale the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -1111,7 +1109,7 @@
     },
     {
      "worker": "700 roz",
-     "agent": "700 rupaye rozana the, samajh gaya. Ab bataiye, aapko kitna advance mila tha ya pehle se kuch paisa diya gaya tha?",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -1122,7 +1120,7 @@
     },
     {
      "worker": "500 advance",
-     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain, wo bataiye please?",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain, advance ke alawa?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -1134,7 +1132,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Theek hai, aapko 3000 rupaye aur mile hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapko advance ke alawa 3000 rupaye mile, samajh gaya. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -1206,7 +1204,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "agent": "Samajh gaya, paise nahi mile. Aapne kitne din kaam kiya tha uss dauran?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1214,7 +1212,7 @@
     },
     {
      "worker": "aaj baarish bahut ho rahi hai",
-     "agent": "Baarish kaafi ho rahi hai aaj. Ab aapne kitne din kaam kiya tha jiske paise baaki hain?",
+     "agent": "Haan, baarish kabhi kabhi dikkat karti hai. Ab bataiye, aapne kitne din kaam kiya tha uss dauran?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1222,7 +1220,7 @@
     },
     {
      "worker": "7 din",
-     "agent": "Theek hai, aapne 7 din kaam kiya. Rozana kitne rupaye milne wale the?",
+     "agent": "Theek hai, aapne 7 din kaam kiya. Ab bataiye, rozana kitne rupaye milte the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 7
@@ -1232,7 +1230,7 @@
     },
     {
      "worker": "600",
-     "agent": "Rozana 600 rupaye the, samajh gaya. Kya aapko kaam ke dauran koi advance mila tha ya nahi?",
+     "agent": "Shukriya, rozana 600 rupaye the. Ab bataiye, aapko kitna advance mila tha ya nahi mila?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 7,
@@ -1243,7 +1241,7 @@
     },
     {
      "worker": "nahi",
-     "agent": "Samajh gaya, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mile hain is kaam ke liye?",
+     "agent": "Samajh gaya, aapko koi advance nahi mila. Ab bataiye, aapko ab tak kitne paise mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 7,
@@ -1255,7 +1253,7 @@
     },
     {
      "worker": "2000",
-     "agent": "Aapko ab tak 2000 rupaye mile hain. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: saat din, chhe sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Shukriya, aapko ab tak 2000 rupaye mile hain. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: saat din, chhe sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 7,
@@ -1320,14 +1318,16 @@
     "llm",
     "llm"
    ],
-   "context_notes": [],
+   "context_notes": [
+    "days corrected to 5"
+   ],
    "transcript": [
     {
      "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, aapko abhi tak paise nahi mile. Pehle bataiye, kitne din kaam kiya tha?",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1335,7 +1335,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Theek hai, 6 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milne wale the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -1345,7 +1345,7 @@
     },
     {
      "worker": "700",
-     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "Achha, rozana 700 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -1356,7 +1356,7 @@
     },
     {
      "worker": "500",
-     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye mil chuke hain kaam ke liye?",
+     "agent": "Aapko 500 rupaye advance mile the, samajh gaya. Ab tak aapko kitne rupaye aur mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -1368,7 +1368,7 @@
     },
     {
      "worker": "2000",
-     "agent": "Aapko 2000 rupaye mil chuke hain, samajh gaya. Ab main aapka hisaab taiyaar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapko 2000 rupaye aur mile hain, samajh gaya. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -1453,7 +1453,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
+     "agent": "Aapne kitne din kaam kiya tha, batayein.",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1461,7 +1461,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Chh din kaam kiya, samajh gaya. Rozana kitne rupaye milne wale the?",
+     "agent": "6 din kaam kiya, samajh gaya. Roz ki mazdoori kitni thi?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -1471,7 +1471,7 @@
     },
     {
      "worker": "800 roz",
-     "agent": "Rozana 800 rupaye the, theek hai. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "Roz 800 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -1482,7 +1482,7 @@
     },
     {
      "worker": "nahi nahi, 5 din kaam kiya tha",
-     "agent": "Aapne pehle 6 din bataye the, ab 5 din keh rahe hain. Kitne din kaam kiya tha asal mein?",
+     "agent": "Aapne pehle 6 din bataye the, ab 5 din keh rahe hain. Kitne din kaam kiya tha, 5 ya 6 din?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 5,
@@ -1493,7 +1493,7 @@
     },
     {
      "worker": "advance nahi",
-     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mile hain?",
+     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne paise mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 5,
@@ -1576,7 +1576,7 @@
     },
     {
      "worker": "paise ka hisaab dekhna hai",
-     "agent": "Ji, samajh gaya. Sabse pehle, aapne kitne din kaam kiya tha us period mein?",
+     "agent": "Theek hai, sabse pehle bataiye ki aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1584,7 +1584,7 @@
     },
     {
      "worker": "5 din",
-     "agent": "Theek hai, aapne 5 din kaam kiya. Ab bataiye, aapko rozana kitne rupaye milte the?",
+     "agent": "Achha, aapne 5 din kaam kiya. Ab bataiye ki rozana kitne rupaye milte the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 5
@@ -1594,7 +1594,7 @@
     },
     {
      "worker": "800",
-     "agent": "Achha, aapka rozana ka rate 800 rupaye hai. Ab bataiye, aapko koi advance mila tha ya nahi?",
+     "agent": "Achha, rozana 800 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 5,
@@ -1605,7 +1605,7 @@
     },
     {
      "worker": "advance nahi",
-     "agent": "Theek hai, aapko koi advance nahi mila. Ab bataiye, aapko ab tak kitne rupaye mile hain?",
+     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mil chuke hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 5,
@@ -1617,7 +1617,7 @@
     },
     {
      "worker": "poora paisa mil gaya, 4000",
-     "agent": "Achha, aapko ab tak 4000 rupaye mil chuke hain. Main aapka hisaab ab padh leta hoon. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Achha, aapko poora paisa 4000 rupaye mil chuka hai. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 5,
@@ -1688,15 +1688,15 @@
     },
     {
      "worker": "bas confirm karna hai",
-     "agent": "Theek hai, pehle yeh bataye ki aapne kitne din kaam kiya tha jiski mazdoori baaki hai?",
+     "agent": "Ji bilkul, main confirm karne mein madad karta hoon. Sabse pehle, aapne kitne din kaam kiya tha us period mein?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
-     "action": "follow_up"
+     "action": "ask_slot"
     },
     {
      "worker": "4 din",
-     "agent": "Chaar din kaam kiya, samajh gaya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Theek hai, aapne 4 din kaam kiya. Rozana kitne rupaye milte the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 4
@@ -1706,7 +1706,7 @@
     },
     {
      "worker": "500 roz",
-     "agent": "Rozana 500 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "Achha, rozana 500 rupaye the. Kya aapko is dauran koi advance mila tha ya nahi?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 4,
@@ -1717,7 +1717,7 @@
     },
     {
      "worker": "500 advance",
-     "agent": "500 rupaye advance mila, samajh gaya. Ab tak aapko kitne rupaye aur mile hain kaam ke liye?",
+     "agent": "Theek hai, aapko 500 rupaye advance mile. Ab tak aapko kitne rupaye aur mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 4,
@@ -1729,7 +1729,7 @@
     },
     {
      "worker": "1500 mile",
-     "agent": "Achha, aapko 1500 rupaye aur mile hain. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chaar din, paanch sau roz, paanch sau advance, ek hazaar paanch sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Shukriya, aapko 1500 rupaye aur mile hain. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chaar din, paanch sau roz, paanch sau advance, ek hazaar paanch sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 4,
@@ -1796,7 +1796,7 @@
    ],
    "context_notes": [
     "loan from manager 5000",
-    "loan from manager 5000 cut from wages"
+    "5000 loan cut from wages as advance"
    ],
    "transcript": [
     {
@@ -1804,7 +1804,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, paise nahi mile. Aapne kitne din kaam kiya tha uss period mein?",
+     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1812,7 +1812,7 @@
     },
     {
      "worker": "30 din",
-     "agent": "Theek hai, 30 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Theek hai, aapne 30 din kaam kiya. Rozana kitna paisa milta tha?",
      "state": "ASK_RATE",
      "facts": {
       "days": 30
@@ -1822,7 +1822,7 @@
     },
     {
      "worker": "600 roz",
-     "agent": "Rozana 600 rupaye the, samajh gaya. Kya aapko koi advance mila tha ya nahi?",
+     "agent": "Achha, aapko roz 600 rupaye milte the. Kya aapko koi advance mila tha ya nahi?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 30,
@@ -1833,7 +1833,7 @@
     },
     {
      "worker": "manager se paanch hazaar liya",
-     "agent": "Samajh gaya, manager se 5000 rupaye liye the. Kya yeh 5000 rupaye aapki mazdoori mein se kaate gaye hain, ya alag hain?",
+     "agent": "Samajh gaya, manager se 5000 rupaye liye the. Kya yeh 5000 rupaye aapki mazdoori mein se kaate gaye hain, matlab advance hain?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 30,
@@ -1844,7 +1844,7 @@
     },
     {
      "worker": "haan, pagar mein se kaat liya",
-     "agent": "Theek hai, 5000 rupaye advance ke roop mein kaate gaye. Ab bataiye, aapko ab tak kitne rupaye mile hain is kaam ke liye?",
+     "agent": "Theek hai, 5000 rupaye advance ke roop mein kaate gaye hain. Ab aapko mazdoori ke liye kitne rupaye mil chuke hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 30,
@@ -1856,7 +1856,7 @@
     },
     {
      "worker": "8000 mile",
-     "agent": "Aapko ab tak 8000 rupaye mile, samajh gaya. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: tees din, chhe sau roz, paanch hazaar advance, aath hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Achha, aapko 8000 rupaye mil chuke hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: tees din, chhe sau roz, paanch hazaar advance, aath hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 30,
@@ -1921,6 +1921,7 @@
     "llm"
    ],
    "context_notes": [
+    "no payment received",
     "loan from friend not advance"
    ],
    "transcript": [
@@ -1929,7 +1930,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "agent": "Aapko paise nahi mile, yeh samajh gaya. Kitne din kaam kiya tha aapne?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -1937,7 +1938,7 @@
     },
     {
      "worker": "10 din",
-     "agent": "Theek hai, aapne 10 din kaam kiya. Ab bataiye, aapka rozana kitna rate tha?",
+     "agent": "Theek hai, aapne 10 din kaam kiya. Roz ki mazdoori kitni thi?",
      "state": "ASK_RATE",
      "facts": {
       "days": 10
@@ -1947,7 +1948,7 @@
     },
     {
      "worker": "700",
-     "agent": "Achha, rozana 700 rupaye the. Kya aapko koi advance mila tha ya ab tak koi payment hua hai?",
+     "agent": "Achha, roz ki mazdoori 700 rupaye thi. Kya aapko koi advance mila tha ya nahi?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 10,
@@ -1958,7 +1959,7 @@
     },
     {
      "worker": "dost se 2000 udhaar liya tha, woh alag hai, advance nahi mila",
-     "agent": "Samajh gaya, dost se udhaar alag hai aur aapko advance nahi mila. Ab tak aapko is kaam ke liye koi payment mila hai?",
+     "agent": "Samajh gaya, dost se liya hua udhaar alag hai. Toh aapko mazdoori mein se koi advance nahi mila. Ab aapko kitne paise mile hain ab tak?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 10,
@@ -1970,7 +1971,7 @@
     },
     {
      "worker": "4000 mile",
-     "agent": "Theek hai, aapko ab tak 4000 rupaye payment mile hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: das din, saat sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapko ab tak 4000 rupaye mile hain, samajh gaya. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: das din, saat sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 10,
@@ -2041,7 +2042,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, aapko paise nahi mile. Pehle bataiye, kitne din kaam kiya tha?",
+     "agent": "Aapne kaam kitne din kiya tha jiske paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2049,7 +2050,7 @@
     },
     {
      "worker": "chhe",
-     "agent": "Theek hai, aapne 6 din kaam kiya. Ab bataiye, rozana kitne rupaye milne the?",
+     "agent": "Chhe din kaam kiya, samajh gaya. Rozana kitne rupaye milne the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -2059,7 +2060,7 @@
     },
     {
      "worker": "saat sau",
-     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -2070,7 +2071,7 @@
     },
     {
      "worker": "paanch sau",
-     "agent": "Achha, aapko 500 rupaye advance mile the. Ab bataiye, ab tak kitne rupaye aur mile hain?",
+     "agent": "Theek hai, aapko 500 rupaye advance mile the. Ab aapko kitne paise mil chuke hain kaam ke liye?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -2082,7 +2083,7 @@
     },
     {
      "worker": "teen hazaar",
-     "agent": "Theek hai, aapko ab tak 3000 rupaye aur mile hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko 3000 rupaye mil chuke hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2147,7 +2148,7 @@
     "llm"
    ],
    "context_notes": [
-    "worker not paid"
+    "no payment received"
    ],
    "transcript": [
     {
@@ -2155,7 +2156,7 @@
     },
     {
      "worker": "पैसे नहीं मिले",
-     "agent": "Aapne kaam kitne din kiya tha, bataiye please?",
+     "agent": "Aapne kaam kiya tha, kitne din kaam kiya aapne uss dauran?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2163,7 +2164,7 @@
     },
     {
      "worker": "छह दिन",
-     "agent": "Chhe din kaam kiya, samajh gaya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Chhe din kaam kiya, samajh gaya. Roz ki mazdoori kitni thi aapki?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -2173,7 +2174,7 @@
     },
     {
      "worker": "सात सौ",
-     "agent": "Rozana 700 rupaye the, theek hai. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "Roz ki mazdoori 700 rupaye hai, samajh gaya. Kya aapko kaam ke dauran koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -2184,7 +2185,7 @@
     },
     {
      "worker": "पाँच सौ",
-     "agent": "Theek hai, aapko 500 rupaye advance mile the. Ab tak aapko kitne rupaye aur mile hain?",
+     "agent": "Aapko 500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -2196,7 +2197,7 @@
     },
     {
      "worker": "तीन हज़ार",
-     "agent": "Theek hai, aapko 3000 rupaye aur mile hain. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye mile hain. Main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2267,7 +2268,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, paise nahi mile. Pehle batayein, aapne kitne din kaam kiya tha?",
+     "agent": "Samajh gaya, aapko ab tak paise nahi mile. Pehle bataiye, aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2275,7 +2276,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Theek hai, 6 din kaam kiya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Roz ki mazdoori kitni thi?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -2285,7 +2286,7 @@
     },
     {
      "worker": "700 rate",
-     "agent": "Rozana 700 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -2296,7 +2297,7 @@
     },
     {
      "worker": "₹500",
-     "agent": "500 rupaye advance mile the, samajh gaya. Ab batayein, aapko ab tak kitne rupaye mile hain?",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne paise mil chuke hain kaam ke liye?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -2308,7 +2309,7 @@
     },
     {
      "worker": "₹3,000",
-     "agent": "Shukriya, aapko ab tak 3000 rupaye mile hain. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "3000 rupaye mil chuke hain, samajh gaya. Ab main aapke hisaab ko padh raha hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2379,7 +2380,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2387,7 +2388,7 @@
     },
     {
      "worker": "12",
-     "agent": "Theek hai, aapne 12 din kaam kiya. Ab bataiye, aapko rozana kitne rupaye milte the?",
+     "agent": "Theek hai, aapne 12 din kaam kiya. Rozana ki mazdoori kitni thi?",
      "state": "ASK_RATE",
      "facts": {
       "days": 12
@@ -2397,7 +2398,7 @@
     },
     {
      "worker": "550",
-     "agent": "Rozana 550 rupaye the, samajh gaya. Kya aapko kaam ke dauran koi advance mila tha?",
+     "agent": "Achha, rozana ki mazdoori 550 rupaye thi. Kya aapko koi advance mila tha ya nahi?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 12,
@@ -2408,7 +2409,7 @@
     },
     {
      "worker": "0",
-     "agent": "Samajh gaya, advance nahi mila. Ab tak aapko kitne rupaye mile hain is kaam ke liye?",
+     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mile hain is kaam ke liye?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 12,
@@ -2420,7 +2421,7 @@
     },
     {
      "worker": "4,000",
-     "agent": "Dhanyavaad, aapko ab tak 4000 rupaye mile hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: baarah din, paanch sau pachaas roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Shukriya, aapko ab tak 4000 rupaye mile hain. Ab main aapke hisaab ko padh leta hoon. Confirm karta hoon: baarah din, paanch sau pachaas roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 12,
@@ -2492,7 +2493,7 @@
     },
     {
      "worker": "My contractor did not pay me",
-     "agent": "Aapne kitne din kaam kiya tha jiski mazdoori nahi mili?",
+     "agent": "Aapne kitne din kaam kiya tha uss period mein jiska paisa nahi mila?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2500,7 +2501,7 @@
     },
     {
      "worker": "I worked 6 days, rate 700",
-     "agent": "Chh din kaam kiya, samajh gaya. Aapka rozana mazdoori 700 rupaye hai, kya yeh sahi hai? Ab aapne kitna advance liya tha?",
+     "agent": "Aapne 6 din kaam kiya, samajh gaya. Rozana kitne rupaye milte the?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -2511,7 +2512,7 @@
     },
     {
      "worker": "advance 500",
-     "agent": "500 rupaye advance liye, samajh gaya. Ab tak aapko kitne rupaye mil chuke hain?",
+     "agent": "Theek hai, aapko 500 rupaye advance mile the. Ab tak kitne paise aur mile hain is kaam ke liye?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -2523,7 +2524,7 @@
     },
     {
      "worker": "received 3000",
-     "agent": "3000 rupaye mil chuke hain, theek hai. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapko 3000 rupaye aur mile hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2594,7 +2595,7 @@
     },
     {
      "worker": "payment pending hai",
-     "agent": "Samajh gaya, aapka payment pending hai. Sabse pehle, aapne kitne din kaam kiya tha us period mein?",
+     "agent": "Samajh gaya, payment pending hai. Pehle bataiye, aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2602,7 +2603,7 @@
     },
     {
      "worker": "worked 9 days",
-     "agent": "Theek hai, aapne 9 din kaam kiya. Rozana kitne rupaye milte the?",
+     "agent": "Theek hai, aapne 9 din kaam kiya. Roz ki mazdoori kitni thi?",
      "state": "ASK_RATE",
      "facts": {
       "days": 9
@@ -2612,7 +2613,7 @@
     },
     {
      "worker": "daily 750",
-     "agent": "Rozana 750 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "Theek hai, roz 750 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 9,
@@ -2623,7 +2624,7 @@
     },
     {
      "worker": "no advance",
-     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne paise mile hain is kaam ke liye?",
+     "agent": "Theek hai, aapko koi advance nahi mila. Ab tak aapko kitne rupaye mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 9,
@@ -2635,7 +2636,7 @@
     },
     {
      "worker": "got 5000 so far",
-     "agent": "Theek hai, aapko ab tak 5000 rupaye mile hain. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: nau din, saat sau pachaas roz, koi advance nahi, paanch hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 5000 rupaye mile hain. Confirm karta hoon: nau din, saat sau pachaas roz, koi advance nahi, paanch hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 9,
@@ -2702,7 +2703,7 @@
     },
     {
      "worker": "Dekho bhai, Somvaar se Shanivaar tak chhe din kaam kiya site pe, thekedar ne saat sau roz bola tha, shuru mein paanch sau advance diya aur kal teen hazaar diye, baaki nahi diya",
-     "agent": "Samajh gaya, aapne 6 din kaam kiya, roz 700 rupaye the, aur 500 advance mila. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapne 6 din kaam kiya, roz 700 rupees tha, aur 500 advance mila. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2770,7 +2771,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kaam kitne din kiya tha jiske paise nahi mile?",
+     "agent": "Samajh gaya, aapko paise nahi mile. Pehle batayein, aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2778,7 +2779,7 @@
     },
     {
      "worker": "humne pichhle mahine 20 din kaam kiya tha aur 600 roz pe baat hui thi, beech mein 2000 advance liya aur abhi 6000 mile hain",
-     "agent": "Aapne bataya 20 din kaam kiya, 600 rupaye rozana, aur 2000 advance liya. Ab tak 6000 rupaye mile hain. Confirm karta hoon: bees din, chhe sau roz, do hazaar advance, chhe hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Aapne 20 din kaam kiya, roz 600 rupaye tha, aur 2000 advance liya. Ab tak 6000 rupaye mile hain. Confirm karta hoon: bees din, chhe sau roz, do hazaar advance, chhe hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 20,
@@ -2842,14 +2843,17 @@
     "llm",
     "llm"
    ],
-   "context_notes": [],
+   "context_notes": [
+    "no payment received",
+    "500 rupees advance received"
+   ],
    "transcript": [
     {
      "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Samajh gaya, aapko paise nahi mile. Pehle batayein, aapne kitne din kaam kiya tha?",
+     "agent": "Aapne kaam kitne din kiya tha jiske paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2857,7 +2861,7 @@
     },
     {
      "worker": "700 roz milta tha",
-     "agent": "Achha, aapka rozana rate 700 rupaye hai. Ab batayein, aapne kitne din kaam kiya tha?",
+     "agent": "Achha, aapko roz 700 rupaye milte the. Ab bataiye, aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {
       "rate": 700
@@ -2878,7 +2882,7 @@
     },
     {
      "worker": "500 advance",
-     "agent": "Theek hai, aapko 500 rupaye advance mile. Ab bataiye, aapko ab tak kitne paise mil chuke hain?",
+     "agent": "Samajh gaya, aapko 500 rupaye advance mile the. Ab tak aapko kitne rupaye payment mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "rate": 700,
@@ -2890,7 +2894,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Shukriya, aapko ab tak 3000 rupaye mil chuke hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko 3000 rupaye payment mile hain. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "rate": 700,
@@ -2955,7 +2959,7 @@
     "llm"
    ],
    "context_notes": [
-    "500 rupees advance received"
+    "no payment received"
    ],
    "transcript": [
     {
@@ -2963,7 +2967,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "agent": "Aapne kaam kitne din kiya tha jiski mazdoori nahi mili?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -2971,7 +2975,7 @@
     },
     {
      "worker": "3000 mile hain bas",
-     "agent": "Samajh gaya, aapko ab tak 3000 rupaye mile hain. Ab bataiye, kitne din kaam kiya tha aapne?",
+     "agent": "Samajh gaya, aapko ab tak 3000 rupaye mile hain. Ab bataiye, aapne kitne din kaam kiya tha?",
      "state": "ASK_DAYS",
      "facts": {
       "payments": 3000
@@ -2981,7 +2985,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milne the?",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Ab bataiye, rozana kitne rupaye milte the?",
      "state": "ASK_RATE",
      "facts": {
       "payments": 3000,
@@ -2992,7 +2996,7 @@
     },
     {
      "worker": "700",
-     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "payments": 3000,
@@ -3004,7 +3008,7 @@
     },
     {
      "worker": "500 advance",
-     "agent": "Achha, aapko 500 rupaye advance mile the. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "500 rupaye advance mile, samajh gaya. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "payments": 3000,
@@ -3076,7 +3080,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kaam kitne din kiya tha, batayein please?",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -3084,7 +3088,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "6 din kaam kiya, samajh gaya. Rozana kitne rupaye milte the aapko?",
+     "agent": "Chh din kaam kiya, samajh gaya. Rozana kitne rupaye milne the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -3105,7 +3109,7 @@
     },
     {
      "worker": "nahi nahi, roz 800 tha",
-     "agent": "Samajh gaya, roz 800 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
+     "agent": "Theek hai, rozana 800 rupaye the. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -3116,7 +3120,7 @@
     },
     {
      "worker": "500 advance",
-     "agent": "500 rupaye advance mila, samajh gaya. Ab tak aapko kitne rupaye mile hain kaam ke liye?",
+     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain is kaam ke liye?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -3128,7 +3132,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "3000 rupaye mile, samajh gaya. Ab main aapka hisaab karta hoon. Confirm karta hoon: chhe din, aath sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "3000 rupaye aur mile, samajh gaya. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, aath sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -3194,7 +3198,8 @@
     "llm"
    ],
    "context_notes": [
-    "no payment received"
+    "No payment received",
+    "1000 rupees advance received"
    ],
    "transcript": [
     {
@@ -3202,15 +3207,15 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Paise nahi mile, samajh gaya. Aapne kitne din kaam kiya tha uss dauran?",
+     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
-     "action": "follow_up"
+     "action": "ask_slot"
     },
     {
      "worker": "6 din",
-     "agent": "Chh din kaam kiya, theek hai. Rozana kitne rupaye milte the aapko?",
+     "agent": "Chh din kaam kiya, samajh gaya. Rozana kitne rupaye milne wale the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -3220,7 +3225,7 @@
     },
     {
      "worker": "700",
-     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran koi advance mila tha, ya nahi?",
+     "agent": "Rozana 700 rupaye the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -3231,7 +3236,7 @@
     },
     {
      "worker": "1000 advance",
-     "agent": "Aapko 1000 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye payment ke roop mein mile hain?",
+     "agent": "Theek hai, aapko 1000 rupaye advance mile the. Ab tak aapko kitne rupaye aur mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -3243,7 +3248,7 @@
     },
     {
      "worker": "sorry, advance 500 tha",
-     "agent": "Theek hai, advance 500 rupaye the. Ab tak aapko kitne rupaye payment mile hain?",
+     "agent": "Theek hai, advance 500 rupaye the. Ab tak aapko kitne rupaye aur mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -3255,7 +3260,7 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Aapko ab tak 3000 rupaye payment mile hain. Sabhi jankari mil gayi hai, main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye aur mile hain. Ab main aapka hisaab padh leta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -3327,7 +3332,7 @@
     },
     {
      "worker": "...",
-     "agent": "Namaste. Aapne kitne din kaam kiya tha jiski mazdoori abhi tak nahi mili?",
+     "agent": "Namaste. Sabse pehle, aapne kitne din kaam kiya tha jiski mazdoori abhi tak poori nahi mili?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -3335,7 +3340,7 @@
     },
     {
      "worker": "hmm",
-     "agent": "Aapne kitne din kaam kiya? Sirf din ka number batayein, jaise chhe din.",
+     "agent": "Aap kitne din kaam kiye the? Sirf din ka number batayein, jaise 6 din.",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -3343,7 +3348,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Achha, 6 din kaam kiya. Ab aapka rozana kitna rate tha?",
+     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milne wale the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -3353,7 +3358,7 @@
     },
     {
      "worker": "700",
-     "agent": "700 rupaye rozana the, samajh gaya. Ab bataiye, aapko koi advance mila tha ya nahi?",
+     "agent": "700 rupaye rozana the, samajh gaya. Kya aapko kaam ke dauran ya pehle koi advance mila tha?",
      "state": "ASK_ADVANCE",
      "facts": {
       "days": 6,
@@ -3364,7 +3369,7 @@
     },
     {
      "worker": "500",
-     "agent": "Samajh gaya, aapko 500 rupaye advance mile the. Ab tak aapko mazdoori ke liye kitna payment mila hai?",
+     "agent": "Aapko 500 rupaye advance mile the, samajh gaya. Ab tak aapko kitne rupaye aur mile hain?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -3376,7 +3381,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Theek hai, aapko ab tak 3000 rupaye payment mile hain. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye aur mile hain. Ab main aapka hisaab nikalta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -3448,7 +3453,7 @@
     },
     {
      "worker": "paise nahi mile",
-     "agent": "Aapne kitne din kaam kiya tha jiske paise nahi mile?",
+     "agent": "Aapne kaam kitne din kiya tha jiske paise nahi mile?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "llm",
@@ -3456,7 +3461,7 @@
     },
     {
      "worker": "6 din",
-     "agent": "Theek hai, aapne 6 din kaam kiya. Rozana kitne rupaye milne wale the?",
+     "agent": "6 din kaam kiya, samajh gaya. Rozana kitne rupaye milne wale the?",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -3487,7 +3492,7 @@
     },
     {
      "worker": "500",
-     "agent": "500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain jo advance nahi hain?",
+     "agent": "Aapko 500 rupaye advance mile, samajh gaya. Ab tak aapko kitne rupaye aur mile hain kaam ke badle?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 6,
@@ -3499,7 +3504,7 @@
     },
     {
      "worker": "3000",
-     "agent": "Aapko 3000 rupaye aur mile hain, samajh gaya. Ab main aapka hisaab taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, aapko ab tak 3000 rupaye mile hain. Main ab aapke hisaab ko taiyar karta hoon. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,

@@ -152,6 +152,7 @@ def respond(session, reply, scripted, heard=None, text_source="rules"):
         "context_notes": list(session.get("context_notes", [])),
         "policy_source": policy_source,
         "action": reply.get("action"),
+        "llm_error": session.get("llm_error"),     # why a turn fell back, e.g. "HTTPStatusError 429 @ api.openai.com"
         "node_path": list(session.get("node_path", [])),
         "choice": reply.get("choice"),
         "conflict": reply.get("conflict"),
@@ -248,6 +249,7 @@ def turn():
 
     reply, source, started = None, "rules", time.time()
     python_only = session["state"] in (conversation.FOLLOWUP, conversation.ASK_EXTRAS)
+    session.pop("llm_error", None)
     if not scripted and agent_llm.enabled() and not python_only:
         decision = agent_llm.decide(session, text, app.logger)
         if decision:

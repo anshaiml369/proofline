@@ -151,6 +151,9 @@ def decide(session, text, log=None):
             if out and out["agent_text"]:
                 return out
         except Exception as e:  # noqa: BLE001 - any failure means "use the next provider / rules"
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            # error class, HTTP status and host only: never the key or the response body
+            session["llm_error"] = f"{type(e).__name__}{f' {status}' if status else ''} @ {url.split('/')[2]}"
             if log:
-                log.warning("LLM call failed (%s: %s)", type(e).__name__, url.split("/")[2])
+                log.warning("LLM call failed (%s)", session["llm_error"])
     return None
