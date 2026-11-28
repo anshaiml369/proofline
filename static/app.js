@@ -398,6 +398,27 @@
     if (wrap.classList.contains('hidden')) { show(wrap, true); anim(wrap, { opacity: [0, 1], y: [8, 0] }, { duration: 0.2 }); }
   }
 
+  // ?debug=1: the formula Python used when it proposed a derived number, and a chip when it asked
+  // to clarify a range or a conflict. The visible proof that the agent computes, not the LLM.
+  function derivedNote(after, d) {
+    let at = after;
+    if (d.derivation && d.derivation.formula) {
+      const f = document.createElement('li');
+      f.className = 'derive';
+      f.textContent = d.derivation.formula + (d.derivation.slot === 'days' ? ' days' : '') +
+        (d.derivation.assumption ? ' · assumes ' + d.derivation.assumption : '');
+      at.after(f);
+      at = f;
+    }
+    if (d.clarify === 'range' || d.clarify === 'conflict') {
+      const c = document.createElement('li');
+      c.className = 'derive-chip';
+      c.textContent = 'clarify: ' + d.clarify;
+      at.after(c);
+    }
+    el.log.scrollTop = el.log.scrollHeight;
+  }
+
   function renderDebug(d) {
     if (!debug) return;
     show($('debug'), true);
@@ -442,6 +463,7 @@
     last = data;
     setQuestion(data.agent_text);
     const prov = badge(bubble(data.agent_text, 'agent'), TEXT_LABEL[data.text_source] || 'Text: Rules');
+    if (debug) derivedNote(prov, data);
     dlog('reply', data.state, data.text_source, data.audio_source, JSON.stringify(data.agent_text));
     show(el.replay, true);
     show(el.assist, !!data.needs_assistance && !data.case_data);

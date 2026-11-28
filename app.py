@@ -156,6 +156,9 @@ def respond(session, reply, scripted, heard=None, text_source="rules"):
         "node_path": list(session.get("node_path", [])),
         "choice": reply.get("choice"),
         "conflict": reply.get("conflict"),
+        "derivation": reply.get("derivation"),     # {slot, formula, assumption} when a derived number is proposed
+        "clarify": reply.get("clarify") or ("conflict" if reply.get("conflict") else None),
+        "qtype": reply.get("qtype"),
         "deleted": bool(reply.get("delete") and session.get("deleted")),
         **_case_view(row),
         "prior_case": ({"session_id": prior["session_id"], "outstanding": prior["outstanding"], **_case_view(prior)}

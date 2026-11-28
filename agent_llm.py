@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT = open(os.path.join(BASE_DIR, "prompts", "policy.txt"), encoding="utf-8").read()
 PLACEHOLDER_KEYS = {"", "your_key_here"}
 SLOTS = ("days", "rate", "advance", "payments")
-ACTIONS = ("ask_slot", "follow_up", "clarify", "acknowledge_context", "handle_off_topic", "rephrase", "conclude")
+ACTIONS = ("ask_slot", "confirm_derived", "follow_up", "clarify", "acknowledge_context", "handle_off_topic", "rephrase", "conclude")
 TIMEOUT_S = float(os.getenv("LLM_TIMEOUT_S", "8"))
 
 
@@ -97,13 +97,46 @@ def normalise(raw):
         "extracted": extracted,
         "context_delta": None if context.lower() in ("", "null", "none") else context,
         "intent": raw.get("intent") if raw.get("intent") in ("yes", "no", "other") else "other",
+        "observations": _observations(raw.get("observations")),
     }
+
+
+OBS_TYPES = ("period", "frequency", "explicit_days", "rate", "trips", "advance", "payment", "deduction", "bonus",
+             "context")
+
+
+def _observations(raw):
+    """Well-formed observations only (shape check here; conversation.py checks every number was said)."""
+    out = []
+    for o in raw if isinstance(raw, list) else []:
+        if not isinstance(o, dict) or o.get("type") not in OBS_TYPES:
+            continue
+        o = {k: v for k, v in o.items() if k in ("type", "value", "unit", "range", "days_per_week", "explicit_off",
+                                                 "per", "per_day", "ambiguous", "reason", "promised", "text",
+                                                 "category", "correction")}
+        if o["type"] == "period" and o.get("unit") not in ("month", "week", "day"):
+            continue
+        if o["type"] == "rate":
+            per = str(o.get("per") or "day").lower()
+            o["per"] = {"daily": "day", "roz": "day", "weekly": "week", "hafta": "week", "monthly": "month",
+                        "mahina": "month", "per_trip": "trip", "trips": "trip"}.get(per, per)
+            if o["per"] not in ("day", "week", "month", "trip"):
+                continue                               # unknown unit: never guess per day
+        if o["type"] == "context":
+            o["text"] = _text(o.get("text"), 60)
+        out.append(o)
+    return out[:12]
 
 
 def frame(session):
     """What the policy sees about the conversation so far."""
     known = {s: session["facts"].get(s) for s in SLOTS}
     return {"step": session["state"], "known": known,
+            "observations": session.get("observations", [])[-10:],
+            "derivation": {k: v.get("formula") for k, v in session.get("derivation", {}).items()},
+            "pending_confirmation": session.get("pending_derived"),
+            "ambiguity": [a["kind"] + ":" + a["slot"] for a in session.get("ambiguity", [])],
+            "last_question_type": session.get("last_question_type", ""),
             "missing": [s for s in SLOTS if known[s] is None],
             "context_notes": session.get("context_notes", []),
             "unresolved": session.get("unresolved", []),

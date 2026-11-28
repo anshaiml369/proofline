@@ -1,0 +1,2747 @@
+[
+ {
+  "id": "A1",
+  "class": "A period-not-daycount",
+  "turns": [
+   "meri pagar badhao.",
+   "kuch 5-6 mahine",
+   "maine kareeb har hafte ke paanch din",
+   "Hafte mein 7 din mein se 5 din kaam kiye. 5 din",
+   "roz 700",
+   "advance nahi mila",
+   "nabbe hazaar teen sau mile"
+  ],
+  "expected_canonical": {
+   "days": 130,
+   "rate": 700,
+   "advance": 0,
+   "payments": 90300
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [
+   "130",
+   "5-6 mahine, hafte mein 5 din"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": true,
+  "scripted_confirm": true,
+  "notes": "The proof conversation. 5-6 months x 4.33 x 5 = 130 days, 130 x 700 = 91000, 91000 - 90300 = 700."
+ },
+ {
+  "id": "A2",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise nahi mile",
+   "teen hafte kaam kiya",
+   "roz 600",
+   "advance nahi",
+   "5000 mile"
+  ],
+  "expected_canonical": {
+   "days": 18,
+   "rate": 600,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 5800,
+  "must_contain_in_agent": [
+   "18"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "3 weeks, no frequency: 6 days/week assumed and said."
+ },
+ {
+  "id": "A3",
+  "class": "A period-not-daycount",
+  "turns": [
+   "hisaab chahiye",
+   "teen hafte, hafte mein 6 din",
+   "700 roz",
+   "nahi",
+   "10000"
+  ],
+  "expected_canonical": {
+   "days": 18,
+   "rate": 700,
+   "advance": 0,
+   "payments": 10000
+  },
+  "expected_outstanding": 2600,
+  "must_contain_in_agent": [
+   "18"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "3 weeks x 6 days/week."
+ },
+ {
+  "id": "A4",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise baaki hain",
+   "aadha mahina",
+   "500 roz",
+   "advance nahi liya",
+   "4000 mile"
+  ],
+  "expected_canonical": {
+   "days": 13,
+   "rate": 500,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 2500,
+  "must_contain_in_agent": [
+   "13"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Half a month x 26 = 13."
+ },
+ {
+  "id": "A5",
+  "class": "A period-not-daycount",
+  "turns": [
+   "thekedar ne paise nahi diye",
+   "pichhle mahine se",
+   "nahi, ek mahina",
+   "roz 500",
+   "1000 advance",
+   "8000 mile"
+  ],
+  "expected_canonical": {
+   "days": 26,
+   "rate": 500,
+   "advance": 1000,
+   "payments": 8000
+  },
+  "expected_outstanding": 4000,
+  "must_contain_in_agent": [
+   "26"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "'Since last month' is a 1-2 month range; the worker corrects to one month."
+ },
+ {
+  "id": "A6",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paisa nahi mila",
+   "2 mahine alternate din",
+   "800 roz",
+   "advance nahi",
+   "20000 mile"
+  ],
+  "expected_canonical": {
+   "days": 30,
+   "rate": 800,
+   "advance": 0,
+   "payments": 20000
+  },
+  "expected_outstanding": 4000,
+  "must_contain_in_agent": [
+   "30"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Alternate days = 3.5/week; 2 x 4.33 x 3.5 = 30."
+ },
+ {
+  "id": "A7",
+  "class": "A period-not-daycount",
+  "turns": [
+   "mazdoori baaki hai",
+   "2 mahine, sirf Sunday chhutti",
+   "600 roz",
+   "nahi",
+   "25000"
+  ],
+  "expected_canonical": {
+   "days": 52,
+   "rate": 600,
+   "advance": 0,
+   "payments": 25000
+  },
+  "expected_outstanding": 6200,
+  "must_contain_in_agent": [
+   "52"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Only Sunday off = 6/week; 2 x 4.33 x 6 = 52."
+ },
+ {
+  "id": "A8",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise kam diye",
+   "do hafte roz kaam kiya",
+   "650",
+   "advance nahi",
+   "7000"
+  ],
+  "expected_canonical": {
+   "days": 14,
+   "rate": 650,
+   "advance": 0,
+   "payments": 7000
+  },
+  "expected_outstanding": 2100,
+  "must_contain_in_agent": [
+   "14"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Two weeks every day = 14."
+ },
+ {
+  "id": "A9",
+  "class": "A period-not-daycount",
+  "turns": [
+   "pagar nahi mili",
+   "4 hafte, hafte mein 5 din",
+   "700 roz",
+   "500 advance",
+   "10000 mile"
+  ],
+  "expected_canonical": {
+   "days": 20,
+   "rate": 700,
+   "advance": 500,
+   "payments": 10000
+  },
+  "expected_outstanding": 3500,
+  "must_contain_in_agent": [
+   "20"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "4 weeks x 5 = 20."
+ },
+ {
+  "id": "A10",
+  "class": "A period-not-daycount",
+  "turns": [
+   "hisaab karna hai",
+   "1 mahina kaam kiya",
+   "roz 550",
+   "advance nahi",
+   "10000"
+  ],
+  "expected_canonical": {
+   "days": 26,
+   "rate": 550,
+   "advance": 0,
+   "payments": 10000
+  },
+  "expected_outstanding": 4300,
+  "must_contain_in_agent": [
+   "26"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "One month x 26."
+ },
+ {
+  "id": "A11",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise nahi diye",
+   "3 mahine, hafte mein 6 din",
+   "600 roz",
+   "2000 advance",
+   "40000 mile"
+  ],
+  "expected_canonical": {
+   "days": 78,
+   "rate": 600,
+   "advance": 2000,
+   "payments": 40000
+  },
+  "expected_outstanding": 4800,
+  "must_contain_in_agent": [
+   "78"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "3 x 4.33 x 6 = 77.9 -> 78."
+ },
+ {
+  "id": "A12",
+  "class": "A period-not-daycount",
+  "turns": [
+   "seth ne paise roke",
+   "dedh mahina",
+   "500 roz",
+   "advance nahi",
+   "15000"
+  ],
+  "expected_canonical": {
+   "days": 39,
+   "rate": 500,
+   "advance": 0,
+   "payments": 15000
+  },
+  "expected_outstanding": 4500,
+  "must_contain_in_agent": [
+   "39"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "1.5 months x 26 = 39."
+ },
+ {
+  "id": "A13",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise baaki",
+   "5-6 hafte",
+   "600 roz",
+   "advance nahi",
+   "15000 mile"
+  ],
+  "expected_canonical": {
+   "days": 36,
+   "rate": 600,
+   "advance": 0,
+   "payments": 15000
+  },
+  "expected_outstanding": 6600,
+  "must_contain_in_agent": [
+   "36",
+   "5-6"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Week range: upper end used and named; worker agrees."
+ },
+ {
+  "id": "A14",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise nahi mile",
+   "ek hafta",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "6 din"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "One week, 6 days assumed."
+ },
+ {
+  "id": "A15",
+  "class": "A period-not-daycount",
+  "turns": [
+   "pagar kam aayi",
+   "teen mahine, hafte mein 5 din",
+   "500 roz",
+   "nahi",
+   "25000"
+  ],
+  "expected_canonical": {
+   "days": 65,
+   "rate": 500,
+   "advance": 0,
+   "payments": 25000
+  },
+  "expected_outstanding": 7500,
+  "must_contain_in_agent": [
+   "65"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "3 x 4.33 x 5 = 65."
+ },
+ {
+  "id": "B1",
+  "class": "B rate-period",
+  "turns": [
+   "paise nahi mile",
+   "20 din",
+   "mahine ke 15000 tay the",
+   "advance nahi",
+   "5000 mile"
+  ],
+  "expected_canonical": {
+   "days": 20,
+   "rate": 577,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 6540,
+  "must_contain_in_agent": [
+   "577"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "15000/month / 26 = 577/day."
+ },
+ {
+  "id": "B2",
+  "class": "B rate-period",
+  "turns": [
+   "hisaab chahiye",
+   "12 din",
+   "hafte ke 3500",
+   "nahi",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 12,
+   "rate": 583,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 2996,
+  "must_contain_in_agent": [
+   "583"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "3500/week / 6 = 583."
+ },
+ {
+  "id": "B3",
+  "class": "B rate-period",
+  "turns": [
+   "paise baaki hain",
+   "10 din",
+   "per trip 200",
+   "4 trip roz",
+   "advance nahi",
+   "5000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 800,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [
+   "trip"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Per trip: one question for trips/day, then 200 x 4."
+ },
+ {
+  "id": "B4",
+  "class": "B rate-period",
+  "turns": [
+   "paisa nahi mila",
+   "6 din",
+   "600-700 roz",
+   "700",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "600 ya 700"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Rate range asked once."
+ },
+ {
+  "id": "B5",
+  "class": "B rate-period",
+  "turns": [
+   "paise kam diye",
+   "8 din",
+   "market rate jitna",
+   "500 roz",
+   "advance nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 500,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "'Market rate' is not a number: noted, then asked for the agreed rate."
+ },
+ {
+  "id": "B6",
+  "class": "B rate-period",
+  "turns": [
+   "pagar nahi mili",
+   "26 din",
+   "mahine ka 12000",
+   "1000 advance",
+   "8000 mile"
+  ],
+  "expected_canonical": {
+   "days": 26,
+   "rate": 462,
+   "advance": 1000,
+   "payments": 8000
+  },
+  "expected_outstanding": 3012,
+  "must_contain_in_agent": [
+   "462"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "12000 / 26 = 462."
+ },
+ {
+  "id": "B7",
+  "class": "B rate-period",
+  "turns": [
+   "paise nahi diye",
+   "6 din",
+   "hafte ka 4200",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 2200,
+  "must_contain_in_agent": [
+   "700"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "4200 / 6 = 700."
+ },
+ {
+  "id": "B8",
+  "class": "B rate-period",
+  "turns": [
+   "hisaab karo",
+   "5 din",
+   "ek trip ke 150",
+   "din mein 5 trip",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 750,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 2750,
+  "must_contain_in_agent": [
+   "750"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "150 x 5 trips."
+ },
+ {
+  "id": "B9",
+  "class": "B rate-period",
+  "turns": [
+   "paise baaki",
+   "10 din",
+   "500-550 roz",
+   "550",
+   "advance nahi",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 550,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 1500,
+  "must_contain_in_agent": [
+   "500 ya 550"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Range answered with the upper end."
+ },
+ {
+  "id": "B10",
+  "class": "B rate-period",
+  "turns": [
+   "paise nahi mile",
+   "15 din",
+   "18000 mahina",
+   "nahi",
+   "6000"
+  ],
+  "expected_canonical": {
+   "days": 15,
+   "rate": 692,
+   "advance": 0,
+   "payments": 6000
+  },
+  "expected_outstanding": 4380,
+  "must_contain_in_agent": [
+   "692"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "18000 / 26 = 692."
+ },
+ {
+  "id": "B11",
+  "class": "B rate-period",
+  "turns": [
+   "paise kam",
+   "9 din",
+   "roz 650",
+   "nahi",
+   "5000"
+  ],
+  "expected_canonical": {
+   "days": 9,
+   "rate": 650,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 850,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Plain daily rate: no confirmation detour."
+ },
+ {
+  "id": "B12",
+  "class": "B rate-period",
+  "turns": [
+   "pagar baaki",
+   "12 din",
+   "har hafte 3000",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 12,
+   "rate": 500,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [
+   "500"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "3000 / 6 = 500."
+ },
+ {
+  "id": "B13",
+  "class": "B rate-period",
+  "turns": [
+   "paise nahi mile",
+   "4 din",
+   "trip ka 300, din mein 3 trip",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 4,
+   "rate": 900,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 2600,
+  "must_contain_in_agent": [
+   "900"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Trip rate and trips/day in one line."
+ },
+ {
+  "id": "B14",
+  "class": "B rate-period",
+  "turns": [
+   "paise nahi diye",
+   "7 din",
+   "800-900",
+   "800",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 800,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 3600,
+  "must_contain_in_agent": [
+   "800 ya 900"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Range answered with the lower end."
+ },
+ {
+  "id": "B15",
+  "class": "B rate-period",
+  "turns": [
+   "hisaab chahiye",
+   "20 din",
+   "salary 10000 mahine ki",
+   "nahi",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 20,
+   "rate": 385,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 3700,
+  "must_contain_in_agent": [
+   "385"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "10000 / 26 = 385."
+ },
+ {
+  "id": "C1",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "6 din, 700 roz",
+   "khane ke 200 kate",
+   "advance nahi",
+   "3000 mile"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000,
+   "deductions": 200
+  },
+  "expected_outstanding": 1000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Food deduction lowers what was owed."
+ },
+ {
+  "id": "C2",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "8 din kaam kiya",
+   "600 roz",
+   "tools ka 500 kata",
+   "advance nahi",
+   "2000 mile"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 600,
+   "advance": 0,
+   "payments": 2000,
+   "deductions": 500
+  },
+  "expected_outstanding": 2300,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Tool charge deducted."
+ },
+ {
+  "id": "C3",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "10 din",
+   "500 roz",
+   "bonus 1000 bola tha",
+   "advance nahi",
+   "4000 mile"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 500,
+   "advance": 0,
+   "payments": 4000,
+   "bonus": 1000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Promised bonus is part of what is owed."
+ },
+ {
+  "id": "C4",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "5 din",
+   "700 roz",
+   "advance nahi",
+   "2000 cash aur 1000 UPI mila"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 500,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Cash + UPI add up to one payments total."
+ },
+ {
+  "id": "C5",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "paise nahi mile",
+   "12 din",
+   "roz 600",
+   "rehne ke 1000 kate",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 12,
+   "rate": 600,
+   "advance": 0,
+   "payments": 3000,
+   "deductions": 1000
+  },
+  "expected_outstanding": 3200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Lodging deduction."
+ },
+ {
+  "id": "C6",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "7 din, 800 roz",
+   "bonus 500 dene ko bola tha",
+   "advance nahi",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 800,
+   "advance": 0,
+   "payments": 4000,
+   "bonus": 500
+  },
+  "expected_outstanding": 2100,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Bonus after days and rate."
+ },
+ {
+  "id": "C7",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "9 din",
+   "550 roz",
+   "advance nahi",
+   "1500 cash aur 1500 UPI"
+  ],
+  "expected_canonical": {
+   "days": 9,
+   "rate": 550,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1950,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Half cash half UPI, both amounts said."
+ },
+ {
+  "id": "C8",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "15 din",
+   "roz 500",
+   "khane ke 300 kate",
+   "1000 advance",
+   "4000 mile"
+  ],
+  "expected_canonical": {
+   "days": 15,
+   "rate": 500,
+   "advance": 1000,
+   "payments": 4000,
+   "deductions": 300
+  },
+  "expected_outstanding": 2200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Deduction and advance in one case."
+ },
+ {
+  "id": "C9",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "6 din, 900 roz",
+   "advance nahi",
+   "2000 mile aur 1000 baad mein mile"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 900,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 2400,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Two payments in one line."
+ },
+ {
+  "id": "C10",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "10 din",
+   "600 roz",
+   "bonus 2000 bola tha",
+   "khane ke 500 kate",
+   "nahi",
+   "5000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 600,
+   "advance": 0,
+   "payments": 5000,
+   "deductions": 500,
+   "bonus": 2000
+  },
+  "expected_outstanding": 2500,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Bonus and deduction together."
+ },
+ {
+  "id": "C11",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "4 din",
+   "1000 roz",
+   "tools ka 200 kata",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 4,
+   "rate": 1000,
+   "advance": 0,
+   "payments": 1000,
+   "deductions": 200
+  },
+  "expected_outstanding": 2800,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Tools charge, small case."
+ },
+ {
+  "id": "C12",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "20 din",
+   "400 roz",
+   "advance nahi",
+   "3000 UPI aur 2000 cash mila"
+  ],
+  "expected_canonical": {
+   "days": 20,
+   "rate": 400,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "UPI first then cash."
+ },
+ {
+  "id": "C13",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "8 din",
+   "750 roz",
+   "bonus 1000 bola tha",
+   "500 advance",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 750,
+   "advance": 500,
+   "payments": 3000,
+   "bonus": 1000
+  },
+  "expected_outstanding": 3500,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Bonus with an advance."
+ },
+ {
+  "id": "C14",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "5 din",
+   "600 roz",
+   "uniform ke 300 kate",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 600,
+   "advance": 0,
+   "payments": 2000,
+   "deductions": 300
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Uniform charge deducted."
+ },
+ {
+  "id": "C15",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "12 din",
+   "700 roz",
+   "nahi",
+   "5000 mile",
+   "haan"
+  ],
+  "expected_canonical": {
+   "days": 12,
+   "rate": 700,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 3400,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Control: no extras."
+ },
+ {
+  "id": "D1",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "10 din",
+   "600 roz",
+   "manager se 5000 liya tha",
+   "haan, kaatenge",
+   "nahi aur kuch nahi mila"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 600,
+   "advance": 5000,
+   "payments": 0
+  },
+  "expected_outstanding": 1000,
+  "must_contain_in_agent": [
+   "5000"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Money taken from the manager: asked whether it comes out of the wages."
+ },
+ {
+  "id": "D2",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "6 din",
+   "700 roz",
+   "5000 udhaar liya tha",
+   "nahi, woh alag hai",
+   "3000 mile"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "5000"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "A separate loan is not an advance against these wages."
+ },
+ {
+  "id": "D3",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "8 din",
+   "500 roz",
+   "advance 1000 mila tha",
+   "2000 mile"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 500,
+   "advance": 1000,
+   "payments": 2000
+  },
+  "expected_outstanding": 1000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Plainly an advance."
+ },
+ {
+  "id": "D4",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "10 din",
+   "700 roz",
+   "seth se 2000 liye the",
+   "haan katenge",
+   "3000 mile"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 700,
+   "advance": 2000,
+   "payments": 3000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [
+   "2000"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Money taken from the boss, will be cut."
+ },
+ {
+  "id": "D5",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "5 din",
+   "600 roz",
+   "advance nahi",
+   "kuch nahi mila"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 600,
+   "advance": 0,
+   "payments": 0
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Nothing paid at all."
+ },
+ {
+  "id": "D6",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "12 din",
+   "500 roz",
+   "pehle 3000 advance liya",
+   "2000 mile"
+  ],
+  "expected_canonical": {
+   "days": 12,
+   "rate": 500,
+   "advance": 3000,
+   "payments": 2000
+  },
+  "expected_outstanding": 1000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Advance taken before the work."
+ },
+ {
+  "id": "D7",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "7 din",
+   "800 roz",
+   "advance 0",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 800,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 1600,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Zero said as a digit."
+ },
+ {
+  "id": "D8",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "9 din",
+   "600 roz",
+   "thekedar se 1000 liya tha",
+   "haan, kaatenge",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 9,
+   "rate": 600,
+   "advance": 1000,
+   "payments": 2000
+  },
+  "expected_outstanding": 2400,
+  "must_contain_in_agent": [
+   "1000"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Contractor money, will be cut."
+ },
+ {
+  "id": "D9",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "10 din",
+   "500 roz",
+   "advance nahi liya",
+   "2000 aur 1000 mile"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 500,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Two payments."
+ },
+ {
+  "id": "D10",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "6 din",
+   "650 roz",
+   "500 advance",
+   "nahi kuch nahi mila"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 650,
+   "advance": 500,
+   "payments": 0
+  },
+  "expected_outstanding": 3400,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Advance only."
+ },
+ {
+  "id": "D11",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "15 din",
+   "600 roz",
+   "manager se 3000 liya tha",
+   "nahi, woh wapas kar diya",
+   "5000 mile"
+  ],
+  "expected_canonical": {
+   "days": 15,
+   "rate": 600,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 4000,
+  "must_contain_in_agent": [
+   "3000"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Already repaid: not counted."
+ },
+ {
+  "id": "D12",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "4 din",
+   "900 roz",
+   "nahi",
+   "1000 mile"
+  ],
+  "expected_canonical": {
+   "days": 4,
+   "rate": 900,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 2600,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Control."
+ },
+ {
+  "id": "D13",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "20 din",
+   "500 roz",
+   "advance 2000",
+   "6000"
+  ],
+  "expected_canonical": {
+   "days": 20,
+   "rate": 500,
+   "advance": 2000,
+   "payments": 6000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Advance said with the word."
+ },
+ {
+  "id": "D14",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "8 din",
+   "700 roz",
+   "do hazaar advance",
+   "teen hazaar"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 700,
+   "advance": 2000,
+   "payments": 3000
+  },
+  "expected_outstanding": 600,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Words for numbers."
+ },
+ {
+  "id": "D15",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "6 din",
+   "600 roz",
+   "advance nahi mila tha",
+   "1500"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 600,
+   "advance": 0,
+   "payments": 1500
+  },
+  "expected_outstanding": 2100,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Control."
+ },
+ {
+  "id": "E1",
+  "class": "E context/emotion",
+  "turns": [
+   "paise nahi mile",
+   "pichhle hafte hospital mein tha, 6 din kaam kiya",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "dukh hua"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Health: one line, and 'last week' is not a period."
+ },
+ {
+  "id": "E2",
+  "class": "E context/emotion",
+  "turns": [
+   "thekedar dhamki deta hai",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "Dara mat"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Threat."
+ },
+ {
+  "id": "E3",
+  "class": "E context/emotion",
+  "turns": [
+   "tum kaun ho",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "PagarSaathi"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Identity question."
+ },
+ {
+  "id": "E4",
+  "class": "E context/emotion",
+  "turns": [
+   "yeh free hai kya",
+   "8 din",
+   "600 roz",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 600,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 2800,
+  "must_contain_in_agent": [
+   "free"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Cost question."
+ },
+ {
+  "id": "E5",
+  "class": "E context/emotion",
+  "turns": [
+   "mera data safe hai?",
+   "10 din",
+   "500 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 500,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [
+   "delete"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Privacy question."
+ },
+ {
+  "id": "E6",
+  "class": "E context/emotion",
+  "turns": [
+   "bahut pareshan hoon",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "Tension mat"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Emotion."
+ },
+ {
+  "id": "E7",
+  "class": "E context/emotion",
+  "turns": [
+   "paise nahi mile",
+   "5 din",
+   "bimar tha isliye kam din",
+   "600 roz",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 600,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [
+   "dukh hua"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Health mid-way, after the days were given."
+ },
+ {
+  "id": "E8",
+  "class": "E context/emotion",
+  "turns": [
+   "7 din",
+   "seth bolta hai kaam se nikaal dunga",
+   "800 roz",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 800,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 3600,
+  "must_contain_in_agent": [
+   "Dara mat"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Threat mid-way."
+ },
+ {
+  "id": "E9",
+  "class": "E context/emotion",
+  "turns": [
+   "Teen saal se unke saath hoon, pichhle hafte bimar bhi tha.",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "dukh hua"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Tenure and illness: neither is a day count."
+ },
+ {
+  "id": "E10",
+  "class": "E context/emotion",
+  "turns": [
+   "meri pagar badhao",
+   "10 din",
+   "600 roz",
+   "nahi",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 600,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "A raise is out of scope; the agent says so in one line and continues."
+ },
+ {
+  "id": "F1",
+  "class": "F corrections",
+  "turns": [
+   "6 din",
+   "arre 6 nahi 5",
+   "700 roz",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 700,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 1500,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Correction replaces the old number, no question."
+ },
+ {
+  "id": "F2",
+  "class": "F corrections",
+  "turns": [
+   "6 din",
+   "700 roz",
+   "pehle 700 bola tha, 650 sahi hai",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 650,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 1900,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Rate correction."
+ },
+ {
+  "id": "F3",
+  "class": "F corrections",
+  "turns": [
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000",
+   "nahi, din 5 the",
+   "haan"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 500,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Correction at the read-back."
+ },
+ {
+  "id": "F4",
+  "class": "F corrections",
+  "turns": [
+   "8 din",
+   "5 din",
+   "5",
+   "600 roz",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 600,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [
+   "kaunsa"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Two different day counts: the agent asks which, does not overwrite."
+ },
+ {
+  "id": "F5",
+  "class": "F corrections",
+  "turns": [
+   "10 din",
+   "500 roz",
+   "600 roz",
+   "600",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 600,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [
+   "kaunsa"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Two different rates: asked which."
+ },
+ {
+  "id": "F6",
+  "class": "F corrections",
+  "turns": [
+   "7 din nahi 8 din",
+   "600 roz",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 600,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 2800,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Correction inside one line."
+ },
+ {
+  "id": "F7",
+  "class": "F corrections",
+  "turns": [
+   "6 din",
+   "700",
+   "advance 500",
+   "nahi advance nahi tha",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Advance withdrawn."
+ },
+ {
+  "id": "F8",
+  "class": "F corrections",
+  "turns": [
+   "9 din",
+   "600 roz",
+   "nahi",
+   "2000",
+   "nahi, 3000 mile the",
+   "haan"
+  ],
+  "expected_canonical": {
+   "days": 9,
+   "rate": 600,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 2400,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Payment corrected at read-back."
+ },
+ {
+  "id": "F9",
+  "class": "F corrections",
+  "turns": [
+   "12 din",
+   "500 nahi 550 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 12,
+   "rate": 550,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 3600,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Rate corrected in one line."
+ },
+ {
+  "id": "F10",
+  "class": "F corrections",
+  "turns": [
+   "teen hafte",
+   "hafte mein 5 din",
+   "haan",
+   "700 roz",
+   "nahi",
+   "5000"
+  ],
+  "expected_canonical": {
+   "days": 15,
+   "rate": 700,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 5500,
+  "must_contain_in_agent": [
+   "15"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Weeks refined by frequency before confirming."
+ },
+ {
+  "id": "F11",
+  "class": "F corrections",
+  "turns": [
+   "5 din",
+   "700 roz",
+   "nahi",
+   "1000",
+   "nahi, roz 750 the",
+   "haan"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 750,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 2750,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Rate corrected at read-back."
+ },
+ {
+  "id": "F12",
+  "class": "F corrections",
+  "turns": [
+   "2 mahine",
+   "nahi, sirf 40 din",
+   "600 roz",
+   "nahi",
+   "10000"
+  ],
+  "expected_canonical": {
+   "days": 40,
+   "rate": 600,
+   "advance": 0,
+   "payments": 10000
+  },
+  "expected_outstanding": 14000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Derived 52 rejected with the real count."
+ },
+ {
+  "id": "F13",
+  "class": "F corrections",
+  "turns": [
+   "6 din",
+   "same 6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Repeating the same number is not a conflict."
+ },
+ {
+  "id": "F14",
+  "class": "F corrections",
+  "turns": [
+   "10 din",
+   "600 roz",
+   "1000 advance",
+   "nahi 1500 advance",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 600,
+   "advance": 1500,
+   "payments": 3000
+  },
+  "expected_outstanding": 1500,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Advance corrected."
+ },
+ {
+  "id": "F15",
+  "class": "F corrections",
+  "turns": [
+   "mahine ke 15000",
+   "20 din",
+   "haan",
+   "nahi",
+   "5000"
+  ],
+  "expected_canonical": {
+   "days": 20,
+   "rate": 577,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 6540,
+  "must_contain_in_agent": [
+   "577"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Monthly rate first, days after, then a yes."
+ },
+ {
+  "id": "G1",
+  "class": "G format",
+  "turns": [
+   "6 din",
+   "700 roz",
+   "500",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Digits."
+ },
+ {
+  "id": "G2",
+  "class": "G format",
+  "turns": [
+   "chhe din",
+   "saat sau",
+   "paanch sau",
+   "teen hazaar"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Hinglish words."
+ },
+ {
+  "id": "G3",
+  "class": "G format",
+  "turns": [
+   "६ दिन",
+   "७०० रोज़",
+   "५००",
+   "३०००"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Devanagari numerals."
+ },
+ {
+  "id": "G4",
+  "class": "G format",
+  "turns": [
+   "six days",
+   "seven hundred per day",
+   "five hundred",
+   "three thousand"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "English words."
+ },
+ {
+  "id": "G5",
+  "class": "G format",
+  "turns": [
+   "",
+   "6 din",
+   "700 roz",
+   "500",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Silence first."
+ },
+ {
+  "id": "G6",
+  "class": "G format",
+  "turns": [
+   "6-7 din",
+   "7",
+   "700 roz",
+   "500",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 1400,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Mixed range for days: asked once."
+ },
+ {
+  "id": "G7",
+  "class": "G format",
+  "turns": [
+   "chhah din",
+   "700",
+   "nahi",
+   "teen hazaar"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Spelling variant."
+ },
+ {
+  "id": "G8",
+  "class": "G format",
+  "turns": [
+   "das din",
+   "paanch sau",
+   "do sau",
+   "teen hazaar"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 500,
+   "advance": 200,
+   "payments": 3000
+  },
+  "expected_outstanding": 1800,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Words."
+ },
+ {
+  "id": "G9",
+  "class": "G format",
+  "turns": [
+   "छह दिन",
+   "सात सौ",
+   "पांच सौ",
+   "तीन हज़ार"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Devanagari words."
+ },
+ {
+  "id": "G10",
+  "class": "G format",
+  "turns": [
+   "6 days",
+   "700 rupees",
+   "500",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "English unit words."
+ },
+ {
+  "id": "G11",
+  "class": "G format",
+  "turns": [
+   "Chhe din kaam kiya, saat sau roz, paanch sau advance, teen hazaar mila"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "All four in one line."
+ },
+ {
+  "id": "G12",
+  "class": "G format",
+  "turns": [
+   "8 din, 650 roz",
+   "nahi",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 650,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Two in one line."
+ },
+ {
+  "id": "G13",
+  "class": "G format",
+  "turns": [
+   "dhai hazaar mahina",
+   "10 din",
+   "haan",
+   "nahi",
+   "500"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 96,
+   "advance": 0,
+   "payments": 500
+  },
+  "expected_outstanding": 460,
+  "must_contain_in_agent": [
+   "96"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "2500/month / 26 = 96 (very low wage, still computed)."
+ },
+ {
+  "id": "G14",
+  "class": "G format",
+  "turns": [
+   "15 din",
+   "₹600",
+   "nil",
+   "₹5000"
+  ],
+  "expected_canonical": {
+   "days": 15,
+   "rate": 600,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 4000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Rupee sign; 'nil' is zero."
+ },
+ {
+  "id": "G15",
+  "class": "G format",
+  "turns": [
+   "nau din",
+   "aath sau",
+   "hazaar",
+   "do hazaar"
+  ],
+  "expected_canonical": {
+   "days": 9,
+   "rate": 800,
+   "advance": 1000,
+   "payments": 2000
+  },
+  "expected_outstanding": 4200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Words, bare 'hazaar'."
+ },
+ {
+  "id": "H1",
+  "class": "H dispute/legal",
+  "turns": [
+   "court jaunga",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "shikayat"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Court: acknowledged, the hisaab comes first."
+ },
+ {
+  "id": "H2",
+  "class": "H dispute/legal",
+  "turns": [
+   "proof chahiye",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "record"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Proof: the case record is the proof."
+ },
+ {
+  "id": "H3",
+  "class": "H dispute/legal",
+  "turns": [
+   "contractor manna kare to kya",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Refusal question."
+ },
+ {
+  "id": "H4",
+  "class": "H dispute/legal",
+  "turns": [
+   "kitne din mein paisa milega",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Timing question."
+ },
+ {
+  "id": "H5",
+  "class": "H dispute/legal",
+  "turns": [
+   "6 din",
+   "court jaunga",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [
+   "shikayat"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Court mid-way."
+ },
+ {
+  "id": "H6",
+  "class": "H dispute/legal",
+  "turns": [
+   "8 din",
+   "600 roz",
+   "proof chahiye",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 600,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 2800,
+  "must_contain_in_agent": [
+   "record"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Proof mid-way."
+ },
+ {
+  "id": "H7",
+  "class": "H dispute/legal",
+  "turns": [
+   "paise nahi mile, police mein jaunga",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Police."
+ },
+ {
+  "id": "H8",
+  "class": "H dispute/legal",
+  "turns": [
+   "labour office jana hai",
+   "10 din",
+   "500 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 500,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Labour office."
+ },
+ {
+  "id": "H9",
+  "class": "H dispute/legal",
+  "turns": [
+   "6 din",
+   "700 roz",
+   "contractor manna kare to",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Refusal question mid-way."
+ },
+ {
+  "id": "H10",
+  "class": "H dispute/legal",
+  "turns": [
+   "kitne din mein paisa aayega",
+   "5 din",
+   "600 roz",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 600,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Timing."
+ },
+ {
+  "id": "H11",
+  "class": "H dispute/legal",
+  "turns": [
+   "case karna hai",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Case."
+ },
+ {
+  "id": "H12",
+  "class": "H dispute/legal",
+  "turns": [
+   "likh ke chahiye",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Written proof."
+ },
+ {
+  "id": "H13",
+  "class": "H dispute/legal",
+  "turns": [
+   "thekedar bolta hai paise nahi dunga",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Refusal statement."
+ },
+ {
+  "id": "H14",
+  "class": "H dispute/legal",
+  "turns": [
+   "12 din",
+   "600 roz",
+   "court jana padega kya",
+   "nahi",
+   "4000"
+  ],
+  "expected_canonical": {
+   "days": 12,
+   "rate": 600,
+   "advance": 0,
+   "payments": 4000
+  },
+  "expected_outstanding": 3200,
+  "must_contain_in_agent": [
+   "shikayat"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Court question late."
+ },
+ {
+  "id": "H15",
+  "class": "H dispute/legal",
+  "turns": [
+   "6 din",
+   "700 roz",
+   "500",
+   "3000",
+   "kab tak milega"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 500,
+   "payments": 3000
+  },
+  "expected_outstanding": 700,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Timing question after the read-back."
+ }
+]

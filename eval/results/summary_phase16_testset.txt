@@ -1,0 +1,13 @@
+v3-fallback: 32 cases in 0.0s; wrong or no result: none
+
+| Metric | v3-fallback |
+|---|---|
+| Slot accuracy (%) | 100.0 |
+| Math correctness (%) | 100.0 |
+| Completed to a result (%) | 100.0 |
+| Verbatim repetition rate (% of agent lines) | 0.0 |
+| Cases with any repeat | 0 |
+| Avg worker turns to result | 5.75 |
+| Bundled-input success (%) | 100.0 |
+| Context acknowledgement (%) | 83.3 |
+| Turns: LLM / fallback / rules | 0 / 184 / 0 |

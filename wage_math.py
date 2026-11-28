@@ -26,8 +26,8 @@ def _whole(name, value):
     return value
 
 
-def calculate_wages(days, rate, advance=0, payments=0, overtime_hours=0, overtime_rate=0, deductions=0):
-    """expected = days × rate + overtime_hours × overtime_rate − deductions (never below 0);
+def calculate_wages(days, rate, advance=0, payments=0, overtime_hours=0, overtime_rate=0, deductions=0, bonus=0):
+    """expected = days × rate + overtime_hours × overtime_rate + bonus − deductions (never below 0);
     received = advance + payments; outstanding = max(0, expected − received).
     The optional fields default to 0, so the four-number case is unchanged."""
     days = _whole("days", days)
@@ -37,10 +37,11 @@ def calculate_wages(days, rate, advance=0, payments=0, overtime_hours=0, overtim
     overtime_hours = _whole("overtime_hours", overtime_hours or 0)
     overtime_rate = _whole("overtime_rate", overtime_rate or 0)
     deductions = _whole("deductions", deductions or 0)
+    bonus = _whole("bonus", bonus or 0)
 
     base = days * rate
     overtime = overtime_hours * overtime_rate
-    expected = max(0, base + overtime - deductions)
+    expected = max(0, base + overtime + bonus - deductions)
     received = advance + payments
     outstanding = max(0, expected - received)
     out = {
@@ -53,21 +54,26 @@ def calculate_wages(days, rate, advance=0, payments=0, overtime_hours=0, overtim
         "outstanding": outstanding,
         "overpaid": max(0, received - expected),
         "breakdown": breakdown_lines(days, rate, advance, payments, expected, outstanding,
-                                     overtime_hours, overtime_rate, deductions),
+                                     overtime_hours, overtime_rate, deductions, bonus),
     }
-    if overtime or deductions:
+    if overtime or deductions or bonus:
         out.update(overtime_hours=overtime_hours, overtime_rate=overtime_rate, overtime=overtime,
                    deductions=deductions, base=base)
+    if bonus:
+        out["bonus"] = bonus
     return out
 
 
-def breakdown_lines(days, rate, advance, payments, expected, outstanding, overtime_hours=0, overtime_rate=0, deductions=0):
+def breakdown_lines(days, rate, advance, payments, expected, outstanding, overtime_hours=0, overtime_rate=0, deductions=0,
+                    bonus=0):
     """Display strings for the calculation card; the browser only renders these, it does no maths.
     `icon` names a small picture for each line (calendar, clock, minus, rupee, wallet, check)."""
     lines = [{"label": "Kaam", "math": f"{days} din × {format_inr(rate)}", "amount": format_inr(days * rate), "icon": "calendar"}]
     if overtime_hours and overtime_rate:
         lines.append({"label": "Overtime", "math": f"{overtime_hours} ghante × {format_inr(overtime_rate)}",
                       "amount": "+ " + format_inr(overtime_hours * overtime_rate), "icon": "clock"})
+    if bonus:
+        lines.append({"label": "Bonus", "math": "", "amount": "+ " + format_inr(bonus), "icon": "rupee"})
     if deductions:
         lines.append({"label": "Katauti", "math": "minus", "amount": "− " + format_inr(deductions), "icon": "minus"})
     if len(lines) > 1:
@@ -90,9 +96,11 @@ def payment_request(result):
     if result.get("overtime"):
         lines.append(f"• Overtime: {result['overtime_hours']} ghante × {format_inr(result['overtime_rate'])}"
                      f" = {format_inr(result['overtime'])}")
+    if result.get("bonus"):
+        lines.append(f"• Bonus: {format_inr(result['bonus'])}")
     if result.get("deductions"):
         lines.append(f"• Katauti: {format_inr(result['deductions'])}")
-    if result.get("overtime") or result.get("deductions"):
+    if result.get("overtime") or result.get("deductions") or result.get("bonus"):
         lines.append(f"• Kul kamaai: {format_inr(result['expected'])}")
     lines += [f"• Advance mila: {format_inr(result['advance'])}",
               f"• Ab tak mila: {format_inr(result['payments'])}",

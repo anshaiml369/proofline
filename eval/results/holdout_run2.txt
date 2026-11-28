@@ -1,0 +1,27 @@
+v3-before: 20 cases in 0.0s; failed 10: X1, X2, X3, X4, X5, X6, X7, X8, X9, X12
+v4: 20 cases in 0.0s; failed 1: X12
+
+| Metric | v3-before | v4 |
+|---|---|---|
+| Passed (all checks) (%) | 50.0 | 95.0 |
+| Task completion (%) | 90.0 | 100.0 |
+| Correct outstanding (%) | 50.0 | 95.0 |
+| Verbatim repetition rate (% of agent lines) | 0.0 | 0.0 |
+| Avg worker turns (completed cases) | 5.78 | 6.1 |
+| Re-asks per slot | 0.138 | 0.075 |
+| Context acknowledged (% of context turns) | 100.0 | 100.0 |
+| Irritation proxy (re-asks + unresolved conflicts per completed case) | 0.17 | 0.3 |
+| Same, over all cases (unfinished ones included) | 0.55 | 0.3 |
+| Context turns measured | 1 | 1 |
+| Turns: LLM / fallback / rules | 0 / 0 / 114 | 0 / 0 / 122 |
+
+| Class | v3-before | v4 |
+|---|---|---|
+| A | 0/4 | 4/4 |
+| B | 0/3 | 3/3 |
+| C | 1/3 | 3/3 |
+| D | 1/2 | 1/2 |
+| E | 2/2 | 2/2 |
+| F | 2/2 | 2/2 |
+| G | 2/2 | 2/2 |
+| H | 2/2 | 2/2 |

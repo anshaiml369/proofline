@@ -56,7 +56,8 @@ def test_confirm_no_goes_back_to_days():
 
 def test_reask_once_then_needs_assistance():
     s, out = run(["x", "pata nahi"])
-    assert out[1]["agent_text"] == c.STATES[c.ASK_DAYS]["simpler"][0]
+    # Phase 16: a rephrase changes the question type (a different angle), not only the words
+    assert out[1]["agent_text"] == c.STATES[c.ASK_DAYS]["angle"][0]
     assert not out[1]["needs_assistance"]
     third = c.step(s, "yaad nahi", c.local_extract)
     assert third["needs_assistance"] and s["state"] == c.ASK_DAYS   # days can't be guessed

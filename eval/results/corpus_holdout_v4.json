@@ -1,0 +1,2504 @@
+{
+ "summary": {
+  "backend": "v4",
+  "cases": 20,
+  "passed": 95.0,
+  "completed": 100.0,
+  "correct_outstanding": 95.0,
+  "repetition_rate": 0.0,
+  "avg_turns": 6.1,
+  "reasks_per_slot": 0.075,
+  "context_ack": 100.0,
+  "context_turns": 1,
+  "irritation": 0.3,
+  "irritation_all": 0.3,
+  "per_class": {
+   "A": "4/4",
+   "B": "3/3",
+   "C": "3/3",
+   "D": "1/2",
+   "E": "2/2",
+   "F": "2/2",
+   "G": "2/2",
+   "H": "2/2"
+  },
+  "llm_turns": 0,
+  "fallback_turns": 0,
+  "rules_turns": 122,
+  "seconds": 0.0
+ },
+ "results": [
+  {
+   "id": "X1",
+   "class": "A",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 12400,
+   "expected_outstanding": 12400,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 7,
+   "worker_turns": 7,
+   "auto_yes": 1,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise baaki",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "chaar mahine, hafte mein chhe din",
+     "agent": "4 mahine, hafte mein 6 din — matlab kareeb 104 din. Sahi hai?",
+     "state": "ASK_DAYS",
+     "action": "confirm_derived",
+     "formula": "4 mo × 4.33 wk × 6 d/wk ≈ 104",
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Theek hai, 104 din. Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": "python_confirmed_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 104,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "600 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 104,
+      "rate": 600,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "advance nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 104,
+      "rate": 600,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "50000 mile",
+     "agent": "Confirm karta hoon: ek sau chaar din, chhe sau roz, koi advance nahi, pachaas hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 104,
+      "rate": 600,
+      "advance": 0,
+      "payments": 50000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai baasath hazaar chaar sau. Advance shunya, ab tak mila pachaas hazaar, kul mila pachaas hazaar. Baaki baarah hazaar chaar sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 104,
+      "rate": 600,
+      "advance": 0,
+      "payments": 50000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X2",
+   "class": "A",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 2000,
+   "expected_outstanding": 2000,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 7,
+   "worker_turns": 7,
+   "auto_yes": 1,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "hisaab",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "do hafte, hafte mein 5 din",
+     "agent": "2 hafte, hafte mein 5 din — matlab kareeb 10 din. Sahi hai?",
+     "state": "ASK_DAYS",
+     "action": "confirm_derived",
+     "formula": "2 wk × 5 d/wk = 10",
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Theek hai, 10 din. Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": "python_confirmed_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 700,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 700,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "5000",
+     "agent": "Confirm karta hoon: das din, saat sau roz, koi advance nahi, paanch hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 700,
+      "advance": 0,
+      "payments": 5000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai saat hazaar. Advance shunya, ab tak mila paanch hazaar, kul mila paanch hazaar. Baaki do hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 700,
+      "advance": 0,
+      "payments": 5000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X3",
+   "class": "A",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 3000,
+   "expected_outstanding": 3000,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 7,
+   "worker_turns": 7,
+   "auto_yes": 1,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "2-3 hafte",
+     "agent": "2-3 hafte, hafte ke 6 din — matlab 18 din. Sahi hai, ya hafte mein kam din the?",
+     "state": "ASK_DAYS",
+     "action": "confirm_derived",
+     "formula": "2-3 wk (3 used) × 6 d/wk = 18",
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Theek hai, 18 din. Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": "python_confirmed_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 18,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "500 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 18,
+      "rate": 500,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 18,
+      "rate": 500,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "6000",
+     "agent": "Confirm karta hoon: athaarah din, paanch sau roz, koi advance nahi, chhe hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 18,
+      "rate": 500,
+      "advance": 0,
+      "payments": 6000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai nau hazaar. Advance shunya, ab tak mila chhe hazaar, kul mila chhe hazaar. Baaki teen hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 18,
+      "rate": 500,
+      "advance": 0,
+      "payments": 6000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X4",
+   "class": "A",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 6900,
+   "expected_outstanding": 6900,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 7,
+   "worker_turns": 7,
+   "auto_yes": 1,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "pagar baaki",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "ek mahina, sirf Sunday chhutti",
+     "agent": "1 mahina, hafte mein 6 din — matlab kareeb 26 din. Sahi hai?",
+     "state": "ASK_DAYS",
+     "action": "confirm_derived",
+     "formula": "1 mo × 4.33 wk × 6 d/wk ≈ 26",
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Theek hai, 26 din. Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": "python_confirmed_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 26,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "650 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 26,
+      "rate": 650,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 26,
+      "rate": 650,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "10000",
+     "agent": "Confirm karta hoon: chhabbees din, chhe sau pachaas roz, koi advance nahi, das hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 26,
+      "rate": 650,
+      "advance": 0,
+      "payments": 10000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai solah hazaar nau sau. Advance shunya, ab tak mila das hazaar, kul mila das hazaar. Baaki chhe hazaar nau sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 26,
+      "rate": 650,
+      "advance": 0,
+      "payments": 10000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X5",
+   "class": "B",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 3000,
+   "expected_outstanding": 3000,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 7,
+   "worker_turns": 7,
+   "auto_yes": 1,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise nahi mile",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "10 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "mahine ki 13000 salary",
+     "agent": "13000 mahine ke — matlab roz ke kareeb 500 rupaye (26 kaam ke din). Sahi hai?",
+     "state": "ASK_RATE",
+     "action": "confirm_derived",
+     "formula": "13000/mo ÷ 26 d ≈ 500/day",
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Theek hai, 500 rupaye roz. Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": "python_confirmed_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "2000",
+     "agent": "Confirm karta hoon: das din, paanch sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai paanch hazaar. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki teen hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X6",
+   "class": "B",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 3800,
+   "expected_outstanding": 3800,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 7,
+   "worker_turns": 7,
+   "auto_yes": 1,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "hisaab",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "hafte ke 4800",
+     "agent": "4800 hafte ke — matlab roz ke kareeb 800 rupaye (6 din ka hafta). Sahi hai?",
+     "state": "ASK_RATE",
+     "action": "confirm_derived",
+     "formula": "4800/wk ÷ 6 d ≈ 800/day",
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Theek hai, 800 rupaye roz. Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": "python_confirmed_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "1000",
+     "agent": "Confirm karta hoon: chhe din, aath sau roz, koi advance nahi, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar aath sau. Advance shunya, ab tak mila ek hazaar, kul mila ek hazaar. Baaki teen hazaar aath sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X7",
+   "class": "B",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 4000,
+   "expected_outstanding": 4000,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 7,
+   "worker_turns": 7,
+   "auto_yes": 0,
+   "reasks": 1,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "paise kam",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "8 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 8,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700-800 roz",
+     "agent": "700 ya 800: roz ke kitne tay hue the?",
+     "state": "ASK_RATE",
+     "action": "clarify",
+     "formula": null,
+     "clarify": "range",
+     "facts": {
+      "days": 8,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "750",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 8,
+      "rate": 750,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 8,
+      "rate": 750,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "2000",
+     "agent": "Confirm karta hoon: aath din, saat sau pachaas roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 8,
+      "rate": 750,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chhe hazaar. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki chaar hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 8,
+      "rate": 750,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X8",
+   "class": "C",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1750,
+   "expected_outstanding": 1750,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 5,
+   "worker_turns": 5,
+   "auto_yes": 0,
+   "reasks": 1,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "5 din, 600 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 5,
+      "rate": 600,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "khane ke 250 kaat liye",
+     "agent": "250 rupaye katauti note kar li. Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": "python_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 5,
+      "rate": 600,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 5,
+      "rate": 600,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "1000",
+     "agent": "Confirm karta hoon: paanch din, chhe sau roz, koi advance nahi, ek hazaar paid, do sau pachaas katauti. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 5,
+      "rate": 600,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai do hazaar saat sau pachaas. Advance shunya, ab tak mila ek hazaar, kul mila ek hazaar. Baaki ek hazaar saat sau pachaas rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 5,
+      "rate": 600,
+      "advance": 0,
+      "payments": 1000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X9",
+   "class": "C",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 2200,
+   "expected_outstanding": 2200,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 1,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "7 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "500 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 500,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "bonus 700 bola tha",
+     "agent": "700 rupaye bonus note kar liya. Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": "python_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 500,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 500,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "2000",
+     "agent": "Confirm karta hoon: saat din, paanch sau roz, koi advance nahi, do hazaar paid, saat sau bonus. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 500,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki do hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 500,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X10",
+   "class": "C",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1800,
+   "expected_outstanding": 1800,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 5,
+   "worker_turns": 5,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "800 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "1000 UPI aur 2000 cash",
+     "agent": "Confirm karta hoon: chhe din, aath sau roz, koi advance nahi, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar aath sau. Advance shunya, ab tak mila teen hazaar, kul mila teen hazaar. Baaki ek hazaar aath sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 800,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X11",
+   "class": "D",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 2400,
+   "expected_outstanding": 2400,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 1,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "9 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 9,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "600 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 9,
+      "rate": 600,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "thekedar se 2000 liya tha",
+     "agent": "Kya woh 2000 rupaye aapki mazdoori mein se kaate gaye ya katenge?",
+     "state": "ASK_ADVANCE",
+     "action": "clarify",
+     "formula": null,
+     "clarify": "is_advance",
+     "facts": {
+      "days": 9,
+      "rate": 600,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan katenge",
+     "agent": "Theek hai, 2000 advance mein gine. Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": "python_derived",
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 9,
+      "rate": 600,
+      "advance": 2000,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "1000",
+     "agent": "Confirm karta hoon: nau din, chhe sau roz, do hazaar advance, ek hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 9,
+      "rate": 600,
+      "advance": 2000,
+      "payments": 1000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai paanch hazaar chaar sau. Advance do hazaar, ab tak mila ek hazaar, kul mila teen hazaar. Baaki do hazaar chaar sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 9,
+      "rate": 600,
+      "advance": 2000,
+      "payments": 1000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X12",
+   "class": "D",
+   "hard": false,
+   "passed": false,
+   "completed": true,
+   "correct": false,
+   "outstanding": 2000,
+   "expected_outstanding": 3000,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 5,
+   "worker_turns": 5,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 1,
+   "ctx_acked": 1,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "10 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "500 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "bhai se 1000 udhaar liya, woh alag hai",
+     "agent": "Samajh gaya. Jo loan aapki mazdoori se kaata gaya, use advance mein ginenge. Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 1000,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "2000 mile",
+     "agent": "Confirm karta hoon: das din, paanch sau roz, ek hazaar advance, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 1000,
+      "payments": 2000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai paanch hazaar. Advance ek hazaar, ab tak mila do hazaar, kul mila teen hazaar. Baaki do hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 10,
+      "rate": 500,
+      "advance": 1000,
+      "payments": 2000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X13",
+   "class": "E",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1200,
+   "expected_outstanding": 1200,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "mujhe darr lag raha hai",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "3000",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, koi advance nahi, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila teen hazaar, kul mila teen hazaar. Baaki ek hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X14",
+   "class": "E",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1200,
+   "expected_outstanding": 1200,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "kya yeh sarkari app hai",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "3000",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, koi advance nahi, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila teen hazaar, kul mila teen hazaar. Baaki ek hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X15",
+   "class": "F",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1200,
+   "expected_outstanding": 1200,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 1,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "7 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi nahi 6 din",
+     "agent": "Theek hai, din chhe kar diya. Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "3000",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, koi advance nahi, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila teen hazaar, kul mila teen hazaar. Baaki ek hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X16",
+   "class": "F",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1900,
+   "expected_outstanding": 1900,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 1,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "500 advance",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 500,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "galti se bola, 300 advance",
+     "agent": "Theek hai, advance teen sau kar diya. Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 300,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "2000",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, teen sau advance, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 300,
+      "payments": 2000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance teen sau, ab tak mila do hazaar, kul mila do hazaar teen sau. Baaki ek hazaar nau sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 300,
+      "payments": 2000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X17",
+   "class": "G",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 2550,
+   "expected_outstanding": 2550,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 5,
+   "worker_turns": 5,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "saat din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "chhe sau pachaas",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "do hazaar",
+     "agent": "Confirm karta hoon: saat din, chhe sau pachaas roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar paanch sau pachaas. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki do hazaar paanch sau pachaas rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X18",
+   "class": "G",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 2550,
+   "expected_outstanding": 2550,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 5,
+   "worker_turns": 5,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "७ दिन",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "६५० रोज़",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "नहीं",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "२०००",
+     "agent": "Confirm karta hoon: saat din, chhe sau pachaas roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar paanch sau pachaas. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki do hazaar paanch sau pachaas rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 7,
+      "rate": 650,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X19",
+   "class": "H",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1200,
+   "expected_outstanding": 1200,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "shikayat karni hai",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "3000",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, koi advance nahi, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila teen hazaar, kul mila teen hazaar. Baaki ek hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    }
+   ]
+  },
+  {
+   "id": "X20",
+   "class": "H",
+   "hard": false,
+   "passed": true,
+   "completed": true,
+   "correct": true,
+   "outstanding": 1200,
+   "expected_outstanding": 1200,
+   "missing": [],
+   "repeats": 0,
+   "agent_lines": 6,
+   "worker_turns": 6,
+   "auto_yes": 0,
+   "reasks": 0,
+   "unresolved": 0,
+   "ctx_turns": 0,
+   "ctx_acked": 0,
+   "sources": [
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules",
+    "rules"
+   ],
+   "transcript": [
+    {
+     "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
+    },
+    {
+     "worker": "thekedar bhaag gaya",
+     "agent": "Aapne kitne din kaam kiya?",
+     "state": "ASK_DAYS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": null,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "6 din",
+     "agent": "Roz ki mazdoori kitni tay hui thi?",
+     "state": "ASK_RATE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": null,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "700 roz",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": null,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "nahi",
+     "agent": "Ab tak kitne paise mile?",
+     "state": "ASK_PAYMENTS",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": null
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "3000",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, koi advance nahi, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance shunya, ab tak mila teen hazaar, kul mila teen hazaar. Baaki ek hazaar do sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "action": null,
+     "formula": null,
+     "clarify": null,
+     "facts": {
+      "days": 6,
+      "rate": 700,
+      "advance": 0,
+      "payments": 3000
+     },
+     "source": "rules"
+    }
+   ]
+  }
+ ]
+}

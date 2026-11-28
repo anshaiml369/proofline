@@ -145,6 +145,9 @@ def _number_groups(text):
             gap = gap or seen
             prev_number = False
     flush()
+    words = [t for t in toks if t != ";"]
+    if not groups and len(words) == 1 and _SCALES.get(words[0], 0) >= 1000:
+        groups.append([_SCALES[words[0]], 0, 0])          # a bare "hazaar" is one thousand
 
     def nearby(j, step, n=2):
         """Up to n words next to an amount, stopping at a comma or another number."""
@@ -211,7 +214,7 @@ def says_none(text):
     tokens = set(_tokens(text))
     if tokens & _UNSURE:          # "pata nahi" = don't know, not "got nothing"
         return False
-    return bool(tokens & (_NO | {"kuch", "zero", "shunya", "कुछ"})) and not parse_amounts(text)
+    return bool(tokens & (_NO | {"kuch", "zero", "shunya", "कुछ", "nil", "nothing", "none"})) and not parse_amounts(text)
 
 
 def tokens(text):

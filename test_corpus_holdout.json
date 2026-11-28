@@ -1,0 +1,472 @@
+[
+ {
+  "id": "X1",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise baaki",
+   "chaar mahine, hafte mein chhe din",
+   "600 roz",
+   "advance nahi",
+   "50000 mile"
+  ],
+  "expected_canonical": {
+   "days": 104,
+   "rate": 600,
+   "advance": 0,
+   "payments": 50000
+  },
+  "expected_outstanding": 12400,
+  "must_contain_in_agent": [
+   "104"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "4 x 4.33 x 6 = 103.9 -> 104."
+ },
+ {
+  "id": "X2",
+  "class": "A period-not-daycount",
+  "turns": [
+   "hisaab",
+   "do hafte, hafte mein 5 din",
+   "700 roz",
+   "nahi",
+   "5000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 700,
+   "advance": 0,
+   "payments": 5000
+  },
+  "expected_outstanding": 2000,
+  "must_contain_in_agent": [
+   "10"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X3",
+  "class": "A period-not-daycount",
+  "turns": [
+   "paise nahi mile",
+   "2-3 hafte",
+   "500 roz",
+   "nahi",
+   "6000"
+  ],
+  "expected_canonical": {
+   "days": 18,
+   "rate": 500,
+   "advance": 0,
+   "payments": 6000
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [
+   "18"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Range: upper end (3 weeks x 6)."
+ },
+ {
+  "id": "X4",
+  "class": "A period-not-daycount",
+  "turns": [
+   "pagar baaki",
+   "ek mahina, sirf Sunday chhutti",
+   "650 roz",
+   "nahi",
+   "10000"
+  ],
+  "expected_canonical": {
+   "days": 26,
+   "rate": 650,
+   "advance": 0,
+   "payments": 10000
+  },
+  "expected_outstanding": 6900,
+  "must_contain_in_agent": [
+   "26"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "1 x 4.33 x 6 = 26."
+ },
+ {
+  "id": "X5",
+  "class": "B rate-period",
+  "turns": [
+   "paise nahi mile",
+   "10 din",
+   "mahine ki 13000 salary",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 500,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [
+   "500"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "13000 / 26 = 500."
+ },
+ {
+  "id": "X6",
+  "class": "B rate-period",
+  "turns": [
+   "hisaab",
+   "6 din",
+   "hafte ke 4800",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 800,
+   "advance": 0,
+   "payments": 1000
+  },
+  "expected_outstanding": 3800,
+  "must_contain_in_agent": [
+   "800"
+  ],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X7",
+  "class": "B rate-period",
+  "turns": [
+   "paise kam",
+   "8 din",
+   "700-800 roz",
+   "750",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 8,
+   "rate": 750,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 4000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": "Range answered with a number inside it."
+ },
+ {
+  "id": "X8",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "5 din, 600 roz",
+   "khane ke 250 kaat liye",
+   "nahi",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 5,
+   "rate": 600,
+   "advance": 0,
+   "payments": 1000,
+   "deductions": 250
+  },
+  "expected_outstanding": 1750,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X9",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "7 din",
+   "500 roz",
+   "bonus 700 bola tha",
+   "nahi",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 500,
+   "advance": 0,
+   "payments": 2000,
+   "bonus": 700
+  },
+  "expected_outstanding": 2200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X10",
+  "class": "C deductions/non-cash",
+  "turns": [
+   "6 din",
+   "800 roz",
+   "nahi",
+   "1000 UPI aur 2000 cash"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 800,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1800,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X11",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "9 din",
+   "600 roz",
+   "thekedar se 2000 liya tha",
+   "haan katenge",
+   "1000"
+  ],
+  "expected_canonical": {
+   "days": 9,
+   "rate": 600,
+   "advance": 2000,
+   "payments": 1000
+  },
+  "expected_outstanding": 2400,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": ""
+ },
+ {
+  "id": "X12",
+  "class": "D advance-ambiguity",
+  "turns": [
+   "10 din",
+   "500 roz",
+   "bhai se 1000 udhaar liya, woh alag hai",
+   "2000 mile"
+  ],
+  "expected_canonical": {
+   "days": 10,
+   "rate": 500,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 3000,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": "Private loan said with 'alag'; advance never said, so it is asked."
+ },
+ {
+  "id": "X13",
+  "class": "E context/emotion",
+  "turns": [
+   "mujhe darr lag raha hai",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X14",
+  "class": "E context/emotion",
+  "turns": [
+   "kya yeh sarkari app hai",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X15",
+  "class": "F corrections",
+  "turns": [
+   "7 din",
+   "nahi nahi 6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X16",
+  "class": "F corrections",
+  "turns": [
+   "6 din",
+   "700 roz",
+   "500 advance",
+   "galti se bola, 300 advance",
+   "2000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 300,
+   "payments": 2000
+  },
+  "expected_outstanding": 1900,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": true,
+  "notes": ""
+ },
+ {
+  "id": "X17",
+  "class": "G format",
+  "turns": [
+   "saat din",
+   "chhe sau pachaas",
+   "nahi",
+   "do hazaar"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 650,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 2550,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X18",
+  "class": "G format",
+  "turns": [
+   "७ दिन",
+   "६५० रोज़",
+   "नहीं",
+   "२०००"
+  ],
+  "expected_canonical": {
+   "days": 7,
+   "rate": 650,
+   "advance": 0,
+   "payments": 2000
+  },
+  "expected_outstanding": 2550,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X19",
+  "class": "H dispute/legal",
+  "turns": [
+   "shikayat karni hai",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ },
+ {
+  "id": "X20",
+  "class": "H dispute/legal",
+  "turns": [
+   "thekedar bhaag gaya",
+   "6 din",
+   "700 roz",
+   "nahi",
+   "3000"
+  ],
+  "expected_canonical": {
+   "days": 6,
+   "rate": 700,
+   "advance": 0,
+   "payments": 3000
+  },
+  "expected_outstanding": 1200,
+  "must_contain_in_agent": [],
+  "must_not_repeat": true,
+  "must_pass_hard": false,
+  "scripted_confirm": false,
+  "notes": ""
+ }
+]

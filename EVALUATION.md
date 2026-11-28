@@ -1,6 +1,160 @@
 # PagarSaathi: before and after, measured
 
-Every number on this page was printed by `evaluate.py` on the 32-case test set ([TEST_SET.md](TEST_SET.md)). Full transcripts are in `eval/results/`.
+## Phase 16: observations and derivation
+
+Every number in this section was printed by `evaluate.py` and is pasted from `eval/results/corpus_summary.txt`, `eval/results/holdout_run1.txt` and `eval/results/summary_phase16_testset.txt`. Transcripts are in `eval/results/corpus_*.json` and `eval/results/corpus_holdout_*.json`. To reproduce:
+
+```bash
+python3 evaluate.py --corpus test_corpus.json
+```
+
+```bash
+python3 evaluate.py --corpus test_corpus_holdout.json
+```
+
+**What is compared:**
+- **v3-before** is `legacy/v3_current.py`, a snapshot of `conversation.py` at tag `v3-before-derivation` (b379e75).
+- **v4** is `conversation.py` with `observe.py` and `derive.py`.
+
+**Rules path only.** Both columns ran without an LLM. The OpenAI key in the local `.env` is rejected (`agent_llm.decide` returns `None`), so the `v3-before-llm` and `v4-llm` backends could not be measured on this machine. The live site's key works. To measure the LLM path:
+
+```bash
+python3 evaluate.py --corpus test_corpus.json v3-before-llm v4-llm
+```
+
+The corpus classes and the simulated worker are described in [TEST_CORPUS.md](TEST_CORPUS.md). It has 115 cases, because the brief's per-class counts add up to 115.
+
+### The proof conversation (A1)
+
+A1 5-6 months → 130 days → ₹700: v3-before FAIL, v4 PASS
+
+| Worker | v3-before | v4 |
+|---|---|---|
+| (opening) | Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai? | Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai? |
+| meri pagar badhao. | Aapne kitne din kaam kiya? | Pagar badhwane se pehle, jo baaki hai uska hisaab pakka karte hain. Aapne kitne din kaam kiya? |
+| kuch 5-6 mahine | Theek hai. Us mahine mein asal mein kitne din kaam kiya? Chhutti ke din chhod kar boliye. | 5-6 mahine, mahine ke 26 kaam ke din — matlab kareeb 156 din. Sahi hai, ya hafte mein kam din jaate the? `5-6 mo (6 used) × 26 d/mo ≈ 156` |
+| maine kareeb har hafte ke paanch din | Roz ki mazdoori kitni tay hui thi? | 5-6 mahine, hafte mein 5 din — matlab kareeb 130 din. Sahi hai? `5-6 mo (6 used) × 4.33 wk × 5 d/wk ≈ 130` |
+| Hafte mein 7 din mein se 5 din kaam kiye. 5 din | Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye. | Theek hai, 130 din. Roz ki mazdoori kitni tay hui thi? |
+| roz 700 | Koi advance mila tha pehle? | Koi advance mila tha pehle? |
+| advance nahi mila | Ab tak kitne paise mile? | Ab tak kitne paise mile? |
+| nabbe hazaar teen sau mile | Confirm karta hoon: paanch din, saat sau roz, koi advance nahi, nabbe hazaar teen sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye. | Confirm karta hoon: ek sau tees din, saat sau roz, koi advance nahi, nabbe hazaar teen sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye. |
+| haan | Kul kamaai teen hazaar paanch sau. Advance shunya, ab tak mila nabbe hazaar teen sau, kul mila nabbe hazaar teen sau. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya. | Kul kamaai ikyaanave hazaar. Advance shunya, ab tak mila nabbe hazaar teen sau, kul mila nabbe hazaar teen sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun? |
+| **outstanding** | 0 | 700 |
+
+### Corpus: 115 cases
+
+| Metric | v3-before | v4 |
+|---|---|---|
+| Passed (all checks) (%) | 40.9 | 100.0 |
+| Task completion (%) | 82.6 | 100.0 |
+| Correct outstanding (%) | 53.9 | 100.0 |
+| Verbatim repetition rate (% of agent lines) | 0.2 | 0.0 |
+| Avg worker turns (completed cases) | 5.78 | 6.02 |
+| Re-asks per slot | 0.17 | 0.085 |
+| Context acknowledged (% of context turns) | 12.5 | 95.8 |
+| Irritation proxy (re-asks + unresolved conflicts per completed case) | 0.24 | 0.34 |
+| Same, over all cases (unfinished ones included) | 0.68 | 0.34 |
+| Context turns measured | 24 | 24 |
+| Turns: LLM / fallback / rules | 0 / 0 / 652 | 0 / 0 / 692 |
+
+| Class | v3-before | v4 |
+|---|---|---|
+| A | 0/15 | 15/15 |
+| B | 2/15 | 15/15 |
+| C | 5/15 | 15/15 |
+| D | 9/15 | 15/15 |
+| E | 5/10 | 10/10 |
+| F | 4/15 | 15/15 |
+| G | 12/15 | 15/15 |
+| H | 10/15 | 15/15 |
+
+**How to read this table:**
+- **Re-asks per slot** counts turns where the agent is still on the same number question after the worker spoke.
+- **The irritation proxy** is (re-asks + unresolved contradictions) per **completed** case, as the brief defines it. v3-before's re-asks sit mostly in the 20 cases it never finished, so they drop out of that average. The row below it counts every case.
+- **Average worker turns** rose by about 0.2. That is the cost of the confirmation turn ("…130 din. Sahi hai?") that every derived number now gets.
+
+**This corpus is not held out.** The first run of v4 on it, before any fixes, printed:
+- 78.3% passed, 93.9% completed, 87.8% correct outstanding.
+- v3-before printed 38.3% passed.
+
+The failures in that run were real bugs, fixed in this phase. Each now has a regression test in `tests/test_observations.py`:
+- A number for another slot said while a derived number waited for a yes was lost.
+- A corrected period was rephrased away instead of being proposed.
+- "6 nahi 5" and "pehle 700 bola tha, 650 sahi hai" were ignored, or summed into the advance.
+- A second, different day count silently overwrote the first.
+- "nahi, din 5 the" at the read-back restarted the whole case.
+- "advance 1000 mila tha" was counted as both advance and payment.
+- "ek trip ke 150" was read as 1 trip a day.
+- "seven hundred per day" was read as 700 days.
+
+v3-before went from 38.3% to 40.9% passed between the two runs, because nine `must_contain_in_agent` strings in classes E and H were corrected (see TEST_CORPUS.md).
+
+### Held-out: 20 cases, first and only tuned-free run
+
+These cases were written after the fixes above, run once, and not tuned on.
+
+| Metric | v3-before | v4 |
+|---|---|---|
+| Passed (all checks) (%) | 50.0 | 95.0 |
+| Task completion (%) | 90.0 | 100.0 |
+| Correct outstanding (%) | 50.0 | 95.0 |
+| Verbatim repetition rate (% of agent lines) | 0.0 | 0.0 |
+| Avg worker turns (completed cases) | 5.78 | 6.1 |
+| Re-asks per slot | 0.138 | 0.075 |
+| Context acknowledged (% of context turns) | 0.0 | 0.0 |
+| Irritation proxy (re-asks + unresolved conflicts per completed case) | 0.17 | 0.3 |
+| Same, over all cases (unfinished ones included) | 0.55 | 0.3 |
+| Context turns measured | 0 | 0 |
+| Turns: LLM / fallback / rules | 0 / 0 / 114 | 0 / 0 / 122 |
+
+| Class | v3-before | v4 |
+|---|---|---|
+| A | 0/4 | 4/4 |
+| B | 0/3 | 3/3 |
+| C | 1/3 | 3/3 |
+| D | 1/2 | 1/2 |
+| E | 2/2 | 2/2 |
+| F | 2/2 | 2/2 |
+| G | 2/2 | 2/2 |
+| H | 2/2 | 2/2 |
+
+**What the held-out run shows:**
+- **X12 fails on v4.** The worker said "bhai se 1000 udhaar liya, woh alag hai". `observe.py` sees the loan is private, but on the rules path the core still stores 1000 as the advance. This is a known bug and is left unfixed.
+- **0 context turns were detected** in the held-out lines. `observe.py`'s context words miss "darr lag raha hai", "sarkari app", "shikayat karni hai" and "thekedar bhaag gaya". This is a gap in the context detector, not an acknowledgement result.
+- **A second run was made after a later change.** A private-loan acknowledgement was added after the original test set's I2 case. In that run (`eval/results/holdout_run2.txt`), X12 still fails, and its loan line now counts as one acknowledged context turn for both backends.
+
+### The original 32-case test set after Phase 16
+
+`python3 evaluate.py v3-fallback` is the rules path of `conversation.py`, which is now v4:
+
+v3-fallback: 32 cases in 0.0s; wrong or no result: none
+
+| Metric | v3-fallback |
+|---|---|
+| Slot accuracy (%) | 100.0 |
+| Math correctness (%) | 100.0 |
+| Completed to a result (%) | 100.0 |
+| Verbatim repetition rate (% of agent lines) | 0.0 |
+| Cases with any repeat | 0 |
+| Avg worker turns to result | 5.75 |
+| Bundled-input success (%) | 100.0 |
+| Context acknowledgement (%) | 83.3 |
+| Turns: LLM / fallback / rules | 0 / 184 / 0 |
+
+Before this phase, the same command printed:
+- slots 93.0%, maths 84.4%, completed 90.6%;
+- bundled 85.7%, context 66.7%;
+- failures: C2, G1, I2, N1, N2.
+
+That run used the committed code at b379e75, in a clean `git worktree`. During this phase, this set also exposed problems in the new code: C2, I2, M1 and N1 regressed at first and were then fixed. So it is not held-out evidence for v4 either. The v3-fallback column further down this page is older still. It comes from run 2, before later phases.
+
+**One wording fix during this phase.** The health acknowledgement changed from "Tabiyat kharab thi" (you were ill) to "Yeh sunkar dukh hua, samajh sakta hoon". The old line was wrong when the person who was ill was the worker's wife (case C2).
+
+---
+
+## Earlier phases (32-case test set)
+
+Every number in this part was printed by `evaluate.py` on the 32-case test set ([TEST_SET.md](TEST_SET.md)). Full transcripts are in `eval/results/`.
 
 To reproduce (v2-llm and v3 need `OPENAI_API_KEY` or `OPENROUTER_API_KEY`):
 

@@ -1,0 +1,42 @@
+v3-before: 115 cases in 0.1s; failed 68: A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, B1, B2, B3, B4, B6, B7, B8, B9, B10, B12, B13, B14, B15, C1, C2, C3, C5, C6, C8, C10, C11, C13, C14, D1, D2, D3, D4, D8, D11, E2, E4, E5, E6, E8, F1, F2, F3, F4, F5, F6, F7, F8, F10, F11, F15, G13, G14, G15, H1, H2, H5, H6, H14; HARD FAIL: A1
+v4: 115 cases in 0.1s; failed 0: none
+
+| Metric | v3-before | v4 |
+|---|---|---|
+| Passed (all checks) (%) | 40.9 | 100.0 |
+| Task completion (%) | 82.6 | 100.0 |
+| Correct outstanding (%) | 53.9 | 100.0 |
+| Verbatim repetition rate (% of agent lines) | 0.2 | 0.0 |
+| Avg worker turns (completed cases) | 5.78 | 6.02 |
+| Re-asks per slot | 0.17 | 0.085 |
+| Context acknowledged (% of context turns) | 12.5 | 95.8 |
+| Irritation proxy (re-asks + unresolved conflicts per completed case) | 0.24 | 0.34 |
+| Same, over all cases (unfinished ones included) | 0.68 | 0.34 |
+| Context turns measured | 24 | 24 |
+| Turns: LLM / fallback / rules | 0 / 0 / 652 | 0 / 0 / 692 |
+
+| Class | v3-before | v4 |
+|---|---|---|
+| A | 0/15 | 15/15 |
+| B | 2/15 | 15/15 |
+| C | 5/15 | 15/15 |
+| D | 9/15 | 15/15 |
+| E | 5/10 | 10/10 |
+| F | 4/15 | 15/15 |
+| G | 12/15 | 15/15 |
+| H | 10/15 | 15/15 |
+
+A1 5-6 months → 130 days → ₹700: v3-before FAIL, v4 PASS
+
+| Worker | v3-before | v4 |
+|---|---|---|
+| (opening) | Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai? | Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai? |
+| meri pagar badhao. | Aapne kitne din kaam kiya? | Pagar badhwane se pehle, jo baaki hai uska hisaab pakka karte hain. Aapne kitne din kaam kiya? |
+| kuch 5-6 mahine | Theek hai. Us mahine mein asal mein kitne din kaam kiya? Chhutti ke din chhod kar boliye. | 5-6 mahine, mahine ke 26 kaam ke din — matlab kareeb 156 din. Sahi hai, ya hafte mein kam din jaate the? `5-6 mo (6 used) × 26 d/mo ≈ 156` |
+| maine kareeb har hafte ke paanch din | Roz ki mazdoori kitni tay hui thi? | 5-6 mahine, hafte mein 5 din — matlab kareeb 130 din. Sahi hai? `5-6 mo (6 used) × 4.33 wk × 5 d/wk ≈ 130` |
+| Hafte mein 7 din mein se 5 din kaam kiye. 5 din | Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye. | Theek hai, 130 din. Roz ki mazdoori kitni tay hui thi? |
+| roz 700 | Koi advance mila tha pehle? | Koi advance mila tha pehle? |
+| advance nahi mila | Ab tak kitne paise mile? | Ab tak kitne paise mile? |
+| nabbe hazaar teen sau mile | Confirm karta hoon: paanch din, saat sau roz, koi advance nahi, nabbe hazaar teen sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye. | Confirm karta hoon: ek sau tees din, saat sau roz, koi advance nahi, nabbe hazaar teen sau paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye. |
+| haan | Kul kamaai teen hazaar paanch sau. Advance shunya, ab tak mila nabbe hazaar teen sau, kul mila nabbe hazaar teen sau. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya. | Kul kamaai ikyaanave hazaar. Advance shunya, ab tak mila nabbe hazaar teen sau, kul mila nabbe hazaar teen sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun? |
+| **outstanding** | 0 | 700 |

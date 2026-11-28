@@ -2,18 +2,18 @@
  "summary": {
   "version": "v3-fallback",
   "cases": 32,
-  "slot_accuracy": 93.0,
-  "math_correct": 84.4,
-  "completed": 90.6,
+  "slot_accuracy": 100.0,
+  "math_correct": 100.0,
+  "completed": 100.0,
   "repetition_rate": 0.0,
   "cases_with_repeat": 0,
-  "avg_turns_completed": 5.83,
-  "bundled_success": 85.7,
+  "avg_turns_completed": 5.75,
+  "bundled_success": 100.0,
   "bundled_cases": 7,
-  "context_ack": 66.7,
+  "context_ack": 83.3,
   "context_cases": 6,
   "llm_turns": 0,
-  "fallback_turns": 181,
+  "fallback_turns": 184,
   "rules_turns": 0,
   "seconds": 0.0
  },
@@ -459,14 +459,14 @@
    "id": "C2",
    "category": "C bundled+context",
    "slots": {
-    "days": false,
+    "days": true,
     "rate": true,
-    "advance": false,
+    "advance": true,
     "payments": true
    },
-   "math_ok": false,
-   "completed": false,
-   "outstanding": null,
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 2000,
    "expected": {
     "days": 5,
     "rate": 800,
@@ -475,32 +475,46 @@
     "outstanding": 2000
    },
    "final_facts": {
-    "days": null,
+    "days": 5,
     "rate": 800,
-    "advance": null,
+    "advance": 0,
     "payments": 2000
    },
-   "agent_lines": 1,
+   "agent_lines": 2,
    "repeats": 0,
-   "worker_turns": 1,
+   "worker_turns": 2,
    "context_ack": true,
-   "bundled_ok": false,
+   "bundled_ok": true,
    "sources": [
+    "fallback",
     "fallback"
    ],
-   "context_notes": [
-    "Was ill / in hospital for some days"
-   ],
+   "context_notes": [],
    "transcript": [
     {
      "agent": "Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?"
     },
     {
      "worker": "Meri biwi bimar thi isliye 2 din chhutti li, baaki 5 din kaam kiya, 800 roz, advance nahi, 2000 mile",
-     "agent": "Yeh sunkar dukh hua. Sirf jin dino kaam kiya, wahi ginenge. Aapne kitne din kaam kiya?",
-     "state": "ASK_DAYS",
+     "agent": "Yeh sunkar dukh hua, samajh sakta hoon. Theek hai, din 5. Theek hai, roz 800. Theek hai, advance 0. Theek hai, mile 2000. Confirm karta hoon: paanch din, aath sau roz, koi advance nahi, do hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
      "facts": {
+      "days": 5,
       "rate": 800,
+      "advance": 0,
+      "payments": 2000
+     },
+     "source": "fallback",
+     "action": "python_derived"
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar. Advance shunya, ab tak mila do hazaar, kul mila do hazaar. Baaki do hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 5,
+      "rate": 800,
+      "advance": 0,
       "payments": 2000
      },
      "source": "fallback",
@@ -563,7 +577,7 @@
     },
     {
      "worker": "pata nahi",
-     "agent": "Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
+     "agent": "Pakka yaad na ho to aise boliye: kitne hafte ya mahine kaam kiya, aur hafte mein kitne din?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "fallback",
@@ -571,7 +585,7 @@
     },
     {
      "worker": "yaad nahi",
-     "agent": "Koi baat nahi. Kisi saathi ki madad le lijiye. Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
+     "agent": "Hafte ke hisaab se sochiye: jis hafte ka paisa baaki hai, usme kitne din kaam par gaye?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "fallback",
@@ -703,7 +717,7 @@
     },
     {
      "worker": "pata nahi kitna tha",
-     "agent": "Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
+     "agent": "Roz, hafte ya mahine ka, jaise bhi paisa tay hua tha, waise hi boliye. Hisaab main kar lunga.",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -713,7 +727,7 @@
     },
     {
      "worker": "yaad nahi aa raha",
-     "agent": "Koi baat nahi. Kisi saathi ki madad le lijiye. Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
+     "agent": "Thekedar ne ek din ka kitna bola tha? Sirf rupaye boliye.",
      "state": "ASK_RATE",
      "facts": {
       "days": 6
@@ -826,7 +840,7 @@
     },
     {
      "worker": "nahi bataunga",
-     "agent": "Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
+     "agent": "Pakka yaad na ho to aise boliye: kitne hafte ya mahine kaam kiya, aur hafte mein kitne din?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "fallback",
@@ -957,7 +971,7 @@
     },
     {
      "worker": "yeh sab kyun poochh rahe ho, nahi bataunga",
-     "agent": "Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
+     "agent": "Roz, hafte ya mahine ka, jaise bhi paisa tay hua tha, waise hi boliye. Hisaab main kar lunga.",
      "state": "ASK_RATE",
      "facts": {
       "days": 5
@@ -1195,7 +1209,7 @@
     },
     {
      "worker": "aaj baarish bahut ho rahi hai",
-     "agent": "Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
+     "agent": "Pakka yaad na ho to aise boliye: kitne hafte ya mahine kaam kiya, aur hafte mein kitne din?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "fallback",
@@ -1266,14 +1280,14 @@
    "id": "G1",
    "category": "G contradiction",
    "slots": {
-    "days": false,
-    "rate": false,
-    "advance": false,
-    "payments": false
+    "days": true,
+    "rate": true,
+    "advance": true,
+    "payments": true
    },
-   "math_ok": false,
-   "completed": false,
-   "outstanding": null,
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 1000,
    "expected": {
     "days": 5,
     "rate": 700,
@@ -1282,17 +1296,18 @@
     "outstanding": 1000
    },
    "final_facts": {
-    "days": null,
-    "rate": null,
-    "advance": null,
-    "payments": null
+    "days": 5,
+    "rate": 700,
+    "advance": 500,
+    "payments": 2000
    },
-   "agent_lines": 6,
+   "agent_lines": 7,
    "repeats": 0,
-   "worker_turns": 6,
+   "worker_turns": 7,
    "context_ack": null,
    "bundled_ok": null,
    "sources": [
+    "fallback",
     "fallback",
     "fallback",
     "fallback",
@@ -1361,9 +1376,27 @@
     },
     {
      "worker": "nahi, 5 din the",
-     "agent": "Theek hai, phir se shuru karte hain. Aapne kitne din kaam kiya?",
-     "state": "ASK_DAYS",
-     "facts": {},
+     "agent": "Theek hai, din paanch kar diya. Confirm karta hoon: paanch din, saat sau roz, paanch sau advance, do hazaar paid. Sahi hai?",
+     "state": "CONFIRM",
+     "facts": {
+      "days": 5,
+      "rate": 700,
+      "advance": 500,
+      "payments": 2000
+     },
+     "source": "fallback",
+     "action": null
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai teen hazaar paanch sau. Advance paanch sau, ab tak mila do hazaar, kul mila do hazaar paanch sau. Baaki ek hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "days": 5,
+      "rate": 700,
+      "advance": 500,
+      "payments": 2000
+     },
      "source": "fallback",
      "action": null
     }
@@ -1745,7 +1778,7 @@
    "agent_lines": 7,
    "repeats": 0,
    "worker_turns": 7,
-   "context_ack": false,
+   "context_ack": true,
    "bundled_ok": null,
    "sources": [
     "fallback",
@@ -1792,19 +1825,18 @@
     },
     {
      "worker": "manager se paanch hazaar liya",
-     "agent": "Ab tak kitne paise mile?",
-     "state": "ASK_PAYMENTS",
+     "agent": "Kya woh 5000 rupaye aapki mazdoori mein se kaate gaye ya katenge?",
+     "state": "ASK_ADVANCE",
      "facts": {
       "days": 30,
-      "rate": 600,
-      "advance": 5000
+      "rate": 600
      },
      "source": "fallback",
-     "action": null
+     "action": "clarify"
     },
     {
      "worker": "haan, pagar mein se kaat liya",
-     "agent": "Advance ke alawa ab tak kitne rupaye mile? Kuch nahi mila to boliye nahi.",
+     "agent": "Theek hai, 5000 advance mein gine. Ab tak kitne paise mile?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 30,
@@ -1812,7 +1844,7 @@
       "advance": 5000
      },
      "source": "fallback",
-     "action": null
+     "action": "python_derived"
     },
     {
      "worker": "8000 mile",
@@ -1848,12 +1880,12 @@
    "slots": {
     "days": true,
     "rate": true,
-    "advance": false,
+    "advance": true,
     "payments": true
    },
-   "math_ok": false,
+   "math_ok": true,
    "completed": true,
-   "outstanding": 1000,
+   "outstanding": 3000,
    "expected": {
     "days": 10,
     "rate": 700,
@@ -1864,7 +1896,7 @@
    "final_facts": {
     "days": 10,
     "rate": 700,
-    "advance": 2000,
+    "advance": 0,
     "payments": 4000
    },
    "agent_lines": 6,
@@ -1881,7 +1913,7 @@
     "fallback"
    ],
    "context_notes": [
-    "Took a loan"
+    "Private loan, not cut from wages"
    ],
    "transcript": [
     {
@@ -1918,24 +1950,24 @@
     },
     {
      "worker": "dost se 2000 udhaar liya tha, woh alag hai, advance nahi mila",
-     "agent": "Samajh gaya. Jo loan aapki mazdoori se kaata gaya, use advance mein ginenge. Ab tak kitne paise mile?",
+     "agent": "Woh alag udhaar hai, use mazdoori mein nahi ginenge. Theek hai, advance 0. Ab tak kitne paise mile?",
      "state": "ASK_PAYMENTS",
      "facts": {
       "days": 10,
       "rate": 700,
-      "advance": 2000
+      "advance": 0
      },
      "source": "fallback",
-     "action": null
+     "action": "python_derived"
     },
     {
      "worker": "4000 mile",
-     "agent": "Confirm karta hoon: das din, saat sau roz, do hazaar advance, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Confirm karta hoon: das din, saat sau roz, koi advance nahi, chaar hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 10,
       "rate": 700,
-      "advance": 2000,
+      "advance": 0,
       "payments": 4000
      },
      "source": "fallback",
@@ -1943,12 +1975,12 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai saat hazaar. Advance do hazaar, ab tak mila chaar hazaar, kul mila chhe hazaar. Baaki ek hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "agent": "Kul kamaai saat hazaar. Advance shunya, ab tak mila chaar hazaar, kul mila chaar hazaar. Baaki teen hazaar rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
      "state": "ASK_SEND",
      "facts": {
       "days": 10,
       "rate": 700,
-      "advance": 2000,
+      "advance": 0,
       "payments": 4000
      },
      "source": "fallback",
@@ -2658,7 +2690,7 @@
     },
     {
      "worker": "Dekho bhai, Somvaar se Shanivaar tak chhe din kaam kiya site pe, thekedar ne saat sau roz bola tha, shuru mein paanch sau advance diya aur kal teen hazaar diye, baaki nahi diya",
-     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Theek hai, din 6. Theek hai, roz 700. Theek hai, advance 500. Theek hai, mile 3000. Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
       "days": 6,
@@ -2667,7 +2699,7 @@
       "payments": 3000
      },
      "source": "fallback",
-     "action": null
+     "action": "python_derived"
     },
     {
      "worker": "haan",
@@ -2765,13 +2797,13 @@
    "category": "N skip ahead",
    "slots": {
     "days": true,
-    "rate": false,
+    "rate": true,
     "advance": true,
     "payments": true
    },
-   "math_ok": false,
+   "math_ok": true,
    "completed": true,
-   "outstanding": 0,
+   "outstanding": 700,
    "expected": {
     "days": 6,
     "rate": 700,
@@ -2781,7 +2813,7 @@
    },
    "final_facts": {
     "days": 6,
-    "rate": 500,
+    "rate": 700,
     "advance": 500,
     "payments": 3000
    },
@@ -2813,17 +2845,20 @@
     },
     {
      "worker": "700 roz milta tha",
-     "agent": "Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
+     "agent": "Theek hai, roz 700. Aapne kitne din kaam kiya?",
      "state": "ASK_DAYS",
-     "facts": {},
+     "facts": {
+      "rate": 700
+     },
      "source": "fallback",
-     "action": null
+     "action": "python_derived"
     },
     {
      "worker": "6 din",
-     "agent": "Roz ki mazdoori kitni tay hui thi?",
-     "state": "ASK_RATE",
+     "agent": "Koi advance mila tha pehle?",
+     "state": "ASK_ADVANCE",
      "facts": {
+      "rate": 700,
       "days": 6
      },
      "source": "fallback",
@@ -2834,8 +2869,8 @@
      "agent": "Ab tak kitne paise mile?",
      "state": "ASK_PAYMENTS",
      "facts": {
+      "rate": 700,
       "days": 6,
-      "rate": 500,
       "advance": 500
      },
      "source": "fallback",
@@ -2843,11 +2878,11 @@
     },
     {
      "worker": "3000 mile",
-     "agent": "Confirm karta hoon: chhe din, paanch sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
      "state": "CONFIRM",
      "facts": {
+      "rate": 700,
       "days": 6,
-      "rate": 500,
       "advance": 500,
       "payments": 3000
      },
@@ -2856,11 +2891,11 @@
     },
     {
      "worker": "haan",
-     "agent": "Kul kamaai teen hazaar. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Hisaab ke hisaab se koi paisa baaki nahi hai. Case save ho gaya.",
-     "state": "DONE",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
      "facts": {
+      "rate": 700,
       "days": 6,
-      "rate": 500,
       "advance": 500,
       "payments": 3000
      },
@@ -2876,11 +2911,11 @@
     "days": true,
     "rate": true,
     "advance": true,
-    "payments": false
+    "payments": true
    },
-   "math_ok": false,
-   "completed": false,
-   "outstanding": null,
+   "math_ok": true,
+   "completed": true,
+   "outstanding": 700,
    "expected": {
     "days": 6,
     "rate": 700,
@@ -2892,14 +2927,15 @@
     "days": 6,
     "rate": 700,
     "advance": 500,
-    "payments": null
+    "payments": 3000
    },
-   "agent_lines": 5,
+   "agent_lines": 6,
    "repeats": 0,
-   "worker_turns": 5,
+   "worker_turns": 6,
    "context_ack": null,
    "bundled_ok": null,
    "sources": [
+    "fallback",
     "fallback",
     "fallback",
     "fallback",
@@ -2921,17 +2957,20 @@
     },
     {
      "worker": "3000 mile hain bas",
-     "agent": "Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
+     "agent": "Theek hai, mile 3000. Aapne kitne din kaam kiya?",
      "state": "ASK_DAYS",
-     "facts": {},
+     "facts": {
+      "payments": 3000
+     },
      "source": "fallback",
-     "action": null
+     "action": "python_derived"
     },
     {
      "worker": "6 din",
      "agent": "Roz ki mazdoori kitni tay hui thi?",
      "state": "ASK_RATE",
      "facts": {
+      "payments": 3000,
       "days": 6
      },
      "source": "fallback",
@@ -2942,6 +2981,7 @@
      "agent": "Koi advance mila tha pehle?",
      "state": "ASK_ADVANCE",
      "facts": {
+      "payments": 3000,
       "days": 6,
       "rate": 700
      },
@@ -2950,9 +2990,23 @@
     },
     {
      "worker": "500 advance",
-     "agent": "Ab tak kitne paise mile?",
-     "state": "ASK_PAYMENTS",
+     "agent": "Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? Overtime ya katauti thi to woh bhi bataiye.",
+     "state": "CONFIRM",
      "facts": {
+      "payments": 3000,
+      "days": 6,
+      "rate": 700,
+      "advance": 500
+     },
+     "source": "fallback",
+     "action": null
+    },
+    {
+     "worker": "haan",
+     "agent": "Kul kamaai chaar hazaar do sau. Advance paanch sau, ab tak mila teen hazaar, kul mila teen hazaar paanch sau. Baaki saat sau rupaye. Ab kya karun: message bhejun, escalate karun, ya sirf case save karun?",
+     "state": "ASK_SEND",
+     "facts": {
+      "payments": 3000,
       "days": 6,
       "rate": 700,
       "advance": 500
@@ -3265,7 +3319,7 @@
     },
     {
      "worker": "hmm",
-     "agent": "Kitne din kaam kiya? Sirf number boliye, jaise chhe din.",
+     "agent": "Pakka yaad na ho to aise boliye: kitne hafte ya mahine kaam kiya, aur hafte mein kitne din?",
      "state": "ASK_DAYS",
      "facts": {},
      "source": "fallback",
@@ -3396,7 +3450,7 @@
     },
     {
      "worker": "...",
-     "agent": "Ek din ke kitne rupaye tay hue the? Jaise saat sau rupaye.",
+     "agent": "Roz, hafte ya mahine ka, jaise bhi paisa tay hua tha, waise hi boliye. Hisaab main kar lunga.",
      "state": "ASK_RATE",
      "facts": {
       "days": 6

@@ -92,7 +92,9 @@ def test_number_not_said_by_worker_is_rejected():
     s = started()
     s["state"] = c.ASK_DAYS
     r = c.step_policy(s, "ek hafta", decided(text="Achha, saat din. Roz kitna milta tha?", extracted=[x("days", 7)]))
-    assert "days" not in s["facts"] and r["agent_text"].startswith("Maaf kijiye")
+    # the model's 7 was never said; Phase 16: Python derives 1 week x 6 days and asks, stating the assumption
+    assert "days" not in s["facts"] and r["action"] == "confirm_derived"
+    assert "6 din" in r["agent_text"] and "saat" not in r["agent_text"] and "7" not in r["agent_text"]
 
 
 def test_model_never_states_a_total():
@@ -290,7 +292,7 @@ def test_rules_years_and_week_are_clarified_not_stored():
     r = c.step(s, "maine 3 saal kaam kiya", c.local_extract)
     assert "days" not in s["facts"] and "Lamba saath" in r["agent_text"]
     r = c.step(s, "ek hafta", c.local_extract)
-    assert "days" not in s["facts"] and "chhe ya saat" in r["agent_text"]
+    assert "days" not in s["facts"] and "hafte mein kam din" in r["agent_text"]   # Phase 16: assumption stated
     r = c.step(s, "hafte mein 6 din", c.local_extract)
     assert s["facts"]["days"] == 6
 
