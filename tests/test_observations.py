@@ -184,3 +184,21 @@ def test_llm_misread_amount_falls_back_to_python_reading():             # live A
         c.step_policy(s, "nabbe hazaar teen sau mile",
                       decided("Theek hai.", extracted=[{"slot": "payments", "value": wrong, "confidence": "high"}]))
         assert s["facts"]["payments"] == 90300 and s["state"] == c.CONFIRM
+
+
+def test_llm_question_asking_two_numbers_becomes_one():                 # live A1, first turn
+    s = started()
+    llm = ("Pagar badhwane se pehle, jo baaki hai uska hisaab pakka karte hain. "
+           "Abhi ke liye, aapne kitne din kaam kiya aur roz kitna milta tha, bataiye?")
+    r = c.step_policy(s, "meri pagar badhao.", decided(llm, [{"type": "context", "text": "pagar badhao",
+                                                              "category": "wage_raise"}], "acknowledge_context"))
+    assert r["agent_text"] == ("Pagar badhwane se pehle, jo baaki hai uska hisaab pakka karte hain. "
+                               "Aapne kitne din kaam kiya?")
+    assert c._asks_many(r["agent_text"]) == ["days"]
+
+
+def test_one_number_questions_from_the_llm_are_kept():
+    s = started()
+    llm = "Achha. Abhi tak kitne din kaam kiya hai jiski payment baaki hai?"
+    r = c.step_policy(s, "paise nahi mile", decided(llm))
+    assert r["agent_text"] == llm

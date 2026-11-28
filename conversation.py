@@ -1546,6 +1546,27 @@ def _question_only(line):
     return " ".join(parts[asks[-1]:]) if asks else line
 
 
+_SLOT_ASKS = {"days": re.compile(r"kitne din|kitne dino|कितने दिन"),
+              "rate": re.compile(r"\broz(ana)?\b[^?]*kit?n|mazdoori kitni|ek din ke kitne|din ka kitna|रोज़?[^?]*कितन"),
+              "advance": re.compile(r"advance|एडवांस"),
+              "payments": re.compile(r"kitne paise mile|kitna paisa mila|ab tak kitn|kitne rupaye mile|अब तक कितन")}
+
+
+def _asks_many(line):
+    """Slots asked in the line's question sentences: "kitne din kaam kiya aur roz kitna milta tha?" -> 2."""
+    qs = " ".join(p for p in re.split(r"(?<=[.?!।])\s+", (line or "").lower()) if p.endswith("?"))
+    return [k for k, rx in _SLOT_ASKS.items() if rx.search(qs)]
+
+
+def _one_question(reply, state):
+    """The LLM's statements, then Python's one question for this state (never two numbers at once)."""
+    def keep(line):
+        return " ".join(p for p in re.split(r"(?<=[.?!।])\s+", (line or "").strip()) if p and not p.endswith("?"))
+    q = STATES[state]["question_hi"]
+    shown, spoken = keep(reply["agent_text"]), keep(reply["speak_text"])
+    return (_join((shown + " ", (spoken or shown) + " "), q) if shown else q)
+
+
 def _post(session, text, reply, before_state, policy=False):
     """Every collecting reply passes here: one acknowledgement for context, never a near-repeat,
     and a rephrase changes the question's type, not only its words."""
@@ -1556,6 +1577,10 @@ def _post(session, text, reply, before_state, policy=False):
     st = reply.get("state")
     qtype = _qtype(session, reply)
     slot_state = st if st in SLOT_OF else None
+    if policy and slot_state and not str(reply.get("action") or "").startswith("python_") and \
+            len(_asks_many(reply["agent_text"])) > 1:
+        _set_line(session, reply, _one_question(reply, st))
+        session["turns"][-1]["guarded"] = "one question"
     if slot_state and st in STATES and session.get("language", "hi") in ("hi", "en-mix", "bho"):
         # "…52 din. Sahi hai?" then "…26 din. Sahi hai?" is a new number, not a repeat
         new_number = reply.get("action") == "confirm_derived" and \
