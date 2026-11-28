@@ -6,6 +6,7 @@ No API key is needed for the core flow. Optional extras, only if keys are set:
   worker actually said (agent_llm.py). It never calculates.
 - SARVAM_API_KEY: Sarvam Bulbul, a natural Hindi voice for the agent
 """
+import logging
 import os
 import threading
 import time
@@ -29,6 +30,7 @@ SESSION_TTL_S = 2 * 60 * 60
 RATE_LIMIT, RATE_WINDOW_S = 120, 10 * 60   # turns per visitor per 10 minutes
 
 app = Flask(__name__)
+app.logger.setLevel(logging.INFO)   # per-turn timing lines show in Railway logs
 app.config["MAX_CONTENT_LENGTH"] = 64 * 1024
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)  # real client IP behind Railway's proxy
 database.init_db()
@@ -46,14 +48,18 @@ def env_key(name):
 
 # ---------- optional: Sarvam voice (natural Hindi); the browser voice is the free fallback ----------
 
-def agent_audio_url(agent_text, speak_text, scripted):
+def agent_audio(agent_text, speak_text, scripted):
+    """(url, source) for the agent's voice. source: "recorded" (static/demo clip), "sarvam"
+    (live Bulbul), or None, which means the browser speaks the line itself."""
     name = sarvam_tts.audio_name(agent_text)
     if os.path.exists(os.path.join(DEMO_DIR, name)):       # pre-recorded, free
-        return f"/static/demo/{name}"
+        return f"/static/demo/{name}", "recorded"
     if scripted or not env_key("SARVAM_API_KEY"):
-        return None
+        return None, None
+    started = time.time()
     name = sarvam_tts.synthesize(speak_text, env_key("SARVAM_API_KEY"), TTS_DIR, app.logger)
-    return f"/static/tts/{name}" if name else None
+    app.logger.info("tts sarvam %s in %.2fs", "ok" if name else "FAILED", time.time() - started)
+    return (f"/static/tts/{name}", "sarvam") if name else (None, None)
 
 
 def rate_limited():
@@ -80,14 +86,20 @@ def get_session(session_id):
         return session
 
 
-def respond(session, reply, scripted, heard=None):
+def respond(session, reply, scripted, heard=None, text_source="rules"):
+    """text_source: "llm" when the LLM read the message and wrote the reply, "rules" for the
+    built-in state machine. Shown in the UI as a provenance badge."""
     if reply.pop("save", False) and session["case"]:
         session["case_id"] = database.save_case(session["id"], session["case"])
+    audio_url, audio_source = agent_audio(reply["agent_text"], reply["speak_text"], scripted)
     return jsonify({
         "session_id": session["id"],
         "agent_text": reply["agent_text"],
         "speak_text": reply["speak_text"],
-        "agent_audio_url": agent_audio_url(reply["agent_text"], reply["speak_text"], scripted),
+        "agent_audio_url": audio_url,
+        "audio_source": audio_source,
+        "text_source": text_source,
+        "input_source": None if heard is None else ("scripted" if scripted else "typed"),
         "state": reply["state"],
         "done": reply["done"],
         "case_data": reply["case"],
@@ -100,6 +112,27 @@ def respond(session, reply, scripted, heard=None):
     })
 
 
+# Hinglish errors, never a raw traceback or an English error page.
+ERRORS = {404: "Yeh page nahi mila.", 405: "Yeh tareeka yahan nahi chalta.",
+          413: "Jawab bahut lamba hai. Chhota karke boliye.", 500: "Kuch gadbad ho gayi. Phir se koshish kijiye."}
+
+
+@app.errorhandler(404)
+@app.errorhandler(405)
+@app.errorhandler(413)
+@app.errorhandler(500)
+def error_page(e):
+    code = getattr(e, "code", 500) or 500
+    message = ERRORS.get(code, ERRORS[500])
+    if request.path.startswith(("/turn", "/health")) or request.is_json:
+        return jsonify({"error": message}), code
+    html = (f'<!doctype html><html lang="hi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            f'<title>PagarSaathi</title><body style="font:18px system-ui;background:#1e1b4b;color:#f1f5f9;display:grid;place-items:center;'
+            f'min-height:100vh;margin:0;text-align:center;padding:16px"><div><p style="font-size:24px;font-weight:700">{message}</p>'
+            f'<p><a style="color:#a5b4fc" href="/">PagarSaathi par wapas jaiye</a></p></div></body></html>')
+    return html, code
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -107,9 +140,16 @@ def index():
 
 @app.route("/health")
 def health():
+    llm, voice = agent_llm.enabled(), bool(env_key("SARVAM_API_KEY"))
     return jsonify({"status": "ok",
-                    "key_set": bool(env_key("SARVAM_API_KEY") or agent_llm.enabled()),
-                    "llm": agent_llm.enabled(), "voice": bool(env_key("SARVAM_API_KEY"))})
+                    "key_set": llm or voice,
+                    "llm": llm,
+                    "llm_provider": agent_llm.provider_name(),
+                    "voice": voice,
+                    "stt": False,        # by design: Wispr Flow does speech-to-text on the device
+                    "mode": "live" if (llm or voice) else "keyless",
+                    "missing": [k for k, ok in (("OPENAI_API_KEY or OPENROUTER_API_KEY", llm),
+                                                ("SARVAM_API_KEY", voice)) if not ok]})
 
 
 @app.route("/turn", methods=["POST"])
@@ -140,14 +180,16 @@ def turn():
         return jsonify({"session_id": session["id"], "state": session["state"],
                         "error": "Jawab khaali hai. Wispr Flow se boliye ya likhiye."}), 400
 
-    reply = None
+    reply, source, started = None, "rules", time.time()
     if not scripted and agent_llm.enabled():
         understood = agent_llm.understand(session, session["last_agent_text"], text, app.logger)
         if understood:
-            reply = conversation.step_llm(session, text, understood)
+            reply, source = conversation.step_llm(session, text, understood), "llm"
     if reply is None:   # no key, scripted demo, or the LLM failed: built-in rules
         reply = conversation.step(session, text, conversation.local_extract)
-    return respond(session, reply, scripted, heard=text)
+    app.logger.info("turn %s state=%s text=%s in %.2fs", session["id"][:8], reply["state"], source,
+                    time.time() - started)
+    return respond(session, reply, scripted, heard=text, text_source=source)
 
 
 if __name__ == "__main__":

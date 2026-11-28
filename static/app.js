@@ -5,7 +5,11 @@
 // otherwise the browser's own SpeechSynthesis (free). No arithmetic happens here: every number on the
 // card comes from the server (wage_math.py).
 (() => {
-  const scripted = new URLSearchParams(location.search).get('mode') === 'scripted';
+  const params = new URLSearchParams(location.search);
+  const scripted = params.get('mode') === 'scripted';
+  const textMode = params.get('mode') === 'text';
+  const debug = params.get('debug') === '1';
+  const dlog = (...a) => { if (debug) console.log('[PagarSaathi]', new Date().toISOString().slice(11, 23), ...a); };
 
   // The demo conversation: what the worker says (via Wispr Flow) at each turn.
   const SCRIPT = [
@@ -24,6 +28,7 @@
     form: $('answer-form'), answer: $('answer'), cont: $('continue'), status: $('status'), assist: $('assist'),
     result: $('result'), calc: $('calc'), nodue: $('nodue'), previewWrap: $('preview-wrap'),
     preview: $('preview'), send: $('send'), again: $('again'), log: $('log'), chip: $('mode-chip'),
+    keyless: $('keyless'),
   };
   const show = (node, on = true) => node.classList.toggle('hidden', !on);
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -33,7 +38,16 @@
   let last = null;            // last server reply (for replay)
   let busy = false;
   let message = '';
+  let scriptStopped = false;
   const player = new Audio();
+  const played = new Set();      // "state|url": a clip never plays twice in the same state
+  // Debug: every media event, so a stray or repeated clip shows up in the console (?debug=1).
+  for (const ev of ['play', 'pause', 'ended', 'error']) {
+    player.addEventListener(ev, () => dlog('audio', ev, player.currentSrc.split('/').pop(),
+      ev === 'error' && player.error ? 'code ' + player.error.code : ''));
+  }
+  // A 0.1 s silent WAV, played inside the Start tap so later clips are allowed to play (Safari/iOS).
+  const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 
   // ---------- voice out ----------
   let voices = [];
@@ -49,6 +63,7 @@
 
   function utter(text, voice, lang) {
     return new Promise((resolve) => {
+      dlog('browser voice', lang, voice ? voice.name : '(default)', JSON.stringify(text));
       const u = new SpeechSynthesisUtterance(text);
       if (voice) u.voice = voice;
       u.lang = lang;
@@ -60,26 +75,37 @@
     });
   }
 
+  // Resolves true when the clip played to the end (or was cut off on purpose), false if it could
+  // not play at all, so the caller can fall back to the browser voice instead of staying silent.
   function playClip(url) {
     return new Promise((resolve) => {
-      const done = () => { player.onended = player.onerror = player.onpause = null; resolve(); };
-      player.onended = player.onerror = player.onpause = done;
+      let started = false;
+      const finish = (ok) => { player.onended = player.onerror = player.onpause = player.onplaying = null; resolve(ok); };
+      player.onplaying = () => { started = true; };
+      player.onended = () => finish(true);
+      player.onpause = () => finish(started);
+      player.onerror = () => finish(false);
       player.src = url;
-      player.play().catch(done);
+      player.play().catch((e) => { dlog('audio play() rejected', e.name); finish(false); });
     });
   }
 
-  async function speak(reply) {
+  // Returns which voice actually spoke: "recorded", "sarvam", "browser" or "none".
+  async function speak(reply, { force = false } = {}) {
     stopSpeaking();
+    const key = reply.state + '|' + (reply.agent_audio_url || reply.agent_text);
+    if (!force && played.has(key)) { dlog('skip repeat', key); return 'none'; }
+    played.add(key);
     show(el.speaking, true);
     // Browser voices can read "?" aloud as "question mark": speak a danda instead.
     const clean = (t) => t.replace(/\s*[?？]+/g, '।').replace(/।\s*।/g, '।');
     try {
-      if (reply.agent_audio_url) return await playClip(reply.agent_audio_url);    // natural voice: Sarvam / recorded
+      if (reply.agent_audio_url && await playClip(reply.agent_audio_url)) return reply.audio_source || 'recorded';
       const hi = window.speechSynthesis && hindiVoice();
-      if (hi) return await utter(clean(reply.speak_text), hi, 'hi-IN');           // free fallback: browser voice
-      if (window.speechSynthesis && voices.length) return await utter(clean(reply.agent_text), null, 'en-IN');
+      if (hi) { await utter(clean(reply.speak_text), hi, 'hi-IN'); return 'browser'; }
+      if (window.speechSynthesis && voices.length) { await utter(clean(reply.agent_text), null, 'en-IN'); return 'browser'; }
       await sleep(Math.min(3500, 600 + reply.agent_text.length * 30));       // no voice at all: reading time
+      return 'none';
     } finally {
       show(el.speaking, false);
     }
@@ -89,6 +115,21 @@
   function setStatus(text, isError = false) {
     el.status.textContent = text || '';
     el.status.className = 'mt-3 min-h-[1.5rem] text-base ' + (isError ? 'font-semibold text-rose-300' : 'text-slate-400');
+  }
+
+  const TEXT_LABEL = { llm: 'Text: LLM', rules: 'Text: Rules' };
+  const VOICE_LABEL = { recorded: 'Voice: Recorded', sarvam: 'Voice: Sarvam', browser: 'Voice: Browser', none: 'Voice: off' };
+  const INPUT_LABEL = { typed: 'Wispr Flow / typed', scripted: 'Scripted demo' };
+
+  // Small grey provenance line under a bubble: where this line came from.
+  function badge(li, text) {
+    const b = document.createElement('li');
+    b.setAttribute('role', 'note');
+    b.className = 'prov mt-1 text-[11px] font-medium tracking-wide ' + (li.classList.contains('self-end') ? 'text-right text-indigo-300/80' : 'text-slate-400');
+    b.textContent = text;
+    li.after(b);
+    b.classList.add(li.classList.contains('self-end') ? 'self-end' : 'self-start');
+    return b;
   }
 
   function bubble(text, who, tag) {
@@ -106,6 +147,7 @@
       li.append(t);
     }
     el.log.append(li);
+    return li;
   }
 
   function showFact(parsed) {
@@ -178,14 +220,15 @@
   async function handle(data, saidText) {
     if (data.error) { setStatus(data.error, true); return false; }
     sessionId = data.session_id;
-    if (saidText !== undefined) bubble(saidText, 'worker', factTag(data.parsed));
+    if (saidText !== undefined) badge(bubble(saidText, 'worker', factTag(data.parsed)), INPUT_LABEL[data.input_source] || 'Typed');
     if (data.state === 'ASK_DAYS' && saidText !== undefined && last && last.state === 'CONFIRM') clearFacts();
     if (data.facts) showFacts(data.facts); else showFact(data.parsed);
     if (data.parsed && data.parsed.assumed) showFact(data.parsed);
 
     last = data;
     el.agent.textContent = data.agent_text;
-    bubble(data.agent_text, 'agent');
+    const prov = badge(bubble(data.agent_text, 'agent'), TEXT_LABEL[data.text_source] || 'Text: Rules');
+    dlog('reply', data.state, data.text_source, data.audio_source, JSON.stringify(data.agent_text));
     show(el.replay, true);
     show(el.assist, !!data.needs_assistance && !data.case_data);
     setStatus('');
@@ -197,7 +240,7 @@
     if (finished) show(el.again, true);
     if (!finished && !preview && !scripted) el.answer.focus();   // Wispr Flow types into the focused field
 
-    const spoken = speak(data);
+    const spoken = speak(data).then((voice) => { prov.textContent += ' · ' + VOICE_LABEL[voice]; });
     if (preview) {
       // SHOW_PREVIEW: the message appears first, the Send button after it.
       message = data.case_data.payment_request;
@@ -214,7 +257,8 @@
 
   let queued = false;
   async function submit(text) {
-    if (!text) return;
+    if (scriptStopped && scripted) return;
+    if (!text) { setStatus('Pehle jawab boliye (Wispr Flow) ya likhiye, phir Continue dabaiye.'); el.answer.focus(); return; }
     if (busy) { queued = true; setStatus('Ek second…'); return; }   // sent when the current reply arrives
     busy = true;
     el.cont.disabled = true;
@@ -251,16 +295,22 @@
       await sleep(250);
       el.cont.classList.remove('ring-4', 'ring-indigo-300/60');
       await submit(el.answer.value.trim());
-      if (!el.send.classList.contains('hidden') || (last && last.done)) break;
+      if (last && (last.state === 'SHOW_PREVIEW' || last.done)) break;   // stop cleanly: never type past the end
     }
+    scriptStopped = true;
+    dlog('script finished at', last && last.state);
   }
 
   // ---------- wiring ----------
   el.start.addEventListener('click', async () => {
     show(el.start, false);
+    // Unlock the audio element inside this tap, so later clips may play without one.
+    player.src = SILENT;
+    player.play().then(() => { if (player.src === SILENT) player.pause(); }).catch(() => {});
     // Unlock speech on this tap (browsers need a user gesture before talking).
     if (window.speechSynthesis) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
     show(el.form, true);
+    show($('wispr-hint'), false);   // the answer box carries the Wispr Flow label from here on
     setStatus('Shuru ho raha hai…');
     try {
       const ok = await handle(await post({}));
@@ -276,7 +326,7 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(el.answer.value.trim()); }
   });
   el.answer.addEventListener('input', () => { if (el.answer.value) stopSpeaking(); });
-  el.replay.addEventListener('click', () => last && speak(last));
+  el.replay.addEventListener('click', () => last && speak(last, { force: true }));
 
   el.send.addEventListener('click', async () => {
     // Plain deep link, no WhatsApp API: the worker picks the contractor's chat and presses send.
@@ -286,13 +336,24 @@
       if (!data.error) {
         last = data;
         el.agent.textContent = data.agent_text;
-        bubble(data.agent_text, 'agent');
+        const prov = badge(bubble(data.agent_text, 'agent'), TEXT_LABEL[data.text_source] || 'Text: Rules');
         show(el.again, true);
-        speak(data);
+        speak(data).then((voice) => { prov.textContent += ' · ' + VOICE_LABEL[voice]; });
       }
     } catch { /* WhatsApp already opened */ }
   });
 
   el.again.addEventListener('click', () => location.reload());
   if (scripted) show(el.chip, true);
+  if (textMode) { el.chip.textContent = 'Text mode'; show(el.chip, true); }
+
+  // Tell a judge up front when the server runs without keys (rules + recorded voice).
+  fetch('/health').then((r) => r.json()).then((h) => {
+    dlog('health', JSON.stringify(h));
+    if (h.mode === 'keyless' && !scripted) {
+      el.keyless.textContent = 'Demo mode: built-in rules + recorded voice. LLM aur Sarvam voice ke liye server par ' +
+        h.missing.join(' aur ') + ' set kijiye.';
+      show(el.keyless, true);
+    }
+  }).catch(() => {});
 })();

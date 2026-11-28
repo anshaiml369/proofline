@@ -106,7 +106,7 @@ def test_app_falls_back_to_rules_when_llm_fails(monkeypatch):
     import app as A
     monkeypatch.setattr(agent_llm, "enabled", lambda: True)
     monkeypatch.setattr(agent_llm, "understand", lambda *a, **k: None)
-    monkeypatch.setattr(A, "agent_audio_url", lambda *a: None)
+    monkeypatch.setattr(A, "agent_audio", lambda *a: (None, None))
     client = A.app.test_client()
     sid = client.post("/turn", json={}).get_json()["session_id"]
     client.post("/turn", json={"session_id": sid, "text": "paise nahi mile"})
@@ -118,3 +118,21 @@ def test_so_far_is_not_sau():
     assert parse_amounts("Three thousand so far") == [3000]
     assert parse_amounts("700 so far") == [700]
     assert parse_amounts("saat so") == [700]
+
+
+def test_errors_are_hinglish_never_a_traceback(monkeypatch):
+    import app as A
+    client = A.app.test_client()
+    assert "nahi mila" in client.get("/no-such-page").get_data(as_text=True)
+    monkeypatch.setattr(agent_llm, "enabled", lambda: False)
+    monkeypatch.setattr(c, "step", lambda *a, **k: 1 / 0)
+    sid = client.post("/turn", json={}).get_json()["session_id"]
+    r = client.post("/turn", json={"session_id": sid, "text": "6 din"})
+    assert r.status_code == 500 and r.get_json() == {"error": A.ERRORS[500]}
+
+
+def test_health_reports_pipeline():
+    import app as A
+    h = A.app.test_client().get("/health").get_json()
+    assert h["status"] == "ok" and h["stt"] is False and h["mode"] in ("live", "keyless")
+    assert set(h) >= {"llm", "voice", "stt", "mode", "missing", "key_set"}

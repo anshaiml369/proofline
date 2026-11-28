@@ -40,6 +40,12 @@ def enabled():
     return bool(providers())
 
 
+def provider_name():
+    """Which provider is tried first: "openai", "openrouter", or None."""
+    first = providers()[:1]
+    return ("openai" if "openai.com" in first[0][0] else "openrouter") if first else None
+
+
 def _int_or_none(v):
     if isinstance(v, bool):
         return None
