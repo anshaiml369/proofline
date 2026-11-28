@@ -8,6 +8,7 @@ import time
 import httpx
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
+from werkzeug.middleware.proxy_fix import ProxyFix
 from openai import OpenAI
 
 import conversation
@@ -35,6 +36,13 @@ SESSION_TTL_S = 2 * 60 * 60
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)  # real client IP behind Railway's proxy
+
+# /turn calls paid APIs and needs no login, so cap how often one visitor can use it.
+# A full conversation is about 8 turns; this allows several in a row.
+RATE_LIMIT, RATE_WINDOW_S = 40, 10 * 60
+RATE_HITS = {}
+RATE_LOCK = threading.Lock()
 database.init_db()
 os.makedirs(TTS_DIR, exist_ok=True)
 
@@ -162,6 +170,21 @@ def respond(session, reply, scripted, heard=None):
     })
 
 
+def rate_limited():
+    now = time.time()
+    ip = request.remote_addr or "?"
+    with RATE_LOCK:
+        hits = [t for t in RATE_HITS.get(ip, []) if now - t < RATE_WINDOW_S]
+        if len(RATE_HITS) > 5000:  # keep memory bounded
+            RATE_HITS.clear()
+        if len(hits) >= RATE_LIMIT:
+            RATE_HITS[ip] = hits
+            return True
+        hits.append(now)
+        RATE_HITS[ip] = hits
+        return False
+
+
 @app.errorhandler(413)
 def too_large(_):
     return jsonify({"error": "Recording too large (max 10 MB)"}), 413
@@ -184,6 +207,8 @@ def turn():
     No session_id starts a new conversation and returns the agent's opening line."""
     mode = request.form.get("mode", "voice")
     scripted = mode == "scripted"
+    if not scripted and rate_limited():
+        return jsonify({"error": "Bahut zyada koshish ho gayi. Thodi der baad phir try kijiye."}), 429
     session = get_session(request.form.get("session_id"))
     if session is None:
         session = conversation.new_session()
