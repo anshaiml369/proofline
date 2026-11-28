@@ -83,26 +83,30 @@ def _parse_one(text):
     text = re.sub(r"(?<=\d),(?=\d)", "", text)          # 3,000 -> 3000
     text = re.sub(r"(\d)\s*k\b", r"\1 k", text)          # 3k -> 3 k
     total, current, seen, half = 0.0, 0.0, False, False
+    prev_number = False      # a scale word counts only right after a number: "so far" is not "sau"
     for tok in _TOKEN.findall(text):
+        is_number = False
         if re.fullmatch(r"\d+(?:\.\d+)?", tok):
             current += float(tok)
-            seen = True
+            seen = is_number = True
         elif tok in _UNITS:
             current += _UNITS[tok] + (0.5 if half else 0)
             half = False
-            seen = True
+            seen = is_number = True
         elif tok in _FRACTIONS:
             current += _FRACTIONS[tok]
-            seen = True
+            seen = is_number = True
         elif tok in _PLUS_HALF:
             half = True
-        elif tok in _SCALES and seen:
+        elif tok in _SCALES and seen and (prev_number or tok in ("k",)):
             scale = _SCALES[tok]
             if scale == 100:
-                current = (current or 1) * 100
+                if current < 100:                         # "saat sau" = 700, but "700 so far" stays 700
+                    current = (current or 1) * 100
             else:
                 total += (current or 1) * scale
                 current = 0
+        prev_number = is_number
     if not seen:
         return None
     value = total + current

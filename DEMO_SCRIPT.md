@@ -32,6 +32,8 @@
 | 80s | Worker | *Tap the green **Send to contractor**. WhatsApp opens with the message filled in.* |
 | 90s | Close | "PagarSaathi. Bolo, hisaab pao. Built with Wispr Flow and Claude Code." |
 
+With keys set, the agent's short replies are written live by the LLM, so the exact words vary from take to take; the questions, the read-back and the numbers do not. Try one off-script line in the live demo, such as **"Bhai, kya karun, thekedar sunta nahi"**, to show that it answers what you said.
+
 ## If something goes wrong
 
 - **Wispr Flow text lands somewhere else:** click the answer box first, then double-tap Fn.

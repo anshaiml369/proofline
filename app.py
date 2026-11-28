@@ -2,32 +2,28 @@
 
 The worker dictates with Wispr Flow (an OS-level dictation layer), so the app receives TEXT.
 No API key is needed for the core flow. Optional extras, only if keys are set:
-- OPENROUTER_API_KEY: an LLM reads the answer instead of the built-in rules (it never calculates)
-- SARVAM_API_KEY: Sarvam Bulbul voice for the agent when the browser has no Hindi voice
+- OPENAI_API_KEY or OPENROUTER_API_KEY: an LLM understands each message and replies to what the
+  worker actually said (agent_llm.py). It never calculates.
+- SARVAM_API_KEY: Sarvam Bulbul, a natural Hindi voice for the agent
 """
-import json
 import os
 import threading
 import time
 
-import httpx
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+import agent_llm
 import conversation
 import database
 import sarvam_tts
-from hinglish_numbers import parse_amounts, says_none
 
 load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TTS_DIR = os.path.join(BASE_DIR, "static", "tts")      # generated, git-ignored
 DEMO_DIR = os.path.join(BASE_DIR, "static", "demo")    # pre-recorded agent lines (free fallback voice)
-PROMPT = open(os.path.join(BASE_DIR, "prompts", "turn.txt"), encoding="utf-8").read()
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
 PLACEHOLDER_KEYS = {"", "your_key_here"}
 SESSION_TTL_S = 2 * 60 * 60
 RATE_LIMIT, RATE_WINDOW_S = 120, 10 * 60   # turns per visitor per 10 minutes
@@ -48,37 +44,7 @@ def env_key(name):
     return None if value in PLACEHOLDER_KEYS else value
 
 
-# ---------- optional: OpenRouter reads ONE number or yes/no; never calculates ----------
-
-def llm_extract(field, question, text):
-    key = env_key("OPENROUTER_API_KEY")
-    if not key:
-        return conversation.local_extract(field, question, text)
-    try:
-        resp = httpx.post(
-            OPENROUTER_URL,
-            headers={"Authorization": f"Bearer {key}"},
-            json={"model": OPENROUTER_MODEL, "temperature": 0, "max_tokens": 120,
-                  "response_format": {"type": "json_object"},
-                  "messages": [{"role": "system", "content": PROMPT},
-                               {"role": "user", "content": f"Field asked: {field}\nAgent asked: {question}\nWorker said: {text}"}]},
-            timeout=15,
-        )
-        resp.raise_for_status()
-        answer = json.loads(resp.json()["choices"][0]["message"]["content"])
-        if not isinstance(answer, dict) or answer.get("field") != field:
-            return conversation.local_extract(field, question, text)
-        # ₹0 only when the worker actually said "nothing" (a bare "haan" is not zero)
-        if field in ("advance", "payments") and answer.get("value") == 0 and not answer.get("parts"):
-            if not (says_none(text) or 0 in parse_amounts(text)):
-                return {"field": field, "value": None, "confidence": "low"}
-        return answer
-    except Exception as e:
-        app.logger.warning("OpenRouter failed (%s), using built-in rules", type(e).__name__)
-        return conversation.local_extract(field, question, text)
-
-
-# ---------- optional: Sarvam voice, used by the browser only when it has no Hindi voice ----------
+# ---------- optional: Sarvam voice (natural Hindi); the browser voice is the free fallback ----------
 
 def agent_audio_url(agent_text, speak_text, scripted):
     name = sarvam_tts.audio_name(agent_text)
@@ -130,6 +96,7 @@ def respond(session, reply, scripted, heard=None):
         "parsed": reply.get("parsed"),
         "reasked": reply.get("reasked", False),
         "needs_assistance": reply.get("needs_assistance", False),
+        "facts": dict(session["facts"]),
     })
 
 
@@ -140,7 +107,9 @@ def index():
 
 @app.route("/health")
 def health():
-    return jsonify({"status": "ok", "key_set": bool(env_key("SARVAM_API_KEY") or env_key("OPENROUTER_API_KEY"))})
+    return jsonify({"status": "ok",
+                    "key_set": bool(env_key("SARVAM_API_KEY") or agent_llm.enabled()),
+                    "llm": agent_llm.enabled(), "voice": bool(env_key("SARVAM_API_KEY"))})
 
 
 @app.route("/turn", methods=["POST"])
@@ -171,8 +140,13 @@ def turn():
         return jsonify({"session_id": session["id"], "state": session["state"],
                         "error": "Jawab khaali hai. Wispr Flow se boliye ya likhiye."}), 400
 
-    extract = conversation.local_extract if scripted else llm_extract
-    reply = conversation.step(session, text, extract)
+    reply = None
+    if not scripted and agent_llm.enabled():
+        understood = agent_llm.understand(session, session["last_agent_text"], text, app.logger)
+        if understood:
+            reply = conversation.step_llm(session, text, understood)
+    if reply is None:   # no key, scripted demo, or the LLM failed: built-in rules
+        reply = conversation.step(session, text, conversation.local_extract)
     return respond(session, reply, scripted, heard=text)
 
 

@@ -54,7 +54,8 @@ Then: message preview → **Send to contractor** → WhatsApp opens with the req
 
 **The voice layer is the product's interface.**
 - Wispr Flow is OS-level dictation: double-tap Fn on Mac, the Wispr Flow keyboard on iPhone.
-- The worker speaks; the words land in the answer box. PagarSaathi needs **no mic code, no speech-to-text service and no API key.**
+- The worker speaks; the words land in the answer box. PagarSaathi needs **no mic code and no speech-to-text service.**
+- An LLM replies to what the worker actually said, and Sarvam speaks it in natural Hindi. **With no keys, the whole flow still works** using built-in rules and a recorded voice.
 - Wispr Flow lists Hindi and Hinglish support and writes romanised Hindi **[SOURCED: wisprflow.ai]**. The app reads digits, Roman and Devanagari.
 - Voice fits this user: spoken numbers instead of typed ones. A speed gain for this user is **[UNVERIFIED]**: not yet measured.
 
@@ -78,9 +79,8 @@ Note: "Labor Mistri" and "HaazriPro" from an earlier draft could not be found, s
 | Dependency | Status |
 |---|---|
 | Wispr Flow (OS-level) | The worker or volunteer installs it. No API key. |
-| Browser voice | Free, built in. |
-| Sarvam voice | Optional fallback. |
-| OpenRouter | Optional answer reader; never calculates. |
+| OpenAI / OpenRouter LLM | Optional. Understands and replies; never calculates. Falls back to built-in rules. |
+| Sarvam voice | Optional. Natural Hindi voice; falls back to recorded clips and the browser voice. |
 
 **Biggest objection:** "The contractor will just ignore the message."
 **Answer:** PagarSaathi doesn't promise payment. It gives the worker an exact, read-back figure and a written request. That's the first step of any claim, including SAMADHAN.

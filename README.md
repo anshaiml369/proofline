@@ -47,15 +47,29 @@ Worker speaks (Wispr Flow) → text box → agent asks: days? rate? advance? pai
 
 The worker speaks, and the words land in PagarSaathi's text box. **The app receives text, and needs no Wispr Flow API key and no speech-to-text service.** The page has no microphone button by design.
 
-The agent's replies are spoken by the **browser's own voice** (SpeechSynthesis, free, no key). Sarvam Bulbul is only an optional fallback for browsers without a Hindi voice. Setup steps are in [`WISPR_FLOW_SETUP.md`](WISPR_FLOW_SETUP.md).
+Setup steps are in [`WISPR_FLOW_SETUP.md`](WISPR_FLOW_SETUP.md).
 
-| Part | What does it | Key needed? |
+| Part | With keys | With no keys |
 |---|---|---|
-| Voice in | Wispr Flow (OS-level dictation) | No |
-| Understanding the answer | Built-in Hinglish rules: digits, Roman, Devanagari, "nahi mila" | No |
-| Maths | `wage_math.py` | No |
-| Voice out | Browser SpeechSynthesis (hi-IN) | No |
-| Optional | OpenRouter LLM reads answers (never calculates); Sarvam voice fallback | Optional |
+| Voice in | Wispr Flow (OS-level dictation) | Same: Wispr Flow needs no key |
+| Understanding and replying | An LLM (OpenAI `gpt-4.1-mini`, or OpenRouter) reads each message, hears several facts at once, takes corrections, and replies to what the worker actually said | Built-in Hinglish rules: digits, Roman, Devanagari, "nahi mila" |
+| Maths | `wage_math.py` (Python) | Same |
+| Voice out | Sarvam Bulbul, a natural Hindi voice | Pre-recorded Sarvam clips for fixed lines, then the browser's own voice |
+
+**The LLM never calculates.** It returns the facts it heard as JSON. Python checks each one, adds multiple amounts, still insists on the "Sahi hai?" read-back, and does all the maths. If the LLM fails or takes over 8 seconds, that turn uses the built-in rules.
+
+### A real conversation (LLM path)
+
+```
+Agent:  Namaste, main PagarSaathi hoon. Bataiye, paise ko lekar kya pareshani hai?
+Worker: Bhai thekedar ne poore paise nahi diye, kya karun?
+Agent:  Chinta mat kijiye, main aapki madad karunga. Kitne din kaam kiya tha aapne?
+Worker: Monday se Saturday tak kaam kiya
+Agent:  Achha, aapne Monday se Saturday tak 6 din kaam kiya. Roz ki mazdoori kitni tay hui thi?
+...
+Worker: Nahi, rate 800 tha
+Agent:  Theek hai, aapka roz ka rate 800 rupaye hai. Confirm karta hoon: chhe din, aath sau roz, ... Sahi hai?
+```
 
 ## Run locally
 
@@ -93,12 +107,12 @@ Everything in the core flow works:
 - the WhatsApp message,
 - the scripted demo.
 
-`GET /health` returns `{"status": "ok", "key_set": false}`. Keys in `.env` only switch on the optional extras in the table above.
+`GET /health` returns `{"status": "ok", "key_set": false, "llm": false, "voice": false}`. Keys in `.env` (see `.env.example`) switch on the LLM conversation and the Sarvam voice.
 
 ## Modes
 
 - `/`: normal use. Dictate with Wispr Flow, or type, then press **Continue**.
-- `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself, in about 55 seconds. It calls no outside service.
+- `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself, in about 55 seconds. It always uses the built-in rules and pre-recorded voice, so it calls no outside service and runs the same every time.
 
 ## API
 
@@ -117,22 +131,24 @@ pip3 install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-There are 35 tests. They cover:
+There are 48 tests. They need no network or keys (the LLM is faked). They cover:
 - the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
 - the demo conversation and Wispr-style text (digits, ₹, Devanagari);
 - the mandatory confirm step;
 - re-ask, then *needs assistance*;
 - multiple payments added in Python;
 - "pata nahi" not being read as ₹0;
-- the nothing-owed path.
+- the nothing-owed path;
+- the LLM path: several facts in one sentence, corrections at the read-back, Python adding amounts, "haan" never read as ₹0, the reply never asking its own question, falling back to rules when the LLM fails;
+- "so far" not being read as "sau".
 
 ## Built with
 
 - **Flask** (Python 3.11) and **gunicorn**
 - **Wispr Flow**: the voice layer (OS-level dictation)
 - **Browser SpeechSynthesis**: the agent's voice
-- **Sarvam Bulbul**: optional voice fallback
-- **OpenRouter**: optional answer reader
+- **OpenAI `gpt-4.1-mini`** (or **OpenRouter**): the optional conversational layer; it never calculates
+- **Sarvam Bulbul**: the agent's natural Hindi voice
 - **SQLite**: finished cases, in the `wage_cases` table
 - **Tailwind CSS**: compiled to a static file, so pages need no CDN
 - **Docker**
@@ -155,17 +171,19 @@ There are 35 tests. They cover:
 - **It calculates; it does not enforce.** The message is sent by the worker, if they choose to.
 - **Simple cases only:** one daily rate. Overtime, half days and deductions are not handled yet.
 - **No accounts.** Conversations in progress live in server memory (one gunicorn worker); finished cases go to SQLite.
-- **Not yet tested with real workers.** The built-in reader was tested on demo-style answers. Real dictation will bring new phrasings.
+- **Not yet tested with real workers.** Real dictation will bring new phrasings. The LLM handles more of them than the built-in rules, and the read-back catches what either gets wrong.
+- **With keys, each conversation costs a little:** a few LLM calls and short Sarvam clips.
 
 ## Files
 
 | Path | What it is |
 |---|---|
 | `app.py` | Flask: `GET /`, `POST /turn`, `GET /health` |
-| `conversation.py` | The state machine and the built-in Hinglish reader |
+| `conversation.py` | The state machine, the built-in Hinglish reader, and the LLM turn (`step_llm`) |
+| `agent_llm.py`, `prompts/agent.txt` | The optional LLM layer: hears facts, writes the reply |
 | `wage_math.py` | All arithmetic, as pure functions |
 | `hinglish_numbers.py` | Number words, both ways (4200 ⇄ "chaar hazaar do sau") |
-| `sarvam_tts.py` | Optional Sarvam voice fallback |
+| `sarvam_tts.py` | Sarvam voice |
 | `database.py` | SQLite `wage_cases`: `save_case()`, `get_case()` |
 | `templates/index.html`, `static/app.js` | The one screen |
 | `WISPR_FLOW_SETUP.md` | Mac and iPhone setup |

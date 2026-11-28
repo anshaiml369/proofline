@@ -1,8 +1,8 @@
 // PagarSaathi front end.
 // Voice IN is Wispr Flow: the worker dictates into the text box (double-tap Fn on Mac, the
 // Wispr Flow keyboard on iPhone). This page has no microphone code by design.
-// Voice OUT is the browser's own SpeechSynthesis (free). A pre-recorded / Sarvam clip is used
-// only when the browser has no Hindi voice. No arithmetic happens here: every number on the
+// Voice OUT is Sarvam Bulbul (natural Hindi) when the server has a key, or a pre-recorded clip;
+// otherwise the browser's own SpeechSynthesis (free). No arithmetic happens here: every number on the
 // card comes from the server (wage_math.py).
 (() => {
   const scripted = new URLSearchParams(location.search).get('mode') === 'scripted';
@@ -72,11 +72,13 @@
   async function speak(reply) {
     stopSpeaking();
     show(el.speaking, true);
+    // Browser voices can read "?" aloud as "question mark": speak a danda instead.
+    const clean = (t) => t.replace(/\s*[?？]+/g, '।').replace(/।\s*।/g, '।');
     try {
+      if (reply.agent_audio_url) return await playClip(reply.agent_audio_url);    // natural voice: Sarvam / recorded
       const hi = window.speechSynthesis && hindiVoice();
-      if (hi) return await utter(reply.speak_text, hi, 'hi-IN');            // primary: free browser voice
-      if (reply.agent_audio_url) return await playClip(reply.agent_audio_url); // fallback: recorded / Sarvam
-      if (window.speechSynthesis && voices.length) return await utter(reply.agent_text, null, 'en-IN');
+      if (hi) return await utter(clean(reply.speak_text), hi, 'hi-IN');           // free fallback: browser voice
+      if (window.speechSynthesis && voices.length) return await utter(clean(reply.agent_text), null, 'en-IN');
       await sleep(Math.min(3500, 600 + reply.agent_text.length * 30));       // no voice at all: reading time
     } finally {
       show(el.speaking, false);
@@ -113,6 +115,12 @@
     const b = box.querySelector('b');
     b.className = 'mt-0.5 block text-base font-bold text-white';
     b.textContent = (parsed.field === 'days' ? parsed.value : inr(parsed.value)) + (parsed.assumed ? '?' : '');
+  }
+
+  function showFacts(facts) {      // the LLM can hear several facts in one sentence
+    if (!facts) return;
+    clearFacts();
+    for (const [field, value] of Object.entries(facts)) showFact({ field, value });
   }
 
   function clearFacts() {
@@ -172,7 +180,8 @@
     sessionId = data.session_id;
     if (saidText !== undefined) bubble(saidText, 'worker', factTag(data.parsed));
     if (data.state === 'ASK_DAYS' && saidText !== undefined && last && last.state === 'CONFIRM') clearFacts();
-    showFact(data.parsed);
+    if (data.facts) showFacts(data.facts); else showFact(data.parsed);
+    if (data.parsed && data.parsed.assumed) showFact(data.parsed);
 
     last = data;
     el.agent.textContent = data.agent_text;

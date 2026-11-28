@@ -222,6 +222,119 @@ def step(session, text, extract):
     return _reply(session, DONE_LINE)
 
 
+# ---------- LLM path: the agent replies to what the worker actually said ----------
+
+ORDER = (("days", ASK_DAYS), ("rate", ASK_RATE), ("advance", ASK_ADVANCE), ("payments", ASK_PAYMENTS))
+WHAT_WRONG = ("Kya galat hai? Din, roz ki mazdoori, advance ya mila hua paisa: sahi number boliye.",
+              "क्या गलत है? दिन, रोज़ की मज़दूरी, एडवांस या मिला हुआ पैसा: सही नंबर बोलिए।")
+
+
+def merge_facts(session, text, understood):
+    """Validate and store the facts the LLM heard. Python adds multiple amounts. Returns
+    {field: value} for what was stored this turn."""
+    stored = {}
+    for field, _ in ORDER:
+        parts = understood["parts"].get(field)
+        value = sum(parts) if parts else understood["facts"].get(field)
+        if value is None:
+            continue
+        # ₹0 only when the worker actually said "nothing" (a bare "haan" is not zero)
+        if value == 0 and field in ("advance", "payments") and not (says_none(text) or 0 in parse_amounts(text)):
+            continue
+        lo, hi = LIMITS[field]
+        if lo <= value <= hi and session["facts"].get(field) != value:   # new or changed only
+            session["facts"][field] = value
+            stored[field] = value
+            if field in session["needs_assistance"]:
+                session["needs_assistance"].remove(field)
+    return stored
+
+
+def _next_missing(session):
+    for field, state in ORDER:
+        if field not in session["facts"]:
+            return state
+    return CONFIRM
+
+
+def _say(understood):
+    """The LLM's short reply, as a (shown, spoken) prefix."""
+    if not understood["say"]:
+        return None
+    return (understood["say"].rstrip() + " ", understood["say_hi"].rstrip() + " ")
+
+
+def _with(prefix, line):
+    return _join(prefix, line) if prefix else line
+
+
+def step_llm(session, text, understood):
+    """One worker turn when the LLM understood the message. Same states and rules as step():
+    the read-back is still mandatory and Python still does the maths."""
+    state = session["state"]
+    text = (text or "").strip()
+    session["turns"].append({"agent": session["last_agent_text"], "worker": text, "state": state})
+    prefix = _say(understood)
+
+    if state in (START, ASK_DAYS, ASK_RATE, ASK_ADVANCE, ASK_PAYMENTS):
+        stored = merge_facts(session, text, understood)
+        session["turns"][-1]["facts"] = stored
+        extra = {"facts": dict(session["facts"])}
+        if stored:
+            extra["parsed"] = {"field": list(stored)[-1], "value": list(stored.values())[-1]}
+        if state == START and not stored and understood["ask"]:
+            _advance_to(session, ASK_DAYS)
+            return _reply(session, _with(prefix, (understood["ask"], understood["ask_hi"])), **extra)
+        if state == START or stored:
+            return _reply(session, _with(prefix, _ask(session, _next_missing(session))), **extra)
+        session["failures"] += 1
+        field = STATES[state]["extract_field"]
+        if session["failures"] == 1:
+            question = (understood["ask"], understood["ask_hi"]) if understood["ask"] else STATES[state]["question_hi"]
+            return _reply(session, _with(prefix, question), reasked=True, **extra)
+        if field not in session["needs_assistance"]:
+            session["needs_assistance"].append(field)
+        if field in ("advance", "payments") and session["failures"] >= 3:
+            session["facts"][field] = 0
+            return _reply(session, _ask(session, _next_missing(session), prefix=ASSIST_ZERO),
+                          parsed={"field": field, "value": 0, "assumed": True}, facts=dict(session["facts"]))
+        return _reply(session, _with(prefix, STATES[state]["simpler"]), reasked=True, **extra)
+
+    if state == CONFIRM:
+        stored = merge_facts(session, text, understood)
+        if stored:                                   # a correction: read everything back again
+            _advance_to(session, CONFIRM)
+            return _reply(session, _with(prefix, readback(session["facts"])),
+                          facts=dict(session["facts"]), corrected=stored)
+        if understood["intent"] == "yes":
+            return step(_undo_turn(session), text, lambda *a: {"value": True, "confidence": "high"})
+        if understood["intent"] == "no":
+            session["failures"] += 1
+            if session["failures"] >= 2:
+                session["facts"] = {}
+                session["needs_assistance"] = []
+                _advance_to(session, ASK_DAYS)
+                return _reply(session, RESTART, restarted=True, facts={})
+            return _reply(session, WHAT_WRONG)
+        return _reply(session, _with(prefix, STATES[CONFIRM]["simpler"]), reasked=True)
+
+    if state == ASK_SEND:
+        if understood["intent"] in ("yes", "no"):
+            ok = understood["intent"] == "yes"
+            return step(_undo_turn(session), text, lambda *a: {"value": ok, "confidence": "high"})
+        return _reply(session, _with(prefix, STATES[ASK_SEND]["simpler"]), reasked=True)
+
+    if state == SHOW_PREVIEW:
+        return _reply(session, _with(prefix, PREVIEW))
+    return _reply(session, _with(prefix, DONE_LINE))
+
+
+def _undo_turn(session):
+    """step() records the turn itself; drop the one step_llm() just added."""
+    session["turns"].pop()
+    return session
+
+
 def mark_sent(session):
     """The worker tapped "Send to contractor" (SHOW_PREVIEW → DONE)."""
     if session["state"] != SHOW_PREVIEW:
