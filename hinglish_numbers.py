@@ -139,7 +139,13 @@ def parse_yes_no(text):
     return None
 
 
+_UNSURE = {unicodedata.normalize("NFC", w) for w in
+           ("pata", "maloom", "malum", "yaad", "shayad", "पता", "मालूम", "याद", "शायद")}
+
+
 def says_none(text):
     """'kuch nahi', 'nahi mila', 'zero' -> worker received nothing."""
     tokens = set(_tokens(text))
+    if tokens & _UNSURE:          # "pata nahi" = don't know, not "got nothing"
+        return False
     return bool(tokens & (_NO | {"kuch", "zero", "shunya", "कुछ"})) and not parse_amounts(text)

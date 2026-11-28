@@ -11,3 +11,8 @@ __pycache__/
 .git/
 .DS_Store
 tests/
+tailwind/
+pytest.ini
+requirements-dev.txt
+scripts/
+.pytest_cache/

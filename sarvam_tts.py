@@ -1,7 +1,8 @@
-"""Sarvam Bulbul v4 Flash text-to-speech (hi-IN), returning mp3 bytes.
+"""OPTIONAL Sarvam Bulbul v4 Flash voice (hi-IN, mp3) for the agent's replies.
 
-Same text → same file, so repeated questions cost one API call. Returns None on any failure:
-the caller then shows the question as text and the conversation carries on.
+The browser's own SpeechSynthesis is the primary voice and needs no key. This is only a fallback
+for browsers without a Hindi voice, and only if SARVAM_API_KEY is set. Returns None on any
+failure or missing key; the page then shows the text (and uses whatever browser voice exists).
 """
 import base64
 import hashlib
@@ -49,6 +50,11 @@ def _request(text, api_key):
     )
     resp.raise_for_status()
     return base64.b64decode(resp.json()["audios"][0])
+
+
+def speak(text, api_key=None, out_dir=None, log=None):
+    """Alias: speak(text) -> mp3 file name, or None if the key is missing or the call fails."""
+    return synthesize(text, api_key, out_dir, log) if api_key and out_dir else None
 
 
 def synthesize(text, api_key, out_dir, log=None):

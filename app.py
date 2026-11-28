@@ -1,7 +1,12 @@
-"""PagarSaathi: a Hinglish voice agent that works out a daily-wage worker's unpaid wages."""
+"""PagarSaathi: a Hinglish wage-reconciliation agent. Voice input is Wispr Flow.
+
+The worker dictates with Wispr Flow (an OS-level dictation layer), so the app receives TEXT.
+No API key is needed for the core flow. Optional extras, only if keys are set:
+- OPENROUTER_API_KEY: an LLM reads the answer instead of the built-in rules (it never calculates)
+- SARVAM_API_KEY: Sarvam Bulbul voice for the agent when the browser has no Hindi voice
+"""
 import json
 import os
-import tempfile
 import threading
 import time
 
@@ -9,7 +14,6 @@ import httpx
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from werkzeug.middleware.proxy_fix import ProxyFix
-from openai import OpenAI
 
 import conversation
 import database
@@ -20,35 +24,23 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TTS_DIR = os.path.join(BASE_DIR, "static", "tts")      # generated, git-ignored
-DEMO_DIR = os.path.join(BASE_DIR, "static", "demo")    # pre-recorded, committed (scripted mode)
+DEMO_DIR = os.path.join(BASE_DIR, "static", "demo")    # pre-recorded agent lines (free fallback voice)
 PROMPT = open(os.path.join(BASE_DIR, "prompts", "turn.txt"), encoding="utf-8").read()
-
-SARVAM_STT_URL = "https://api.sarvam.ai/speech-to-text"
-SARVAM_STT_MODEL = os.getenv("SARVAM_STT_MODEL", "saaras:v4")
-STT_KEYTERMS = json.dumps(["din", "rupaye", "sau", "hazaar", "advance", "thekedar", "mazdoori", "haan", "nahi"])
-OPENROUTER_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
 PLACEHOLDER_KEYS = {"", "your_key_here"}
-AUDIO_EXT = {"webm": "audio/webm", "ogg": "audio/ogg", "mp4": "audio/mp4", "m4a": "audio/mp4",
-             "wav": "audio/wav", "mp3": "audio/mpeg"}
-HEARD_NOTHING = "Sun nahi paya, phir se boliye."
 SESSION_TTL_S = 2 * 60 * 60
+RATE_LIMIT, RATE_WINDOW_S = 120, 10 * 60   # turns per visitor per 10 minutes
 
 app = Flask(__name__)
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+app.config["MAX_CONTENT_LENGTH"] = 64 * 1024
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)  # real client IP behind Railway's proxy
-
-# /turn calls paid APIs and needs no login, so cap how often one visitor can use it.
-# A full conversation is about 8 turns; this allows several in a row.
-RATE_LIMIT, RATE_WINDOW_S = 40, 10 * 60
-RATE_HITS = {}
-RATE_LOCK = threading.Lock()
 database.init_db()
 os.makedirs(TTS_DIR, exist_ok=True)
 
 # Conversations in progress live in memory (one gunicorn worker); finished cases go to SQLite.
-SESSIONS = {}
-SESSIONS_LOCK = threading.Lock()
+SESSIONS, SESSIONS_LOCK = {}, threading.Lock()
+RATE_HITS, RATE_LOCK = {}, threading.Lock()
 
 
 def env_key(name):
@@ -56,89 +48,59 @@ def env_key(name):
     return None if value in PLACEHOLDER_KEYS else value
 
 
-def missing_keys():
-    """What does not work without keys. Typed mode and scripted mode need none."""
-    missing = []
-    if not env_key("SARVAM_API_KEY"):
-        missing.append("SARVAM_API_KEY (voice input and spoken replies)"
-                       if not env_key("OPENAI_API_KEY") else "SARVAM_API_KEY (spoken replies)")
-    if not (env_key("OPENROUTER_API_KEY") or env_key("OPENAI_API_KEY")):
-        missing.append("OPENROUTER_API_KEY (AI understanding; simple rules used instead)")
-    return missing
+# ---------- optional: OpenRouter reads ONE number or yes/no; never calculates ----------
 
-
-# ---------- speech-to-text: Sarvam Saaras v4 codemix, Whisper fallback ----------
-
-def transcribe_sarvam(path, api_key):
-    ext = path.rsplit(".", 1)[-1]
-    with open(path, "rb") as f:
-        resp = httpx.post(
-            SARVAM_STT_URL,
-            headers={"api-subscription-key": api_key},
-            data={"model": SARVAM_STT_MODEL, "mode": "codemix", "language_code": "hi-IN", "keyterms": STT_KEYTERMS},
-            files={"file": (os.path.basename(path), f, AUDIO_EXT.get(ext, "application/octet-stream"))},
-            timeout=20,
-        )
-    resp.raise_for_status()
-    return resp.json().get("transcript", "")
-
-
-def transcribe(path):
-    sarvam_key = env_key("SARVAM_API_KEY")
-    if sarvam_key:
-        try:
-            return transcribe_sarvam(path, sarvam_key)
-        except Exception as e:
-            app.logger.warning("Sarvam STT failed (%s)", type(e).__name__)
-    openai_key = env_key("OPENAI_API_KEY")
-    if openai_key:
-        with open(path, "rb") as f:
-            return OpenAI(api_key=openai_key).audio.transcriptions.create(
-                model="whisper-1", file=f, prompt="Hinglish: chhe din, saat sau rupaye, paanch sau advance, haan, nahi."
-            ).text
-    raise RuntimeError("no speech-to-text engine available")
-
-
-# ---------- understanding: OpenRouter reads ONE number or yes/no; never calculates ----------
-
-def llm_extract(field, question, transcript):
-    if openrouter := env_key("OPENROUTER_API_KEY"):
-        client, model = OpenAI(api_key=openrouter, base_url=OPENROUTER_URL), OPENROUTER_MODEL
-    elif openai_key := env_key("OPENAI_API_KEY"):
-        client, model = OpenAI(api_key=openai_key), "gpt-4o-mini"
-    else:
-        return conversation.local_extract(field, question, transcript)
+def llm_extract(field, question, text):
+    key = env_key("OPENROUTER_API_KEY")
+    if not key:
+        return conversation.local_extract(field, question, text)
     try:
-        resp = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "system", "content": PROMPT},
-                      {"role": "user", "content": f"Field asked: {field}\nAgent asked: {question}\nWorker said: {transcript}"}],
-            temperature=0, max_tokens=120, response_format={"type": "json_object"}, timeout=15,
+        resp = httpx.post(
+            OPENROUTER_URL,
+            headers={"Authorization": f"Bearer {key}"},
+            json={"model": OPENROUTER_MODEL, "temperature": 0, "max_tokens": 120,
+                  "response_format": {"type": "json_object"},
+                  "messages": [{"role": "system", "content": PROMPT},
+                               {"role": "user", "content": f"Field asked: {field}\nAgent asked: {question}\nWorker said: {text}"}]},
+            timeout=15,
         )
-        answer = json.loads(resp.choices[0].message.content)
+        resp.raise_for_status()
+        answer = json.loads(resp.json()["choices"][0]["message"]["content"])
         if not isinstance(answer, dict) or answer.get("field") != field:
-            return {"field": field, "value": None, "confidence": "low"}
-        # Guard: ₹0 only when the worker actually said "nothing" (a bare "haan" is not zero).
+            return conversation.local_extract(field, question, text)
+        # ₹0 only when the worker actually said "nothing" (a bare "haan" is not zero)
         if field in ("advance", "payments") and answer.get("value") == 0 and not answer.get("parts"):
-            if not (says_none(transcript) or 0 in parse_amounts(transcript)):
+            if not (says_none(text) or 0 in parse_amounts(text)):
                 return {"field": field, "value": None, "confidence": "low"}
         return answer
     except Exception as e:
-        app.logger.warning("LLM extraction failed (%s), using local rules", type(e).__name__)
-        return conversation.local_extract(field, question, transcript)
+        app.logger.warning("OpenRouter failed (%s), using built-in rules", type(e).__name__)
+        return conversation.local_extract(field, question, text)
 
 
-# ---------- agent voice ----------
+# ---------- optional: Sarvam voice, used by the browser only when it has no Hindi voice ----------
 
-def agent_audio_url(text, scripted):
-    # Fixed lines were pre-recorded and checked by sending them back through Saaras: reuse them.
-    name = sarvam_tts.audio_name(text)
-    if os.path.exists(os.path.join(DEMO_DIR, name)):
+def agent_audio_url(agent_text, speak_text, scripted):
+    name = sarvam_tts.audio_name(agent_text)
+    if os.path.exists(os.path.join(DEMO_DIR, name)):       # pre-recorded, free
         return f"/static/demo/{name}"
-    if scripted:  # pre-recorded only: scripted mode makes no network calls
+    if scripted or not env_key("SARVAM_API_KEY"):
         return None
-    name = sarvam_tts.synthesize(text, env_key("SARVAM_API_KEY"), TTS_DIR, app.logger)
+    name = sarvam_tts.synthesize(speak_text, env_key("SARVAM_API_KEY"), TTS_DIR, app.logger)
     return f"/static/tts/{name}" if name else None
+
+
+def rate_limited():
+    now, ip = time.time(), request.remote_addr or "?"
+    with RATE_LOCK:
+        if len(RATE_HITS) > 5000:
+            RATE_HITS.clear()
+        hits = [t for t in RATE_HITS.get(ip, []) if now - t < RATE_WINDOW_S]
+        limited = len(hits) >= RATE_LIMIT
+        if not limited:
+            hits.append(now)
+        RATE_HITS[ip] = hits
+        return limited
 
 
 def get_session(session_id):
@@ -158,58 +120,39 @@ def respond(session, reply, scripted, heard=None):
     return jsonify({
         "session_id": session["id"],
         "agent_text": reply["agent_text"],
-        "agent_audio_url": agent_audio_url(reply["agent_text"], scripted),
+        "speak_text": reply["speak_text"],
+        "agent_audio_url": agent_audio_url(reply["agent_text"], reply["speak_text"], scripted),
         "state": reply["state"],
         "done": reply["done"],
-        "case": reply["case"],
+        "case_data": reply["case"],
         "case_id": session["case_id"],
         "heard": heard,
         "parsed": reply.get("parsed"),
         "reasked": reply.get("reasked", False),
-        "fallback_text": reply.get("fallback_text", False),
+        "needs_assistance": reply.get("needs_assistance", False),
     })
-
-
-def rate_limited():
-    now = time.time()
-    ip = request.remote_addr or "?"
-    with RATE_LOCK:
-        hits = [t for t in RATE_HITS.get(ip, []) if now - t < RATE_WINDOW_S]
-        if len(RATE_HITS) > 5000:  # keep memory bounded
-            RATE_HITS.clear()
-        if len(hits) >= RATE_LIMIT:
-            RATE_HITS[ip] = hits
-            return True
-        hits.append(now)
-        RATE_HITS[ip] = hits
-        return False
-
-
-@app.errorhandler(413)
-def too_large(_):
-    return jsonify({"error": "Recording too large (max 10 MB)"}), 413
 
 
 @app.route("/")
 def index():
-    voice_ok = bool(env_key("SARVAM_API_KEY") or env_key("OPENAI_API_KEY"))
-    return render_template("index.html", keys_missing=missing_keys(), voice_ok=voice_ok)
+    return render_template("index.html")
 
 
 @app.route("/health")
 def health():
-    return jsonify({"ok": True, "keys_missing": missing_keys()})
+    return jsonify({"status": "ok", "key_set": bool(env_key("SARVAM_API_KEY") or env_key("OPENROUTER_API_KEY"))})
 
 
 @app.route("/turn", methods=["POST"])
 def turn():
-    """{session_id, audio | text, mode} -> {agent_text, agent_audio_url, state, done, case}.
-    No session_id starts a new conversation and returns the agent's opening line."""
-    mode = request.form.get("mode", "voice")
-    scripted = mode == "scripted"
+    """{session_id, text} -> {agent_text, state, done, case_data}. `text` is what the worker
+    dictated with Wispr Flow. No session_id starts a new conversation (the agent speaks first)."""
+    data = request.get_json(silent=True) or request.form
+    scripted = data.get("mode", "") == "scripted"
     if not scripted and rate_limited():
         return jsonify({"error": "Bahut zyada koshish ho gayi. Thodi der baad phir try kijiye."}), 429
-    session = get_session(request.form.get("session_id"))
+
+    session = get_session(data.get("session_id"))
     if session is None:
         session = conversation.new_session()
         session["touched"] = time.time()
@@ -217,41 +160,20 @@ def turn():
             SESSIONS[session["id"]] = session
         return respond(session, conversation.opening(session), scripted)
 
-    if request.form.get("event") == "sent":           # worker tapped "Send to contractor"
+    if data.get("event") == "sent":                     # worker tapped "Send to contractor"
         reply = conversation.mark_sent(session)
         if reply is None:
-            return jsonify({"error": "Nothing to send yet."}), 409
+            return jsonify({"error": "Abhi bhejne ke liye kuch nahi hai."}), 409
         return respond(session, reply, scripted)
 
-    audio = request.files.get("audio")
-    if audio and audio.filename:
-        if not (env_key("SARVAM_API_KEY") or env_key("OPENAI_API_KEY")):
-            return jsonify({"error": "API key not set: SARVAM_API_KEY. Voice input is off; use typed mode (?mode=text).",
-                            "key_missing": True}), 503
-        ext = (audio.filename.rsplit(".", 1)[-1] or "webm").lower()
-        ext = ext if ext in AUDIO_EXT else "webm"
-        fd, path = tempfile.mkstemp(suffix="." + ext)
-        os.close(fd)
-        try:
-            audio.save(path)
-            transcript = transcribe(path).strip()
-        except Exception as e:
-            app.logger.warning("STT failed (%s)", type(e).__name__)
-            transcript = ""
-        finally:
-            os.remove(path)
-        if not transcript:
-            return jsonify({"session_id": session["id"], "error": HEARD_NOTHING, "stt_failed": True,
-                            "state": session["state"]}), 200
-    else:
-        transcript = (request.form.get("text") or "").strip()[:300]
-        if not transcript:
-            return jsonify({"session_id": session["id"], "error": "Kuch likhiye ya boliye.",
-                            "state": session["state"]}), 400
+    text = str(data.get("text") or "").strip()[:500]
+    if not text:
+        return jsonify({"session_id": session["id"], "state": session["state"],
+                        "error": "Jawab khaali hai. Wispr Flow se boliye ya likhiye."}), 400
 
     extract = conversation.local_extract if scripted else llm_extract
-    reply = conversation.step(session, transcript, extract)
-    return respond(session, reply, scripted, heard=transcript)
+    reply = conversation.step(session, text, extract)
+    return respond(session, reply, scripted, heard=text)
 
 
 if __name__ == "__main__":

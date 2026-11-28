@@ -9,3 +9,5 @@ evidence.db
 evidence.db-*
 pagarsaathi.db
 pagarsaathi.db-*
+.pytest_cache/
+node_modules/

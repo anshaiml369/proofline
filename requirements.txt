@@ -1,5 +1,4 @@
 flask
-openai
 httpx
 python-dotenv
 gunicorn

@@ -1,176 +1,101 @@
 <!doctype html>
-<html lang="hi">
+<html lang="hi" class="h-full">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PagarSaathi</title>
-<meta name="theme-color" content="#f7f4ee">
-<style>
-  :root {
-    --bg: #f7f4ee; --surface: #ffffff; --ink: #1c1917; --muted: #6b645c; --line: #e7e1d7;
-    --brand: #c2410c; --brand-soft: #fff1e8; --go: #15803d; --go-dark: #116630; --go-soft: #e8f5ec;
-    --warn-soft: #fff7d6; --warn-ink: #7a5a00; --err: #b42318; --err-soft: #fdecea;
-    --radius: 18px; --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Noto Sans Devanagari", Roboto, sans-serif;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); }
-  body { min-height: 100vh; -webkit-font-smoothing: antialiased; }
-  main { max-width: 560px; margin: 0 auto; padding: 16px 16px 48px; }
-
-  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .logo { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff;
-          display: grid; place-items: center; font-weight: 800; font-size: 18px; }
-  .brand h1 { margin: 0; font-size: 20px; letter-spacing: -0.01em; }
-  .brand p { margin: 0; font-size: 13px; color: var(--muted); }
-  .mode { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--surface);
-          border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; white-space: nowrap; }
-
-  .banner { border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.45; margin-bottom: 14px;
-            background: var(--warn-soft); color: var(--warn-ink); border: 1px solid #f1e2a6; }
-  .banner b { display: block; margin-bottom: 2px; }
-
-  .question { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-              padding: 22px 20px; min-height: 132px; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
-  .q-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand); }
-  #agent-text { margin: 0; font-size: 26px; line-height: 1.3; font-weight: 650; letter-spacing: -0.01em; }
-  .replay { align-self: flex-start; border: 0; background: var(--brand-soft); color: var(--brand); font: inherit;
-            font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
-  .replay[hidden] { display: none; }
-
-  .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0 6px; }
-  .fact { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 9px 8px; text-align: center; }
-  .fact span { display: block; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-  .fact b { display: block; font-size: 16px; margin-top: 3px; font-variant-numeric: tabular-nums; color: #a8a29e; }
-  .fact.filled { border-color: #bfe3cb; background: var(--go-soft); }
-  .fact.filled b { color: var(--ink); }
-
-  .controls { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 22px 0 8px; }
-  #mic { width: 132px; height: 132px; border-radius: 50%; border: 0; cursor: pointer; background: var(--brand); color: #fff;
-         display: grid; place-items: center; box-shadow: 0 10px 30px rgba(194, 65, 12, 0.32); transition: transform .12s, background .2s;
-         -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-  #mic:active { transform: scale(0.97); }
-  #mic svg { width: 52px; height: 52px; }
-  #mic.recording { background: var(--err); animation: pulse 1.2s infinite; }
-  #mic.busy { background: #a8a29e; box-shadow: none; cursor: wait; }
-  #mic:disabled { cursor: not-allowed; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(180, 35, 24, .45); } 70% { box-shadow: 0 0 0 22px rgba(180, 35, 24, 0); } 100% { box-shadow: 0 0 0 0 rgba(180, 35, 24, 0); } }
-  #status { min-height: 22px; font-size: 15px; color: var(--muted); text-align: center; }
-  #status.error { color: var(--err); font-weight: 600; }
-
-  .typed { display: flex; gap: 8px; width: 100%; }
-  .typed[hidden] { display: none; }
-  .typed input { flex: 1; min-width: 0; font: inherit; font-size: 18px; padding: 14px 16px; border-radius: 14px;
-                 border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); }
-  .typed input:focus { outline: none; border-color: var(--brand); }
-  .typed button { font: inherit; font-size: 16px; font-weight: 700; border: 0; border-radius: 14px; padding: 0 20px;
-                  background: var(--ink); color: #fff; cursor: pointer; }
-  .switch { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
-
-  .start { width: 100%; font: inherit; font-size: 20px; font-weight: 700; border: 0; border-radius: 16px; padding: 18px;
-           background: var(--brand); color: #fff; cursor: pointer; box-shadow: 0 10px 30px rgba(194, 65, 12, 0.28); }
-
-  h2 { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 26px 0 10px; }
-  #log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  #log li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 15px; line-height: 1.4; }
-  #log .a { color: var(--muted); }
-  #log .w { font-weight: 600; }
-  #log .arrow { color: var(--brand); margin: 0 4px; }
-  #log .val { font-size: 12px; font-weight: 700; color: var(--go); background: var(--go-soft); padding: 2px 7px; border-radius: 999px; margin-left: 6px; white-space: nowrap; }
-  .empty { color: #a8a29e; font-size: 14px; }
-
-  .calc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 18px; }
-  .calc .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 16px; }
-  .calc .row:last-child { border-bottom: 0; }
-  .calc .row small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
-  .calc .amt { font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
-  .calc .total { font-size: 22px; font-weight: 800; }
-  .calc .total .amt { color: var(--brand); }
-  .calc.zero .total .amt { color: var(--go); }
-  .nodue { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--go-soft); color: var(--go-dark); font-weight: 600; }
-
-  #preview { white-space: pre-wrap; background: #e7f6dc; border: 1px solid #cde8b8; border-radius: 4px 16px 16px 16px;
-             padding: 14px 16px; font-size: 15px; line-height: 1.5; margin: 0; font-family: var(--font); }
-  #send { width: 100%; margin-top: 14px; font: inherit; font-size: 19px; font-weight: 750; border: 0; border-radius: 16px; padding: 18px;
-          background: var(--go); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-          box-shadow: 0 10px 26px rgba(21, 128, 61, 0.3); }
-  #send:hover { background: var(--go-dark); }
-  #send svg { width: 22px; height: 22px; }
-  .again { display: block; margin: 22px auto 0; font: inherit; font-size: 15px; font-weight: 600; background: var(--surface);
-           border: 1px solid var(--line); border-radius: 12px; padding: 11px 18px; cursor: pointer; color: var(--ink); }
-  [hidden] { display: none !important; }
-  footer { margin-top: 30px; font-size: 12px; color: #a8a29e; text-align: center; line-height: 1.5; }
-</style>
+<meta name="description" content="Bolo, hisaab pao. Speak with Wispr Flow; PagarSaathi works out your unpaid wages.">
+<meta name="theme-color" content="#1e1b4b">
+<link rel="stylesheet" href="{{ url_for('static', filename='tailwind.css') }}">
 </head>
-<body>
-<main>
-  <header>
-    <div class="brand">
-      <div class="logo" aria-hidden="true">₹</div>
-      <div><h1>PagarSaathi</h1><p>Mazdoori ka hisaab, aawaz se</p></div>
+<body class="min-h-full bg-gradient-to-b from-indigo-950 via-slate-900 to-zinc-950 text-slate-100 antialiased text-[18px]">
+<main class="mx-auto w-full max-w-xl px-4 py-6 sm:py-10">
+
+  <!-- header -->
+  <header class="mb-5 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-xl font-black text-indigo-950 shadow-lg shadow-orange-500/30">₹</div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">PagarSaathi</h1>
+        <p class="text-sm text-slate-400">Mazdoori ka hisaab, aawaz se</p>
+      </div>
     </div>
-    <span class="mode" id="mode-chip"></span>
+    <span id="mode-chip" class="hidden shrink-0 whitespace-nowrap rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300">Scripted demo</span>
   </header>
 
-  {% if keys_missing %}
-  <div class="banner" id="keys-banner" role="status">
-    <b>API key not set.</b>
-    Missing: {{ keys_missing | join(", ") }}. Add keys to <code>.env</code> and restart.
-    Typed mode (<a href="/?mode=text">?mode=text</a>) and the scripted demo (<a href="/?mode=scripted">?mode=scripted</a>) still work.
-  </div>
-  {% endif %}
+  <!-- card -->
+  <section class="rounded-[24px] border border-white/10 bg-white/[0.06] p-5 shadow-2xl shadow-black/40 backdrop-blur sm:p-7">
 
-  <section class="question" aria-live="polite">
-    <div class="q-label">PagarSaathi</div>
-    <p id="agent-text">Namaste. Neeche button dabaiye aur apni baat boliye.</p>
-    <button class="replay" id="replay" hidden>▶ Phir se suniye</button>
-  </section>
+    <!-- agent question -->
+    <div class="flex items-start gap-3">
+      <div class="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-indigo-500/25 text-indigo-200" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+      </div>
+      <div class="min-w-0 flex-1" aria-live="polite">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-300">PagarSaathi <span id="speaking" class="ml-1 hidden normal-case tracking-normal text-indigo-200/80">· bol raha hai…</span></p>
+        <p id="agent-text" class="mt-1 text-[28px] font-bold leading-tight text-white">Namaste. Shuru karne ke liye neeche button dabaiye.</p>
+        <button id="replay" type="button" class="mt-3 hidden rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-slate-200 hover:bg-white/15">▶ Phir se suniye</button>
+      </div>
+    </div>
 
-  <div class="facts" aria-label="Collected facts">
-    <div class="fact" data-field="days"><span>Din</span><b>—</b></div>
-    <div class="fact" data-field="rate"><span>Roz</span><b>—</b></div>
-    <div class="fact" data-field="advance"><span>Advance</span><b>—</b></div>
-    <div class="fact" data-field="payments"><span>Mila</span><b>—</b></div>
-  </div>
+    <!-- facts -->
+    <div class="mt-6 grid grid-cols-4 gap-2" aria-label="Collected facts">
+      <div class="fact rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5 text-center" data-field="days"><span class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Din</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
+      <div class="fact rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5 text-center" data-field="rate"><span class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Roz</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
+      <div class="fact rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5 text-center" data-field="advance"><span class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Advance</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
+      <div class="fact rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5 text-center" data-field="payments"><span class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Mila</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
+    </div>
 
-  <div class="controls">
-    <button class="start" id="start">Shuru karein</button>
-    <button id="mic" aria-label="Tap to speak" hidden>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="22"/></svg>
-    </button>
-    <form class="typed" id="typed" hidden autocomplete="off">
-      <input id="typed-input" placeholder="Jawab likhiye, jaise: 6 din" aria-label="Your answer">
-      <button type="submit">Bhejiye</button>
+    <!-- start -->
+    <button id="start" type="button" class="mt-6 w-full rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-4 text-xl font-bold text-white shadow-lg shadow-indigo-500/30 transition hover:brightness-110 active:scale-[0.99]">Shuru karein</button>
+
+    <!-- Wispr Flow input -->
+    <form id="answer-form" class="mt-6 hidden" autocomplete="off">
+      <div class="flex items-center justify-between gap-3">
+        <label for="answer" class="flex items-center gap-2 text-lg font-semibold text-white">
+          <span class="grid h-7 w-7 place-items-center rounded-lg bg-white text-sm font-black text-indigo-950" title="Wispr Flow" aria-hidden="true">W</span>
+          Speak your answer
+        </label>
+        <span class="text-xs text-slate-400">via Wispr Flow</span>
+      </div>
+      <p class="mt-1 text-sm text-slate-400">Mac: double-tap Fn · iPhone: use the Wispr Flow keyboard</p>
+      <textarea id="answer" rows="3" class="mt-3 h-[120px] w-full resize-none rounded-2xl border border-white/15 bg-slate-950/60 px-4 py-3 text-[20px] leading-snug text-white placeholder-slate-500 outline-none ring-indigo-400/60 transition focus:border-indigo-400 focus:ring-4" placeholder="Jaise: chhe din"></textarea>
+      <div id="assist" class="mt-3 hidden rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">Madad chahiye? Kisi saathi se poochh kar sirf number boliye.</div>
+      <p id="status" role="status" class="mt-3 min-h-[1.5rem] text-base text-slate-400"></p>
+      <button id="continue" type="submit" class="mt-1 w-full rounded-2xl bg-indigo-500 px-6 py-4 text-xl font-bold text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-400 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60">Continue</button>
     </form>
-    <div id="status" role="status"></div>
-    <button class="switch" id="switch" type="button" hidden></button>
-  </div>
 
-  <section id="result" hidden>
-    <h2>Hisaab</h2>
-    <div class="calc" id="calc"></div>
-    <div class="nodue" id="nodue" hidden>Hisaab ke hisaab se koi paisa baaki nahi hai.</div>
+    <!-- result -->
+    <section id="result" class="mt-7 hidden">
+      <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Hisaab</h2>
+      <div id="calc" class="mt-3 divide-y divide-dashed divide-white/10 rounded-2xl border border-white/10 bg-slate-950/50 px-5"></div>
+      <div id="nodue" class="mt-3 hidden rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 font-semibold text-emerald-200">Hisaab ke hisaab se koi paisa baaki nahi hai.</div>
+    </section>
+
+    <section id="preview-wrap" class="mt-7 hidden">
+      <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Thekedar ko message</h2>
+      <pre id="preview" class="mt-3 whitespace-pre-wrap rounded-2xl rounded-tl-md border border-emerald-400/20 bg-emerald-950/60 px-5 py-4 font-sans text-base leading-relaxed text-emerald-50"></pre>
+      <button id="send" type="button" class="mt-4 hidden w-full items-center justify-center gap-3 rounded-2xl bg-emerald-500 px-6 py-5 text-xl font-bold text-emerald-950 shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400 active:scale-[0.99]">
+        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3a2.6 2.6 0 0 0-.8 1.9 4.5 4.5 0 0 0 1 2.4 10.3 10.3 0 0 0 4 3.5c1.5.6 2 .7 2.8.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3Z"/></svg>
+        Send to contractor
+      </button>
+    </section>
+
+    <button id="again" type="button" class="mt-6 hidden w-full rounded-2xl border border-white/15 px-6 py-3 text-base font-semibold text-slate-200 hover:bg-white/5">Naya hisaab</button>
   </section>
 
-  <section id="preview-wrap" hidden>
-    <h2>Thekedar ko message</h2>
-    <pre id="preview"></pre>
-    <button id="send" hidden>
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3a2.6 2.6 0 0 0-.8 1.9 4.5 4.5 0 0 0 1 2.4 10.3 10.3 0 0 0 4 3.5c1.5.6 2 .7 2.8.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3Z"/></svg>
-      Send to contractor
-    </button>
+  <!-- turn log -->
+  <section class="mt-6">
+    <h2 class="px-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Baatcheet</h2>
+    <ol id="log" class="mt-3 flex flex-col gap-2.5">
+      <li class="empty px-1 text-sm text-slate-500">Abhi koi baat nahi hui.</li>
+    </ol>
   </section>
 
-  <section>
-    <h2>Baatcheet</h2>
-    <ol id="log"><li class="empty">Abhi koi baat nahi hui.</li></ol>
-  </section>
-
-  <button class="again" id="again" hidden>Naya hisaab</button>
-
-  <footer>Hisaab Python karta hai, AI sirf aapki baat samajhta hai. Message WhatsApp se aap khud bhejte hain.</footer>
+  <footer class="mt-10 pb-4 text-center text-sm text-slate-500">
+    Built with Wispr Flow + Claude Code · Demo mode: <a class="underline decoration-slate-600 underline-offset-2 hover:text-slate-300" href="/?mode=scripted">?mode=scripted</a>
+  </footer>
 </main>
-<script>window.PAGAR = { voiceOk: {{ voice_ok | tojson }} };</script>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

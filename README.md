@@ -1,82 +1,61 @@
 # PagarSaathi
 
-**A Hinglish voice agent that works out a daily-wage worker's unpaid wages.**
-
-A worker says: *"Thekedar ne poore paise nahi diye."* PagarSaathi asks four questions, one at a time, by voice:
-1. How many days did you work?
-2. What daily rate was agreed?
-3. Did you get an advance?
-4. How much have you been paid so far?
-
-It reads all four facts back and waits for "haan". Python then works out what is still owed, and the agent says the result out loud. If the worker wants, it prepares a payment request and opens WhatsApp with the message ready to send.
+**Bolo, hisaab pao.** A daily-wage worker tells PagarSaathi what happened, by voice through Wispr Flow. A Hinglish agent asks four questions, reads the facts back, and Python works out exactly how much is still owed. With one tap, a payment request opens in WhatsApp, ready to send to the contractor.
 
 Built for the *India Runs on Voice* hackathon (Scaler × Wispr Flow).
 
-## The demo conversation
+> Demo video: _link to be added_ · Pitch deck: [`PITCH_DECK.md`](PITCH_DECK.md) · Live app: _link to be added_
 
-| | |
-|---|---|
-| Worker | Mujhe thekedar ne is hafte poore paise nahi diye. |
-| Agent | Aapne kitne din kaam kiya? |
-| Worker | Chhe din. |
-| Agent | Roz ki mazdoori kitni tay hui thi? |
-| Worker | Saat sau rupaye. |
-| Agent | Koi advance mila tha pehle? |
-| Worker | Paanch sau. |
-| Agent | Ab tak kitne paise mile? |
-| Worker | Teen hazaar. |
-| Agent | Confirm karta hoon: chhe din, saat sau roz, paanch sau advance, teen hazaar paid. Sahi hai? |
-| Worker | Haan. |
-| Agent | Kul kamaai chaar hazaar do sau. Mila teen hazaar paanch sau. Baaki saat sau rupaye. Thekedar ko payment request bhejun? |
-| Worker | Haan. |
+## The problem
 
-The screen then shows the calculation (6 × ₹700 = ₹4,200, minus ₹500 advance, minus ₹3,000 paid = **₹700 outstanding**). The message preview appears next, and only then the green **Send to contractor** button.
+A daily-wage worker (construction, loading, domestic or farm work) agrees a daily rate by word of mouth. At the end of the week the contractor pays "something", minus an advance given earlier. Nothing is written down.
 
-## How it works
+- The worker often can't say on the spot how much is still owed.
+- Without a clear figure, a written request is hard to make.
+- Formal routes exist, but they start with paperwork. The government's [SAMADHAN portal](https://samadhan.labour.gov.in) takes unpaid-wage claims, for example.
+
+## The user
+
+A daily-wage worker who speaks Hindi or Hinglish, has a phone, and may not be comfortable typing or doing the sums under pressure. A union or NGO volunteer helping that worker is the second user.
+
+## The solution: one flow
 
 ```
-mic ─▶ Sarvam Saaras v4 (codemix STT) ─▶ OpenRouter: read ONE number or yes/no ─▶ conversation.py (state machine)
-                                                                                         │
-                       Sarvam Bulbul v4 Flash (hi-IN TTS) ◀─ agent's next line ◀─ wage_math.py (all arithmetic)
+Worker speaks (Wispr Flow) → text box → agent asks: days? rate? advance? paid so far?
+→ agent reads all four back: "Sahi hai?" → "Haan" → Python calculates
+→ agent says what is owed → "Payment request bhejun?" → "Haan"
+→ message preview → green "Send to contractor" → WhatsApp opens, message pre-filled
 ```
 
-- **The LLM never does arithmetic.** It only returns `{"field", "value", "confidence"}` for the question just asked. If the worker names several amounts ("do hazaar aur ek hazaar"), it lists them in `parts`, and Python adds them.
-- **Python does all the maths** in `wage_math.py`:
+- **Python does all the arithmetic** in [`wage_math.py`](wage_math.py):
   - `expected = days × rate`
   - `received = advance + payments`
   - `outstanding = max(0, expected − received)`
-- **The read-back is mandatory.** Nothing is calculated until the worker says "haan" to all four facts. "Nahi" starts the questions again.
-- **Unclear answers:** a low-confidence or empty answer gets the same question again in simpler words. After a second miss, the page switches to typing.
-- **Implausible numbers are re-asked,** for example 500 days or ₹5 a day.
+  - No model ever calculates.
+- **The read-back is mandatory.** Nothing is calculated until the worker says "haan". "Nahi" starts the questions again.
+- **Unclear answers** get the same question again in simpler words. After two misses the case is flagged *needs assistance*:
+  - For advance or payments, the agent records zero, says so, and moves on. The worker can correct it at the read-back.
+  - For days or the daily rate, it keeps asking, with a hint to get help, because those can't be guessed.
 - **Nothing owed:** the agent says *"Hisaab ke hisaab se koi paisa baaki nahi hai"*, and no send button appears.
-- **WhatsApp is a plain deep link** (`https://wa.me/?text=…`). There is no WhatsApp API. The worker picks the contractor's chat and presses send.
-- **Saved records:** each finished case is stored in SQLite (`wage_cases`).
+- **WhatsApp is a plain link** (`https://wa.me/?text=…`), with no WhatsApp API. The worker picks the contractor's chat and presses send.
 
-### State machine (`conversation.py`)
+## How Wispr Flow is used (the architectural rule)
 
-`START → ASK_DAYS → ASK_RATE → ASK_ADVANCE → ASK_PAYMENTS → CONFIRM → CALCULATE → READ_RESULT → ASK_SEND → SHOW_PREVIEW → SEND_BUTTON → DONE`
+**Wispr Flow is the product's voice layer.** It is OS-level dictation:
+- **Mac:** double-tap Fn.
+- **iPhone:** the Wispr Flow keyboard.
 
-## Modes
+The worker speaks, and the words land in PagarSaathi's text box. **The app receives text, and needs no Wispr Flow API key and no speech-to-text service.** The page has no microphone button by design.
 
-| URL | What it does |
-|---|---|
-| `/` | Voice: tap the mic, speak, tap again. The agent replies by voice. |
-| `/?mode=text` | Typed answers instead of the mic. It also works with no API keys, using simple built-in rules. |
-| `/?mode=scripted` | Replays the demo conversation above with pre-recorded audio (about 55 s). It needs no mic and no internet. Use it as a backup for the video. |
+The agent's replies are spoken by the **browser's own voice** (SpeechSynthesis, free, no key). Sarvam Bulbul is only an optional fallback for browsers without a Hindi voice. Setup steps are in [`WISPR_FLOW_SETUP.md`](WISPR_FLOW_SETUP.md).
 
-If speech-to-text hears nothing, the page shows *"Sun nahi paya, phir se boliye"* and the worker can try again. If text-to-speech fails, the question is shown as text and the conversation carries on.
-
-## Run with Docker
-
-```bash
-docker compose up
-```
-
-Open http://localhost:5050. Port 5050 is used on the host because macOS uses port 5000 for AirPlay; inside the container the app runs on 5000.
-
-- **Keys are optional.** With no `.env`, the app still starts and the main screen shows **"API key not set"** with the missing keys. Typed mode and the scripted demo still work fully.
-- **No secrets in the image.** `.dockerignore` keeps `.env` and the database out.
-- **Data is not kept.** The SQLite file lives inside the container.
+| Part | What does it | Key needed? |
+|---|---|---|
+| Voice in | Wispr Flow (OS-level dictation) | No |
+| Understanding the answer | Built-in Hinglish rules: digits, Roman, Devanagari, "nahi mila" | No |
+| Maths | `wage_math.py` | No |
+| Voice out | Browser SpeechSynthesis (hi-IN) | No |
+| Optional | OpenRouter LLM reads answers (never calculates); Sarvam voice fallback | Optional |
 
 ## Run locally
 
@@ -87,64 +66,109 @@ pip3 install -r requirements.txt
 ```
 
 ```bash
-cp .env.example .env
-```
-
-| Variable | Used for |
-|---|---|
-| `SARVAM_API_KEY` | Speech-to-text (Saaras v4, codemix) and the agent's voice (Bulbul v4 Flash) |
-| `OPENROUTER_API_KEY` | Reading numbers and yes/no from the worker's words (default model `openai/gpt-4o-mini`) |
-| `OPENAI_API_KEY` | Optional fallback for both: Whisper for speech-to-text, gpt-4o-mini for understanding |
-
-```bash
 python3 app.py
 ```
 
-Then open http://127.0.0.1:5050.
+Open http://127.0.0.1:5050. No `.env` is needed.
+
+## Run with Docker
+
+```bash
+docker compose up
+```
+
+Open http://localhost:5000. On a Mac, macOS AirPlay already holds port 5000. Use another port there:
+
+```bash
+HOST_PORT=5050 docker compose up
+```
+
+## What happens without keys
+
+Everything in the core flow works:
+- the page,
+- the conversation,
+- the maths,
+- the spoken replies (browser voice),
+- the WhatsApp message,
+- the scripted demo.
+
+`GET /health` returns `{"status": "ok", "key_set": false}`. Keys in `.env` only switch on the optional extras in the table above.
+
+## Modes
+
+- `/`: normal use. Dictate with Wispr Flow, or type, then press **Continue**.
+- `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself, in about 55 seconds. It calls no outside service.
+
+## API
+
+`POST /turn` with JSON `{session_id, text}` returns `{agent_text, speak_text, state, done, case_data}`.
+- Leave out `session_id` to start a conversation; the agent speaks first.
+- Send `{session_id, event: "sent"}` when the worker taps Send.
+- States: `START → ASK_DAYS → ASK_RATE → ASK_ADVANCE → ASK_PAYMENTS → CONFIRM → CALCULATE → READ_RESULT → ASK_SEND → SHOW_PREVIEW → DONE`.
 
 ## Tests
 
 ```bash
-python3 -m unittest discover tests
+pip3 install -r requirements-dev.txt
 ```
-
-The tests cover:
-- the wage maths, including the never-negative outstanding amount and bad input;
-- Hinglish number words in both directions;
-- the demo conversation;
-- the mandatory confirm step;
-- a re-ask, then the typed fallback;
-- multiple payments added in Python;
-- the nothing-owed path.
-
-## Pre-recorded audio
-
-`static/demo/` holds the agent's fixed lines and the worker's demo lines. Each clip was checked by sending it back through Saaras. Live mode reuses these clips too, so the fixed lines play instantly. To regenerate them (needs `SARVAM_API_KEY`):
 
 ```bash
-python3 scripts/make_demo_audio.py
+python3 -m pytest
 ```
+
+There are 35 tests. They cover:
+- the three required wage cases: (6, 700, 500, 3000) → 700; (5, 800, 0, 4000) → 0; (10, 500, 200, 3000) → 1800;
+- the demo conversation and Wispr-style text (digits, ₹, Devanagari);
+- the mandatory confirm step;
+- re-ask, then *needs assistance*;
+- multiple payments added in Python;
+- "pata nahi" not being read as ₹0;
+- the nothing-owed path.
+
+## Built with
+
+- **Flask** (Python 3.11) and **gunicorn**
+- **Wispr Flow**: the voice layer (OS-level dictation)
+- **Browser SpeechSynthesis**: the agent's voice
+- **Sarvam Bulbul**: optional voice fallback
+- **OpenRouter**: optional answer reader
+- **SQLite**: finished cases, in the `wage_cases` table
+- **Tailwind CSS**: compiled to a static file, so pages need no CDN
+- **Docker**
+- Built with **Wispr Flow + Claude Code**
+
+## Claims and sources
+
+| Claim | Status | Source |
+|---|---|---|
+| Unpaid wages are a real, recurring problem. In a survey of 950 rescued bonded labourers, more than half had not been paid. | SOURCED (survey of rescued bonded labourers, not all daily-wage workers) | NCCEBL survey, reported by [The Quint](https://www.thequint.com/jobs/migrant-bonded-labour-abolition-rescued-workers-dalit-adivasi-obc-rehabilitation-survey-data-latest-news) |
+| Much of India's services workforce is informal, with limited social security. | SOURCED | NITI Aayog, [*India's Services Sector: Insights from Employment Trends* (2025)](https://www.niti.gov.in/node/2028) |
+| A government route exists for unpaid-wage claims (Payment of Wages Act, Minimum Wages Act). | SOURCED | [SAMADHAN portal](https://samadhan.labour.gov.in) |
+| Wispr Flow supports Hindi and Hinglish, including romanised Hindi output. | SOURCED | [wisprflow.ai/india](https://wisprflow.ai/india), [Wispr Flow blog](https://wisprflow.ai/post/supporting-languages) |
+| Existing wage apps are built for the employer or contractor, not the worker. PagarBook lists 10M+ downloads. | SOURCED (app listings) | [PagarBook](https://pagarbook.com/), [AppBrain listing](https://appgoblin.info/apps/com.gyantech.pagarbook) |
+| How many workers are short-paid each week, and by how much | UNVERIFIED | No reliable national figure found |
+| Speaking is faster than typing for this user | UNVERIFIED | Not measured |
 
 ## Honest limits
 
-- **It calculates; it does not enforce.** The payment request is a message the worker chooses to send. Nothing is sent automatically.
-- **Simple wage cases only:** one daily rate. Overtime, half days and deductions are not handled yet.
-- **No login and no accounts.** Conversations in progress live in server memory (one gunicorn worker); finished cases go to SQLite.
-- **Voice testing so far:** recognition was tested with synthetic Hindi voices fed through Chrome's recorder, not yet with workers in a noisy site. The read-back step is there to catch mishearings.
-- **`/turn` needs no login and calls paid APIs.** Set spend limits on your keys before any public deploy.
+- **It calculates; it does not enforce.** The message is sent by the worker, if they choose to.
+- **Simple cases only:** one daily rate. Overtime, half days and deductions are not handled yet.
+- **No accounts.** Conversations in progress live in server memory (one gunicorn worker); finished cases go to SQLite.
+- **Not yet tested with real workers.** The built-in reader was tested on demo-style answers. Real dictation will bring new phrasings.
 
 ## Files
 
 | Path | What it is |
 |---|---|
-| `app.py` | Flask: `GET /`, `POST /turn`, `GET /health`; Sarvam STT and the OpenRouter call |
-| `conversation.py` | The state machine and the local rule-based reader |
+| `app.py` | Flask: `GET /`, `POST /turn`, `GET /health` |
+| `conversation.py` | The state machine and the built-in Hinglish reader |
 | `wage_math.py` | All arithmetic, as pure functions |
 | `hinglish_numbers.py` | Number words, both ways (4200 ⇄ "chaar hazaar do sau") |
-| `sarvam_tts.py` | Bulbul v4 Flash TTS, hi-IN, mp3, cached |
-| `database.py` | SQLite `wage_cases` table |
-| `prompts/turn.txt` | The extraction prompt |
-| `templates/index.html`, `static/app.js` | The one screen: mic, question, turn log, calculation, preview, send |
-| `scripts/make_demo_audio.py` | Records the scripted-mode audio |
+| `sarvam_tts.py` | Optional Sarvam voice fallback |
+| `database.py` | SQLite `wage_cases`: `save_case()`, `get_case()` |
+| `templates/index.html`, `static/app.js` | The one screen |
+| `WISPR_FLOW_SETUP.md` | Mac and iPhone setup |
+| `PITCH_DECK.md`, `DEMO_SCRIPT.md` | Pitch and demo |
 
 The earlier Proofline project is kept on the `proofline-archive` branch.
