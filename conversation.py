@@ -1529,7 +1529,15 @@ def _set_line(session, reply, line):
 ANGLES = ("angle", "example", "simpler")
 
 
-def _post(session, text, reply, before_state):
+def _question_only(line):
+    """The LLM's own question without its own acknowledgement: "Aapki baat samajh mein aayi, …
+    Kitne din kaam kiya?" -> "Kitne din kaam kiya?". The whole line when it asks nothing."""
+    parts = re.split(r"(?<=[.?!।])\s+", (line or "").strip())
+    asks = [i for i, p in enumerate(parts) if p.endswith("?")]
+    return " ".join(parts[asks[-1]:]) if asks else line
+
+
+def _post(session, text, reply, before_state, policy=False):
     """Every collecting reply passes here: one acknowledgement for context, never a near-repeat,
     and a rephrase changes the question's type, not only its words."""
     if before_state not in COLLECT and before_state not in (CONFIRM,):
@@ -1559,7 +1567,10 @@ def _post(session, text, reply, before_state):
         ack = _ack_for(contexts[0])
         if ack and not any(m in reply["agent_text"].lower() for m in ACK_MARKERS) and \
                 session.get("language", "hi") in ("hi", "en-mix", "bho"):
-            _set_line(session, reply, _join(ack, (reply["agent_text"], reply["speak_text"])))
+            body = (reply["agent_text"], reply["speak_text"])
+            if policy:            # the LLM acknowledged in its own words: one acknowledgement, Python's
+                body = (_question_only(body[0]), _question_only(body[1]))
+            _set_line(session, reply, _join(ack, body))
             session["turns"][-1]["ack_added"] = contexts[0].get("category")
     session["last_question_type"] = qtype
     reply["qtype"] = qtype
@@ -1604,4 +1615,4 @@ def step_policy(session, text, decision):
     reply, state = _pre(session, text, decision.get("observations") or [], policy=True)
     if reply is not None:
         return reply
-    return _post(session, (text or "").strip(), _step_policy_core(session, text, decision), state)
+    return _post(session, (text or "").strip(), _step_policy_core(session, text, decision), state, policy=True)

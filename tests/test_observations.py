@@ -157,3 +157,21 @@ def test_trip_unit_and_english_per_day():                                # B8, G
     assert observe.extract("ek trip ke 150", {"asking": "rate"}) == [
         {"type": "rate", "value": 150, "per": "trip", "range": None}]
     assert observe.extract("seven hundred per day")[0]["type"] == "rate"
+
+
+def test_llm_acknowledgement_is_not_doubled():                          # live A1, first turn
+    s = started()
+    llm = ("Aapki baat samajh mein aayi, aapki mazdoori badhane ki ichha hai. "
+           "Abhi tak kitne din kaam kiya hai jiski payment baaki hai?")
+    r = c.step_policy(s, "meri pagar badhao.", decided(llm, [{"type": "context", "text": "pagar badhao",
+                                                              "category": "wage_raise"}], "acknowledge_context"))
+    assert r["agent_text"] == ("Pagar badhwane se pehle, jo baaki hai uska hisaab pakka karte hain. "
+                               "Abhi tak kitne din kaam kiya hai jiski payment baaki hai?")
+
+
+def test_llm_reply_with_its_own_marker_is_left_alone():
+    s = started()
+    r = c.step_policy(s, "tum kaun ho", decided("Main PagarSaathi, aapki pagar ka hisaab karne ke liye. Kitne din?",
+                                                [{"type": "context", "text": "tum kaun", "category": "question_identity"}],
+                                                "acknowledge_context"))
+    assert r["agent_text"].count("PagarSaathi") == 1
