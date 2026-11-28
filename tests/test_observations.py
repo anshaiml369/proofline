@@ -214,3 +214,13 @@ def test_private_loan_mid_way_stores_nothing():
     s, out = _play(["10 din", "bhai se 1000 udhaar liya, woh alag hai"])
     assert "rate" not in s["facts"] and s["state"] == c.ASK_RATE
     assert out[-1]["agent_text"].endswith("Roz ki mazdoori kitni tay hui thi?")
+
+
+def test_context_phrases_missed_in_held_out_run_1():                      # X13, X14, X19, X20
+    cats = {t: [o["category"] for o in observe.extract(t) if o["type"] == "context"]
+            for t in ("mujhe darr lag raha hai", "kya yeh sarkari app hai", "shikayat karni hai", "thekedar bhaag gaya")}
+    assert cats == {"mujhe darr lag raha hai": ["fear"], "kya yeh sarkari app hai": ["question_govt"],
+                    "shikayat karni hai": ["legal_court"], "thekedar bhaag gaya": ["absconded"]}
+    assert not any(o["type"] == "context" for o in observe.extract("700 ki dar se"))   # "dar" = rate
+    s = started()
+    assert c.step(s, "thekedar bhaag gaya", c.local_extract)["agent_text"].startswith("Thekedar gayab ho to bhi")

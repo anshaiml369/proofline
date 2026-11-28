@@ -54,7 +54,7 @@ Each of those "haan" replies counts as a worker turn. v3 never proposes a derive
 
 ## Held-out set
 
-`test_corpus_holdout.json` has 20 cases, `X1` to `X20`, in the same classes, written in new words. I wrote them **after** the corpus fixes (see EVALUATION.md), ran them once, and did not tune any code on them. Its first run is in `eval/results/holdout_run1.txt`, and that first run is the held-out result. Later runs (`holdout_run2.txt`, `holdout_run3.txt`) came after code changes, including a fix for X12, so they are not held out. The corpus itself is not held out, because the first corpus run found the bugs that were then fixed.
+`test_corpus_holdout.json` has 20 cases, `X1` to `X20`, in the same classes, written in new words. I wrote them **after** the corpus fixes (see EVALUATION.md), ran them once, and did not tune any code on them. Its first run is in `eval/results/holdout_run1.txt`, and that first run is the held-out result. Later runs (`holdout_run2.txt` to `holdout_run4.txt`) came after code changes, including a fix for X12 and new context phrases taken from X13, X14, X19 and X20, so they are not held out. The corpus itself is not held out, because the first corpus run found the bugs that were then fixed.
 
 ## Limits of this corpus
 

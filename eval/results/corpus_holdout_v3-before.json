@@ -8,8 +8,8 @@
   "repetition_rate": 0.0,
   "avg_turns": 5.78,
   "reasks_per_slot": 0.138,
-  "context_ack": 100.0,
-  "context_turns": 1,
+  "context_ack": 20.0,
+  "context_turns": 5,
   "irritation": 0.17,
   "irritation_all": 0.55,
   "per_class": {
@@ -1456,7 +1456,7 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
+   "ctx_turns": 1,
    "ctx_acked": 0,
    "sources": [
     "rules",
@@ -1578,7 +1578,7 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
+   "ctx_turns": 1,
    "ctx_acked": 0,
    "sources": [
     "rules",
@@ -2156,7 +2156,7 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
+   "ctx_turns": 1,
    "ctx_acked": 0,
    "sources": [
     "rules",
@@ -2278,7 +2278,7 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
+   "ctx_turns": 1,
    "ctx_acked": 0,
    "sources": [
     "rules",

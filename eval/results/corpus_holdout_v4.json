@@ -9,7 +9,7 @@
   "avg_turns": 6.1,
   "reasks_per_slot": 0.075,
   "context_ack": 100.0,
-  "context_turns": 1,
+  "context_turns": 5,
   "irritation": 0.3,
   "irritation_all": 0.3,
   "per_class": {
@@ -1572,8 +1572,8 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
-   "ctx_acked": 0,
+   "ctx_turns": 1,
+   "ctx_acked": 1,
    "sources": [
     "rules",
     "rules",
@@ -1588,7 +1588,7 @@
     },
     {
      "worker": "mujhe darr lag raha hai",
-     "agent": "Aapne kitne din kaam kiya?",
+     "agent": "Darne ki koi baat nahi, hum sirf hisaab nikal rahe hain. Aapne kitne din kaam kiya?",
      "state": "ASK_DAYS",
      "action": null,
      "formula": null,
@@ -1694,8 +1694,8 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
-   "ctx_acked": 0,
+   "ctx_turns": 1,
+   "ctx_acked": 1,
    "sources": [
     "rules",
     "rules",
@@ -1710,7 +1710,7 @@
     },
     {
      "worker": "kya yeh sarkari app hai",
-     "agent": "Aapne kitne din kaam kiya?",
+     "agent": "Yeh sarkari app nahi hai; main PagarSaathi, aapki pagar ka hisaab karne ke liye. Aapne kitne din kaam kiya?",
      "state": "ASK_DAYS",
      "action": null,
      "formula": null,
@@ -2272,8 +2272,8 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
-   "ctx_acked": 0,
+   "ctx_turns": 1,
+   "ctx_acked": 1,
    "sources": [
     "rules",
     "rules",
@@ -2288,7 +2288,7 @@
     },
     {
      "worker": "shikayat karni hai",
-     "agent": "Aapne kitne din kaam kiya?",
+     "agent": "Pehle pakka hisaab banate hain; usi se shikayat ka draft banega. Aapne kitne din kaam kiya?",
      "state": "ASK_DAYS",
      "action": null,
      "formula": null,
@@ -2394,8 +2394,8 @@
    "auto_yes": 0,
    "reasks": 0,
    "unresolved": 0,
-   "ctx_turns": 0,
-   "ctx_acked": 0,
+   "ctx_turns": 1,
+   "ctx_acked": 1,
    "sources": [
     "rules",
     "rules",
@@ -2410,7 +2410,7 @@
     },
     {
      "worker": "thekedar bhaag gaya",
-     "agent": "Aapne kitne din kaam kiya?",
+     "agent": "Thekedar gayab ho to bhi pakka hisaab aur shikayat ka draft kaam aayega. Aapne kitne din kaam kiya?",
      "state": "ASK_DAYS",
      "action": null,
      "formula": null,

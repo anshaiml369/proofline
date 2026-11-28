@@ -1052,16 +1052,23 @@ ACKS = {
                    "पैसा कब मिलेगा यह ठेकेदार पर है; हम हिसाब और मैसेज तैयार करते हैं। "),
     "wage_raise": ("Pagar badhwane se pehle, jo baaki hai uska hisaab pakka karte hain. ",
                    "पगार बढ़वाने से पहले, जो बाकी है उसका हिसाब पक्का करते हैं। "),
+    "fear": ("Darne ki koi baat nahi, hum sirf hisaab nikal rahe hain. ",
+             "डरने की कोई बात नहीं, हम सिर्फ़ हिसाब निकाल रहे हैं। "),
+    "question_govt": ("Yeh sarkari app nahi hai; main PagarSaathi, aapki pagar ka hisaab karne ke liye. ",
+                      "यह सरकारी ऐप नहीं है; मैं पगार साथी, आपकी पगार का हिसाब करने के लिए। "),
+    "absconded": ("Thekedar gayab ho to bhi pakka hisaab aur shikayat ka draft kaam aayega. ",
+                  "ठेकेदार ग़ायब हो तो भी पक्का हिसाब और शिकायत का ड्राफ़्ट काम आएगा। "),
     "private_loan": ("Woh alag udhaar hai, use mazdoori mein nahi ginenge. ",
                      "वह अलग उधार है, उसे मज़दूरी में नहीं गिनेंगे। "),
     "market_rate": ("Market rate nahi, jo aapke saath tay hua tha wahi ginenge. ",
                     "मार्केट रेट नहीं, जो आपके साथ तय हुआ था वही गिनेंगे। "),
 }
 # A reply counts as acknowledging when it holds one of these (Python's lines and the rules' lines).
-CONTEXT_NOTES = {"private_loan": "Private loan, not cut from wages", "threat": "Was threatened", "legal_court": "Talked of going to court",
+CONTEXT_NOTES = {"private_loan": "Private loan, not cut from wages", "fear": "Is afraid",
+                 "absconded": "Contractor has gone missing", "threat": "Was threatened", "legal_court": "Talked of going to court",
                  "legal_refusal": "Worried the contractor will refuse", "wage_raise": "Asked for a raise",
                  "market_rate": "Asked about the market rate", "emotion": "Is stressed"}
-ACK_MARKERS = ("alag udhaar", "samajh sakta", "dukh hua", "dara mat", "main pagarsaathi", "tension mat", "free hai",
+ACK_MARKERS = ("darne ki koi baat", "sarkari app nahi", "draft kaam aayega", "alag udhaar", "samajh sakta", "dukh hua", "dara mat", "main pagarsaathi", "tension mat", "free hai",
                "case mein rehta", "case id ke saath", "shikayat ka draft", "thekedar par hai", "pagar badhwane",
                "tay hua tha wahi", "lamba saath", "samajh gaya", "theek rahiye", "chinta mat", "ghabraiye mat")
 

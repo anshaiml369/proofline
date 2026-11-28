@@ -151,7 +151,7 @@ These cases were written after the fixes above, run once, and not tuned on.
 
 **What the held-out run shows:**
 - **X12 failed on v4 in this run.** The worker said "bhai se 1000 udhaar liya, woh alag hai". `observe.py` saw that the loan was private, but on the rules path the core still stored 1000 as the advance. This was fixed later (see below).
-- **0 context turns were detected** in the held-out lines. `observe.py`'s context words miss "darr lag raha hai", "sarkari app", "shikayat karni hai" and "thekedar bhaag gaya". This is a gap in the context detector, not an acknowledgement result.
+- **0 context turns were detected** in the held-out lines in this run. `observe.py`'s context words missed "darr lag raha hai", "sarkari app", "shikayat karni hai" and "thekedar bhaag gaya". This was a gap in the context detector, not an acknowledgement result. It was fixed later (see below).
 - **A second run was made after a later change.** A private-loan acknowledgement was added after the original test set's I2 case. In that run (`eval/results/holdout_run2.txt`), X12 still fails, and its loan line now counts as one acknowledged context turn for both backends.
 - **A third run came after X12 was fixed** (`eval/results/holdout_run3.txt`): v4 passed 20/20, v3-before 10/20. **This run is tuned on X12, so it is not held-out evidence. The held-out figure is run 1's 95%.**
   - The fix, on the rules path: a loan the worker calls "alag" is acknowledged once and stored nowhere.
@@ -159,6 +159,13 @@ These cases were written after the fixes above, run once, and not tuned on.
   - At any other question, the same question is asked again.
   - The LLM path is unchanged, because its policy handles loans itself.
   - The corpus table and the 32-case results did not change with this fix.
+- **A fourth run came after the context detector was fixed** (`eval/results/holdout_run4.txt`). It is also tuned, this time on those four phrases.
+  - The detector gained three new categories, each with its own one-line acknowledgement:
+    - `fear`: "darr lag raha", "dar lagta", "ghabrahat". Bare "dar" is not used, because it also means rate ("700 ki dar se").
+    - `question_govt`: "sarkari", "government". The answer is "Yeh sarkari app nahi hai; main PagarSaathi…".
+    - `absconded`: "bhaag gaya", "gayab", "phone band".
+  - "shikayat" and "complaint" now count as `legal_court`.
+  - Result: 5 context turns detected; v4 acknowledged 100.0%, v3-before 20.0%. v4 still passed 20/20.
 
 ### The original 32-case test set after Phase 16
 
