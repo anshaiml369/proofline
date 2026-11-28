@@ -1,9 +1,10 @@
 // PagarSaathi front end.
 // Voice IN is Wispr Flow: the worker dictates into the text box (double-tap Fn on Mac, the
-// Wispr Flow keyboard on iPhone). This page has no microphone code by design.
+// Wispr Flow keyboard on iPhone). This page has no microphone code by design: the round "Bolo"
+// button only focuses the box, so Wispr Flow's words land there, and shows what the input is doing.
 // Voice OUT is Sarvam Bulbul (natural Hindi) when the server has a key, or a pre-recorded clip;
 // otherwise the browser's own SpeechSynthesis (free). No arithmetic happens here: every number on the
-// card comes from the server (wage_math.py).
+// card comes from the server (wage_math.py). The count-up only animates the server's final value.
 (() => {
   const params = new URLSearchParams(location.search);
   const scripted = params.get('mode') === 'scripted';
@@ -23,24 +24,27 @@
 
   // UI strings per language. Agent lines come from the server; these are the page's own labels.
   const UI = {
-    hi: { tagline: 'Mazdoori ka hisaab, aawaz se', start: 'Shuru karein', continue: 'Continue', hisaab: 'Hisaab', baaki: 'Baaki',
+    hi: { tagline: 'Mazdoori ka hisaab, aawaz se', start: 'Shuru karein', bolo: 'Dabaiye, phir Wispr Flow se boliye',
+      continue: 'Continue', hisaab: 'Hisaab', baaki: 'Baaki', confirmed: 'Confirmed',
       nodue: 'Hisaab ke hisaab se koi paisa baaki nahi hai.', case_id: 'Case ID',
       hash_caption: 'Yeh hash case ka fingerprint hai. Case mein koi badlav hua to hash mel nahi khayega, isse badlav pakda ja sakta hai.',
-      escalate: 'Escalate', share: 'Union / legal aid', delete: 'Case delete', draft: 'Shikayat ka draft (copy karke SAMADHAN par dijiye)',
+      escalate: 'Escalate: shikayat ka draft', share: 'Union / legal aid', delete: 'Case delete', draft: 'Shikayat ka draft (copy karke SAMADHAN par dijiye)',
       copy: 'Copy karein', copied: 'Copy ho gaya', msg: 'Thekedar ko message', send: 'WhatsApp par bhejein', again: 'Naya hisaab', log: 'Baatcheet',
       notes: 'Aapne bataya', f_days: 'Din', f_rate: 'Roz', f_advance: 'Advance', f_payments: 'Mila', sent: 'Bheja gaya',
       reminder: 'Thekedar ka vaada', followup: 'Pichhla case', beta: '' },
-    mr: { tagline: 'मजुरीचा हिशोब, आवाजाने', start: 'सुरू करा', continue: 'पुढे', hisaab: 'हिशोब', baaki: 'बाकी',
+    mr: { tagline: 'मजुरीचा हिशोब, आवाजाने', start: 'सुरू करा', bolo: 'दाबा, मग Wispr Flow ने बोला',
+      continue: 'पुढे', hisaab: 'हिशोब', baaki: 'बाकी', confirmed: 'निश्चित',
       nodue: 'हिशोबानुसार कोणतेही पैसे बाकी नाहीत.', case_id: 'केस आयडी',
       hash_caption: 'हा हॅश केसचा फिंगरप्रिंट आहे. केसमध्ये बदल झाला तर हॅश जुळणार नाही, त्यामुळे बदल पकडता येतो.',
-      escalate: 'तक्रार', share: 'युनियन / कायदेशीर मदत', delete: 'केस डिलीट', draft: 'तक्रारीचा मसुदा (कॉपी करून समाधानवर द्या)',
+      escalate: 'तक्रार: मसुदा', share: 'युनियन / कायदेशीर मदत', delete: 'केस डिलीट', draft: 'तक्रारीचा मसुदा (कॉपी करून समाधानवर द्या)',
       copy: 'कॉपी करा', copied: 'कॉपी झाले', msg: 'ठेकेदाराला मेसेज', send: 'व्हॉट्सॲपवर पाठवा', again: 'नवीन हिशोब', log: 'संवाद',
       notes: 'तुम्ही सांगितले', f_days: 'दिवस', f_rate: 'रोज', f_advance: 'ॲडव्हान्स', f_payments: 'मिळाले', sent: 'पाठवले',
       reminder: 'ठेकेदाराचे वचन', followup: 'मागची केस', beta: '' },
-    en: { tagline: 'Your wages, worked out by voice', start: 'Start', continue: 'Continue', hisaab: 'Calculation', baaki: 'Owed',
+    en: { tagline: 'Your wages, worked out by voice', start: 'Start', bolo: 'Tap, then speak with Wispr Flow',
+      continue: 'Continue', hisaab: 'Calculation', baaki: 'Owed', confirmed: 'Confirmed',
       nodue: 'By this calculation nothing is owed.', case_id: 'Case ID',
       hash_caption: "This hash is the case's fingerprint. If the case is changed, the hash will no longer match, so the change can be detected.",
-      escalate: 'Escalate', share: 'Union / legal aid', delete: 'Delete case', draft: 'Complaint draft (copy it to SAMADHAN)',
+      escalate: 'Escalate: complaint draft', share: 'Union / legal aid', delete: 'Delete case', draft: 'Complaint draft (copy it to SAMADHAN)',
       copy: 'Copy', copied: 'Copied', msg: 'Message to contractor', send: 'Send on WhatsApp', again: 'New calculation', log: 'Conversation',
       notes: 'You told us', f_days: 'Days', f_rate: 'Daily', f_advance: 'Advance', f_payments: 'Paid', sent: 'Sent',
       reminder: "Contractor's promise", followup: 'Earlier case',
@@ -60,37 +64,106 @@
   UI['en-mix'] = UI.en;
   const BETA = new Set(['bho', 'bn', 'ta', 'te', 'en-mix']);
   const VOICE_BCP = { hi: 'hi-IN', mr: 'mr-IN', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN' };
+  const ERR_HEARD = 'Sun nahi paya, phir se boliye.';
   let lang = 'hi';
   try { lang = localStorage.getItem('ps_lang') || 'hi'; } catch { /* storage blocked */ }
   let langChosen = false;       // the worker picked it on the toggle (sent to the server)
   const t = (key) => (UI[lang] && UI[lang][key]) || UI.hi[key] || (UI.en[key] || '');
 
-  function applyLang() {
-    document.documentElement.lang = lang === 'en-mix' ? 'en' : lang;
-    document.querySelectorAll('[data-i18n]').forEach((n) => { const v = t(n.dataset.i18n); if (v) n.textContent = v; });
-    const note = document.getElementById('beta-note');
-    note.textContent = BETA.has(lang) ? (UI[lang].beta || UI.en.beta) : '';
-    show(note, BETA.has(lang));
-    document.getElementById('lang').value = lang;
-  }
-
   const $ = (id) => document.getElementById(id);
   const el = {
-    agent: $('agent-text'), speaking: $('speaking'), replay: $('replay'), start: $('start'),
-    form: $('answer-form'), answer: $('answer'), cont: $('continue'), status: $('status'), assist: $('assist'),
+    q: $('q'), agent: $('agent-text'), speaking: $('speaking'), replay: $('replay'), bolo: $('bolo'), caption: $('bolo-caption'),
+    form: $('answer-form'), answer: $('answer'), cont: $('continue'), status: $('status'), error: $('error'), assist: $('assist'),
     result: $('result'), calc: $('calc'), nodue: $('nodue'), previewWrap: $('preview-wrap'),
     preview: $('preview'), send: $('send'), again: $('again'), log: $('log'), chip: $('mode-chip'),
-    keyless: $('keyless'),
+    keyless: $('keyless'), blocked: $('popup-blocked'), toast: $('toast'),
   };
   const show = (node, on = true) => node.classList.toggle('hidden', !on);
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const inr = (n) => '₹' + Number(n).toLocaleString('en-IN');
+
+  function applyLang() {
+    document.documentElement.lang = lang === 'en-mix' ? 'en' : lang;
+    document.querySelectorAll('[data-i18n]').forEach((n) => { const v = t(n.dataset.i18n); if (v) n.textContent = v; });
+    const note = $('beta-note');
+    note.textContent = BETA.has(lang) ? (UI[lang].beta || UI.en.beta) : '';
+    show(note, BETA.has(lang));
+    $('lang').value = lang;
+    el.caption.textContent = started ? t('bolo') : t('start');
+  }
+
+  // ---------- motion (motion.dev, vanilla). One guard for reduced motion: opacity only. ----------
+  const reduced = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  const M = window.Motion && window.Motion.animate ? window.Motion : null;
+  const SPRING = M ? { type: M.spring, stiffness: 300, damping: 30 } : {};
+  function anim(node, keyframes, options = {}) {
+    if (!node) return Promise.resolve();
+    let kf = keyframes;
+    let opts = options;
+    if (reduced.matches) {
+      if (!kf.opacity) return Promise.resolve();          // nothing moves or scales
+      kf = { opacity: kf.opacity };
+      opts = { duration: 0.2, ease: 'linear' };
+    }
+    if (!M) { node.style.opacity = ''; return Promise.resolve(); }   // CDN failed: no animation, page still works
+    try {
+      const c = M.animate(node, kf, opts);
+      return c && c.finished ? c.finished : Promise.resolve(c);
+    } catch (e) { dlog('animate failed', e); node.style.opacity = ''; return Promise.resolve(); }
+  }
+  // ₹0 → final value, once per case; with reduced motion the final value appears at once.
+  function countUp(node, value) {
+    const final = inr(value);
+    if (reduced.matches || value <= 0) { node.textContent = final; return; }
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.max(0, Math.min(1, (now - start) / 600));
+      const eased = 1 - Math.pow(1 - p, 3);                     // ease-out
+      node.textContent = p < 1 ? inr(Math.round(value * eased)) : final;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    node.textContent = inr(0);
+    requestAnimationFrame(step);
+  }
+
+  // ---------- the Bolo button's states ----------
+  let started = false;
+  let listenTimer = null;
+  function setBolo(state) {
+    el.bolo.dataset.state = state;
+    el.bolo.setAttribute('aria-disabled', state === 'disabled' ? 'true' : 'false');
+  }
+  function listening() {            // Wispr Flow text is arriving in the box
+    if (el.bolo.dataset.state === 'processing' || el.bolo.dataset.state === 'disabled') return;
+    setBolo('listening');
+    clearTimeout(listenTimer);
+    listenTimer = setTimeout(() => { if (el.bolo.dataset.state === 'listening') setBolo('idle'); }, 1000);
+  }
+
+  // ---------- the question: fade out, swap, fade in ----------
+  let qSeq = 0;
+  async function setQuestion(text) {
+    const seq = ++qSeq;
+    if (el.agent.textContent === text) return;
+    await anim(el.agent, { opacity: [1, 0] }, { duration: 0.15, ease: 'easeIn' });
+    if (seq !== qSeq) return;
+    el.agent.textContent = text;
+    el.agent.classList.toggle('long', text.length > 90 && text.length <= 160);
+    el.agent.classList.toggle('xlong', text.length > 160);
+    await anim(el.agent, { opacity: [0, 1], y: [8, 0] }, { duration: 0.2, ease: 'easeOut' });
+  }
+  // keep the sticky question's height in a CSS variable, so scrolled-to blocks land below it
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => document.documentElement.style.setProperty('--qh', el.q.offsetHeight + 'px')).observe(el.q);
+  }
+  window.addEventListener('scroll', () => el.q.classList.toggle('stuck', window.scrollY > el.q.offsetTop + 4), { passive: true });
 
   let sessionId = null;
   let last = null;            // last server reply (for replay)
   let busy = false;
   let message = '';
   let scriptStopped = false;
+  let countedFor = null;
   const player = new Audio();
   const played = new Set();      // "state|url": a clip never plays twice in the same state
   // Debug: every media event, so a stray or repeated clip shows up in the console (?debug=1).
@@ -98,7 +171,7 @@
     player.addEventListener(ev, () => dlog('audio', ev, player.currentSrc.split('/').pop(),
       ev === 'error' && player.error ? 'code ' + player.error.code : ''));
   }
-  // A 0.1 s silent WAV, played inside the Start tap so later clips are allowed to play (Safari/iOS).
+  // A 0.1 s silent WAV, played inside the first tap so later clips are allowed to play (Safari/iOS).
   const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 
   // ---------- voice out ----------
@@ -114,12 +187,12 @@
     player.pause();
   }
 
-  function utter(text, voice, lang) {
+  function utter(text, voice, bcp) {
     return new Promise((resolve) => {
-      dlog('browser voice', lang, voice ? voice.name : '(default)', JSON.stringify(text));
+      dlog('browser voice', bcp, voice ? voice.name : '(default)', JSON.stringify(text));
       const u = new SpeechSynthesisUtterance(text);
       if (voice) u.voice = voice;
-      u.lang = lang;
+      u.lang = bcp;
       u.rate = 0.95;
       // Some browsers never fire onend: cap the wait by text length.
       const guard = setTimeout(resolve, 1500 + text.length * 90);
@@ -132,11 +205,11 @@
   // not play at all, so the caller can fall back to the browser voice instead of staying silent.
   function playClip(url) {
     return new Promise((resolve) => {
-      let started = false;
+      let begun = false;
       const finish = (ok) => { player.onended = player.onerror = player.onpause = player.onplaying = null; resolve(ok); };
-      player.onplaying = () => { started = true; };
+      player.onplaying = () => { begun = true; };
       player.onended = () => finish(true);
-      player.onpause = () => finish(started);
+      player.onpause = () => finish(begun);
       player.onerror = () => finish(false);
       player.src = url;
       player.play().catch((e) => { dlog('audio play() rejected', e.name); finish(false); });
@@ -151,7 +224,7 @@
     played.add(key);
     show(el.speaking, true);
     // Browser voices can read "?" aloud as "question mark": speak a danda instead.
-    const clean = (t) => t.replace(/\s*[?？]+/g, '।').replace(/।\s*।/g, '।');
+    const clean = (s) => s.replace(/\s*[?？]+/g, '।').replace(/।\s*।/g, '।');
     try {
       if (reply.agent_audio_url && await playClip(reply.agent_audio_url)) return reply.audio_source || 'recorded';
       const bcp = VOICE_BCP[reply.voice_lang] || 'hi-IN';
@@ -166,10 +239,19 @@
     }
   }
 
-  // ---------- rendering ----------
-  function setStatus(text, isError = false) {
-    el.status.textContent = text || '';
-    el.status.className = 'mt-3 min-h-[1.5rem] text-base ' + (isError ? 'font-semibold text-rose-300' : 'text-slate-400');
+  // ---------- status and errors ----------
+  function setStatus(text) { el.status.textContent = text || ''; }
+  function clearError() { el.error.textContent = ''; show(el.error, false); }
+  // Always Hinglish, never JSON: the server's own message, or "Sun nahi paya…".
+  function showError(text, { inLog = false } = {}) {
+    const line = text && text !== ERR_HEARD ? ERR_HEARD + ' ' + text : ERR_HEARD;
+    setStatus('');
+    el.error.textContent = line;
+    show(el.error, true);
+    anim(el.error, { opacity: [0, 1] }, { duration: 0.2 });
+    anim(el.bolo, { x: [0, -6, 6, -3, 0] }, { duration: 0.3, ease: 'easeOut' });
+    if (el.bolo.dataset.state !== 'disabled') setBolo('idle');
+    if (inLog) bubble(line, 'agent');
   }
 
   const TEXT_LABEL = { llm: 'Text: LLM', rules: 'Text: Rules' };
@@ -180,10 +262,10 @@
   function badge(li, text) {
     const b = document.createElement('li');
     b.setAttribute('role', 'note');
-    b.className = 'prov mt-1 text-sm font-medium tracking-wide ' + (li.classList.contains('self-end') ? 'text-right text-indigo-300/80' : 'text-slate-400');
+    b.className = 'prov ' + (li.classList.contains('worker') ? 'right' : 'left');
     b.textContent = text;
     li.after(b);
-    b.classList.add(li.classList.contains('self-end') ? 'self-end' : 'self-start');
+    el.log.scrollTop = el.log.scrollHeight;
     return b;
   }
 
@@ -191,27 +273,25 @@
     const empty = el.log.querySelector('.empty');
     if (empty) empty.remove();
     const li = document.createElement('li');
-    li.className = who === 'agent'
-      ? 'max-w-[85%] self-start rounded-2xl rounded-bl-md bg-slate-700/60 px-4 py-2.5 text-[17px] leading-snug text-slate-100'
-      : 'max-w-[85%] self-end rounded-2xl rounded-br-md bg-indigo-500 px-4 py-2.5 text-[17px] leading-snug text-white';
+    li.className = 'msg ' + (who === 'agent' ? 'agent' : 'worker');
     li.textContent = text;
     if (tag) {
-      const t = document.createElement('span');
-      t.className = 'ml-2 rounded-full bg-white/20 px-2 py-0.5 text-sm font-bold';
-      t.textContent = tag;
-      li.append(t);
+      const s = document.createElement('span');
+      s.className = 'tag';
+      s.textContent = tag;
+      li.append(s);
     }
     el.log.append(li);
+    el.log.scrollTop = el.log.scrollHeight;            // the latest line stays in view
+    anim(li, { opacity: [0, 1], y: [6, 0] }, { duration: 0.2, ease: 'easeOut' });
     return li;
   }
 
   function showFact(parsed) {
     const box = parsed && document.querySelector(`.fact[data-field="${parsed.field}"]`);
     if (!box) return;
-    box.classList.add('border-emerald-400/40', 'bg-emerald-400/10');
-    const b = box.querySelector('b');
-    b.className = 'mt-0.5 block text-base font-bold text-white';
-    b.textContent = (parsed.field === 'days' ? parsed.value : inr(parsed.value)) + (parsed.assumed ? '?' : '');
+    box.classList.add('on');
+    box.querySelector('b').textContent = (parsed.field === 'days' ? parsed.value : inr(parsed.value)) + (parsed.assumed ? '?' : '');
   }
 
   function showFacts(facts) {      // the LLM can hear several facts in one sentence
@@ -221,23 +301,20 @@
   }
 
   function showNotes(notes) {     // context the agent kept: hospital, loan, years...
-    const list = document.getElementById('notes');
+    const list = $('notes');
     list.replaceChildren();
     for (const n of notes || []) {
       const li = document.createElement('li');
-      li.className = 'rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-0.5 text-sm text-sky-200';
       li.textContent = n;
       list.append(li);
     }
-    show(document.getElementById('notes-wrap'), !!(notes && notes.length));
+    show($('notes-wrap'), !!(notes && notes.length));
   }
 
   function clearFacts() {
     document.querySelectorAll('.fact').forEach((box) => {
-      box.classList.remove('border-emerald-400/40', 'bg-emerald-400/10');
-      const b = box.querySelector('b');
-      b.className = 'mt-0.5 block text-base text-slate-500';
-      b.textContent = '—';
+      box.classList.remove('on');
+      box.querySelector('b').textContent = '—';
     });
   }
 
@@ -246,37 +323,46 @@
     return (parsed.field === 'days' ? `${parsed.value} din` : inr(parsed.value)) + (parsed.assumed ? ' (maana)' : '');
   }
 
-  const ICONS = { calendar: '📅', clock: '⏱️', minus: '➖', rupee: '₹', wallet: '👛', check: '✅' };
+  // Inline icons for the calculation lines (constant markup, no user text).
+  const SVG = (body, color = '#1a1a1a', w = 2) =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+  const ICONS = {
+    calendar: SVG('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>'),
+    clock: SVG('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    minus: SVG('<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'),
+    rupee: SVG('<path d="M6 3h12M6 8h12M9 3c4 0 6 2 6 5s-2 5-6 5H6l8 8"/>'),
+    wallet: SVG('<path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.2"/>'),
+    check: SVG('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>', '#034f46', 2.4),
+  };
+  const DOT = SVG('<circle cx="12" cy="12" r="3"/>');
+
   function renderCase(c) {
     el.calc.replaceChildren();
-    $('outstanding').textContent = inr(Math.max(0, c.outstanding));
-    $('outstanding').className = 'text-[64px] font-black leading-none tabular-nums ' + (c.outstanding > 0 ? 'text-amber-300' : 'text-emerald-300');
+    const out = $('outstanding');
+    out.classList.toggle('zero', c.outstanding <= 0);
     for (const line of c.breakdown) {
       const row = document.createElement('div');
-      row.className = 'flex items-center justify-between gap-3 py-3.5';
-      const icon = document.createElement('span');
-      icon.className = 'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-lg';
-      icon.setAttribute('aria-hidden', 'true');
-      icon.textContent = ICONS[line.icon] || '•';
-      const left = document.createElement('div');
-      left.className = line.total ? 'text-2xl font-extrabold text-white' : 'text-[17px] text-slate-200';
-      left.textContent = line.label;
+      row.className = 'row' + (line.total ? ' total' : '');
+      row.insertAdjacentHTML('afterbegin', ICONS[line.icon] || DOT);
+      const dt = document.createElement('dt');
+      dt.textContent = line.label;
       if (line.math && line.math !== 'minus') {
-        const s = document.createElement('div');
-        s.className = 'text-sm font-normal text-slate-400';
+        const s = document.createElement('small');
         s.textContent = line.math;
-        left.append(s);
+        dt.append(s);
       }
-      const amt = document.createElement('div');
-      amt.className = 'whitespace-nowrap font-semibold tabular-nums ' +
-        (line.total ? (c.outstanding > 0 ? 'text-2xl font-extrabold text-amber-300' : 'text-2xl font-extrabold text-emerald-300') : 'text-[17px] text-slate-100');
-      amt.textContent = line.amount;
-      left.classList.add('min-w-0', 'flex-1');
-      row.append(icon, left, amt);
+      const dd = document.createElement('dd');
+      dd.textContent = line.amount;
+      row.append(dt, dd);
       el.calc.append(row);
     }
     show(el.nodue, c.outstanding <= 0);
+    const key = sessionId + '|' + c.outstanding + '|' + c.breakdown.map((l) => l.amount).join(',');
+    const entering = el.result.classList.contains('hidden');
     show(el.result, true);
+    if (entering) anim(el.result, { opacity: [0, 1], y: [24, 0], scale: [0.96, 1] }, SPRING);
+    if (key !== countedFor) { countedFor = key; countUp(out, Math.max(0, c.outstanding)); }
+    else out.textContent = inr(Math.max(0, c.outstanding));
   }
 
   const when = (iso) => new Date(iso).toLocaleString(lang === 'mr' ? 'mr-IN' : 'en-IN',
@@ -288,14 +374,28 @@
     $('hash').textContent = d.case_hash_short;
     $('hash').title = d.case_hash;
     $('share').href = '/case/' + d.session_id + '/share';
-    if (d.sent_at) { $('sent-at').textContent = t('sent') + ': ' + when(d.sent_at); show($('sent-at'), true); }
+    if (d.sent_at) {
+      const line = t('sent') + ': ' + when(d.sent_at);
+      $('sent-at').textContent = '✓ ' + line;
+      show($('sent-at'), true);
+      showToast(line);
+    }
     if (d.commitment_date) { $('reminder').textContent = '⏰ ' + t('reminder') + ': ' + d.commitment_date; show($('reminder'), true); }
     if (d.escalation_draft) showDraft(d.escalation_draft);
   }
 
+  function showToast(text) {
+    $('toast-text').textContent = text;
+    if (!el.toast.classList.contains('hidden')) return;
+    show(el.toast, true);
+    document.body.classList.add('has-toast');
+    anim(el.toast, { opacity: [0, 1], y: [24, 0] }, SPRING);
+  }
+
   function showDraft(text) {
     $('draft').textContent = text;
-    show($('draft-wrap'), true);
+    const wrap = $('draft-wrap');
+    if (wrap.classList.contains('hidden')) { show(wrap, true); anim(wrap, { opacity: [0, 1], y: [8, 0] }, { duration: 0.2 }); }
   }
 
   function renderDebug(d) {
@@ -303,25 +403,24 @@
     show($('debug'), true);
     $('debug').textContent = 'node_path: ' + (d.node_path || []).join(' → ') + '\npolicy: ' + d.policy_source +
       ' · action: ' + (d.action || '-') + ' · lang: ' + d.language + ' · voice: ' + d.voice_lang +
-      (d.case_hash ? '\nsha256: ' + d.case_hash : '');
+      (d.llm_error ? ' · llm_error: ' + d.llm_error : '') + (d.case_hash ? '\nsha256: ' + d.case_hash : '');
   }
 
   // ---------- server ----------
-  async function post(body) {
-    const resp = await fetch('/turn', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, session_id: sessionId, mode: scripted ? 'scripted' : '',
-        ...(langChosen ? { language: lang } : {}) }),
-    });
+  async function postJSON(url, body) {
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     let data = {};
-    try { data = await resp.json(); } catch { /* non-JSON error page */ }
-    if (!resp.ok && !data.error) data.error = 'Server se jawab nahi aaya. Phir se koshish kijiye.';
+    try { data = await resp.json(); } catch { /* an HTML or empty error page: never shown */ }
+    if (!data || typeof data !== 'object') data = {};
+    if (!resp.ok && typeof data.error !== 'string') data.error = 'Server se jawab nahi aaya. Thodi der mein phir koshish kijiye.';
     return data;
   }
+  const post = (body) => postJSON('/turn', { ...body, session_id: sessionId, mode: scripted ? 'scripted' : '',
+    ...(langChosen ? { language: lang } : {}) });
 
   async function handle(data, saidText) {
-    if (data.error) { setStatus(data.error, true); return false; }
+    if (data.error) { showError(data.error, { inLog: true }); return false; }
+    clearError();
     sessionId = data.session_id;
     if (saidText !== undefined) badge(bubble(saidText, 'worker', factTag(data.parsed)), INPUT_LABEL[data.input_source] || 'Typed');
     if (data.state === 'ASK_DAYS' && saidText !== undefined && last && last.state === 'CONFIRM') clearFacts();
@@ -341,7 +440,7 @@
     }
 
     last = data;
-    el.agent.textContent = data.agent_text;
+    setQuestion(data.agent_text);
     const prov = badge(bubble(data.agent_text, 'agent'), TEXT_LABEL[data.text_source] || 'Text: Rules');
     dlog('reply', data.state, data.text_source, data.audio_source, JSON.stringify(data.agent_text));
     show(el.replay, true);
@@ -356,20 +455,25 @@
 
     const finished = data.done;
     const preview = data.state === 'SHOW_PREVIEW' && data.case_data && data.case_data.payment_request;
-    if (finished || preview) show(el.form, false);
+    if (finished || preview) { show(el.form, false); setBolo('disabled'); } else setBolo('idle');
     if (finished) show(el.again, true);
-    if (!finished && !preview && !scripted) el.answer.focus();   // Wispr Flow types into the focused field
+    if (!finished && !preview && !scripted) el.answer.focus({ preventScroll: true });   // Wispr Flow types into the focused field
 
     const spoken = speak(data).then((voice) => { prov.textContent += ' · ' + VOICE_LABEL[voice]; });
     if (preview) {
-      // SHOW_PREVIEW: the message appears first, the Send button after it.
+      // SHOW_PREVIEW: the message springs in first, the Send button after it.
       message = data.case_data.payment_request;
       el.preview.textContent = message;
-      show(el.previewWrap, true);
-      el.previewWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (el.previewWrap.classList.contains('hidden')) {
+        show(el.previewWrap, true);
+        anim(el.previewWrap, { opacity: [0, 1], y: [24, 0], scale: [0.96, 1] }, SPRING);
+      }
+      el.previewWrap.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
       await sleep(1200);
-      el.send.classList.remove('hidden');
-      el.send.classList.add('flex');
+      if (el.send.classList.contains('hidden') && !last.sent_at) {
+        show(el.send, true);
+        anim(el.send, { opacity: [0, 1], y: [8, 0] }, { duration: 0.2, ease: 'easeOut' });
+      }
     }
     await spoken;
     return true;
@@ -378,11 +482,13 @@
   let queued = false;
   async function submit(text) {
     if (scriptStopped && scripted) return;
-    if (!text) { setStatus('Pehle jawab boliye (Wispr Flow) ya likhiye, phir Continue dabaiye.'); el.answer.focus(); return; }
+    if (!text) { showError('Pehle Wispr Flow se boliye ya likhiye, phir Continue dabaiye.'); el.answer.focus(); return; }
     if (busy) { queued = true; setStatus('Ek second…'); return; }   // sent when the current reply arrives
     busy = true;
     el.cont.disabled = true;
+    setBolo('processing');
     stopSpeaking();
+    clearError();
     setStatus('Samajh raha hoon…');
     try {
       const data = await post({ text });
@@ -394,10 +500,11 @@
       if (queued) { queued = false; const next = el.answer.value.trim(); if (next) await submit(next); }
       await handled;
     } catch {
-      setStatus('Server se connection nahi hua. Phir se koshish kijiye.', true);
+      showError('Server se connection nahi hua.', { inLog: true });
     } finally {
       busy = false;
       el.cont.disabled = false;
+      if (el.bolo.dataset.state === 'processing') setBolo('idle');
     }
   }
 
@@ -405,15 +512,14 @@
   async function runScript() {
     for (const line of SCRIPT) {
       await sleep(900);
-      el.answer.focus();
+      el.answer.focus({ preventScroll: true });
       for (let i = 1; i <= line.length; i++) {           // text "appears" like dictation
         el.answer.value = line.slice(0, i);
+        listening();
         await sleep(18);
       }
       await sleep(1100);
-      el.cont.classList.add('ring-4', 'ring-indigo-300/60');
-      await sleep(250);
-      el.cont.classList.remove('ring-4', 'ring-indigo-300/60');
+      await anim(el.cont, { scale: [1, 0.97, 1] }, { duration: 0.12 });
       await submit(el.answer.value.trim());
       if (last && (last.state === 'SHOW_PREVIEW' || last.done)) break;   // stop cleanly: never type past the end
     }
@@ -422,61 +528,97 @@
   }
 
   // ---------- wiring ----------
-  el.start.addEventListener('click', async () => {
-    show(el.start, false);
+  async function start() {
+    started = true;
+    applyLang();
     // Unlock the audio element inside this tap, so later clips may play without one.
     player.src = SILENT;
     player.play().then(() => { if (player.src === SILENT) player.pause(); }).catch(() => {});
     // Unlock speech on this tap (browsers need a user gesture before talking).
     if (window.speechSynthesis) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
     show(el.form, true);
+    anim(el.form, { opacity: [0, 1], y: [8, 0] }, { duration: 0.2, ease: 'easeOut' });
     show($('wispr-hint'), false);   // the answer box carries the Wispr Flow label from here on
+    setBolo('processing');
     setStatus('Shuru ho raha hai…');
     try {
       let prior = null;
       try { prior = scripted ? null : JSON.parse(localStorage.getItem('ps_last_case') || 'null'); } catch { /* storage blocked */ }
       const ok = await handle(await post(prior ? { prior_session: prior.session_id } : {}));
       if (ok && scripted) runScript();
+      if (!ok) { started = false; applyLang(); }
     } catch {
-      show(el.start, true);
-      setStatus('Server se connection nahi hua.', true);
+      started = false;
+      applyLang();
+      showError('Server se connection nahi hua.');
     }
+  }
+
+  el.bolo.addEventListener('click', () => {
+    anim(el.bolo, { scale: [1, 0.97, 1] }, { duration: 0.12 });
+    if (!started) { start(); return; }
+    if (el.bolo.dataset.state === 'disabled') return;
+    el.answer.focus({ preventScroll: true });
+    el.form.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'nearest' });
   });
 
   el.form.addEventListener('submit', (e) => { e.preventDefault(); submit(el.answer.value.trim()); });
   el.answer.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(el.answer.value.trim()); }
   });
-  el.answer.addEventListener('input', () => { if (el.answer.value) stopSpeaking(); });
+  el.answer.addEventListener('input', () => { if (el.answer.value) { stopSpeaking(); listening(); } });
   el.replay.addEventListener('click', () => last && speak(last, { force: true }));
+
+  async function markSent() {
+    try {
+      const data = await postJSON('/mark-sent', { session_id: sessionId, mode: scripted ? 'scripted' : '' });
+      if (data.error) { showError(data.error); return; }
+      last = data;
+      renderAudit(data);
+      renderDebug(data);
+      show(el.send, false);
+      show(el.blocked, false);
+      setQuestion(data.agent_text);
+      const prov = badge(bubble(data.agent_text, 'agent'), TEXT_LABEL[data.text_source] || 'Text: Rules');
+      show(el.again, true);
+      speak(data).then((voice) => { prov.textContent += ' · ' + VOICE_LABEL[voice]; });
+    } catch { /* WhatsApp already opened; the card stays as it was */ }
+  }
 
   el.send.addEventListener('click', async () => {
     // Plain deep link, no WhatsApp API: the worker picks the contractor's chat and presses send.
-    window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener');
-    try {
-      const resp = await fetch('/mark-sent', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, mode: scripted ? 'scripted' : '' }) });
-      const data = await resp.json();
-      if (!data.error) {
-        last = data;
-        renderAudit(data);
-        renderDebug(data);
-        el.send.classList.add('hidden'); el.send.classList.remove('flex');
-        el.agent.textContent = data.agent_text;
-        const prov = badge(bubble(data.agent_text, 'agent'), TEXT_LABEL[data.text_source] || 'Text: Rules');
-        show(el.again, true);
-        speak(data).then((voice) => { prov.textContent += ' · ' + VOICE_LABEL[voice]; });
-      }
-    } catch { /* WhatsApp already opened */ }
+    // Opened first, inside the tap, so the browser allows the new tab.
+    const w = window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+    await anim(el.send, { scale: [1, 0.97, 1] }, { duration: 0.12 });
+    if (!w) { show(el.blocked, true); anim(el.blocked, { opacity: [0, 1] }, { duration: 0.2 }); return; }
+    try { w.opener = null; } catch { /* cross-origin already */ }
+    anim(el.previewWrap, { opacity: [1, 0.6] }, { duration: 0.2 });
+    markSent();
+  });
+
+  $('copy-msg').addEventListener('click', () => {
+    const b = $('copy-msg');
+    (navigator.clipboard ? navigator.clipboard.writeText(message) : Promise.reject())
+      .then(() => { b.textContent = t('copied'); markSent(); }, () => {});
   });
 
   el.again.addEventListener('click', () => location.reload());
 
   $('escalate').addEventListener('click', async () => {
-    const r = await fetch('/escalate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId }) });
-    const d = await r.json();
-    if (d.escalation_draft) { showDraft(d.escalation_draft); $('draft-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const errLine = $('escalate-error');
+    show(errLine, false);
+    try {
+      const d = await postJSON('/escalate', { session_id: sessionId });
+      if (d.escalation_draft) {
+        showDraft(d.escalation_draft);
+        $('draft-wrap').scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
+        return;
+      }
+      errLine.textContent = 'Draft nahi bana. ' + (d.error || 'Phir se dabaiye.');
+    } catch {
+      errLine.textContent = 'Draft nahi bana. Server se connection nahi hua.';
+    }
+    show(errLine, true);
   });
   $('copy-draft').addEventListener('click', () => {
     const b = $('copy-draft');
@@ -484,7 +626,7 @@
       .then(() => { b.textContent = t('copied'); }, () => {});
   });
   // Delete goes through the agent: it asks "Pakka?" and deletes only after a spoken (dictated) yes.
-  $('delete').addEventListener('click', () => { show(el.form, true); submit('mera case delete karo'); });
+  $('delete').addEventListener('click', () => { show(el.form, true); setBolo('idle'); submit('mera case delete karo'); });
 
   $('lang').addEventListener('change', (e) => {
     lang = e.target.value;
@@ -501,9 +643,12 @@
   fetch('/health').then((r) => r.json()).then((h) => {
     dlog('health', JSON.stringify(h));
     if (h.mode === 'keyless' && !scripted) {
-      el.keyless.textContent = 'Demo mode: built-in rules + recorded voice. LLM aur Sarvam voice ke liye server par ' +
-        h.missing.join(' aur ') + ' set kijiye.';
+      el.keyless.textContent = 'Demo mode: rules + recorded voice (API keys nahi hain)';
+      el.keyless.title = 'LLM aur Sarvam voice ke liye server par ' + h.missing.join(' aur ') + ' set kijiye.';
       show(el.keyless, true);
     }
   }).catch(() => {});
+
+  // The page's first entrance: one spring, the same guard as everything else.
+  anim(document.querySelector('main'), { opacity: [0, 1], y: [24, 0] }, SPRING);
 })();

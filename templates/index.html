@@ -1,155 +1,191 @@
 <!doctype html>
-<html lang="hi" class="h-full">
+<html lang="hi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PagarSaathi</title>
 <meta name="description" content="Bolo, hisaab pao. Speak with Wispr Flow; PagarSaathi works out your unpaid wages.">
-<meta name="theme-color" content="#1e1b4b">
-<link rel="stylesheet" href="{{ url_for('static', filename='tailwind.css') }}">
+<meta name="theme-color" content="#ffffeb">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Figtree:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="min-h-full bg-gradient-to-b from-indigo-950 via-slate-900 to-zinc-950 text-slate-100 antialiased text-[18px]">
-<main class="mx-auto w-full max-w-xl px-4 py-6 sm:py-10">
+<body>
+<main>
 
-  <!-- header -->
-  <header class="mb-5 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-3">
-      <div class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-xl font-black text-indigo-950 shadow-lg shadow-orange-500/30">₹</div>
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">₹</div>
       <div>
-        <h1 class="text-xl font-bold tracking-tight">PagarSaathi</h1>
-        <p class="text-sm text-slate-400" data-i18n="tagline">Mazdoori ka hisaab, aawaz se</p>
+        <p class="brand-name">PagarSaathi</p>
+        <p class="tagline" data-i18n="tagline">Mazdoori ka hisaab, aawaz se</p>
       </div>
     </div>
-    <div class="flex shrink-0 flex-col items-end gap-1.5">
-      <label class="sr-only" for="lang">Bhasha / Language</label>
-      <select id="lang" class="min-h-[44px] rounded-xl border border-white/20 bg-slate-900 px-2 text-sm font-semibold text-white" aria-label="Bhasha / Language">
-        <option value="hi">हिंदी</option>
-        <option value="mr">मराठी</option>
-        <option value="bho">भोजपुरी (beta)</option>
-        <option value="bn">বাংলা (beta)</option>
-        <option value="ta">தமிழ் (beta)</option>
-        <option value="te">తెలుగు (beta)</option>
-        <option value="en-mix">English mix (beta)</option>
-      </select>
-      <span id="mode-chip" class="hidden whitespace-nowrap rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-sm font-semibold text-amber-300">Scripted demo</span>
-    </div>
+    <label class="sr-only" for="lang">Bhasha / Language</label>
+    <select id="lang" class="lang">
+      <option value="hi">हिंदी</option>
+      <option value="mr">मराठी</option>
+      <option value="bho">भोजपुरी (beta)</option>
+      <option value="bn">বাংলা (beta)</option>
+      <option value="ta">தமிழ் (beta)</option>
+      <option value="te">తెలుగు (beta)</option>
+      <option value="en-mix">English mix (beta)</option>
+    </select>
   </header>
-  <p id="beta-note" class="mb-4 hidden rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-sm text-amber-200" data-i18n="beta"></p>
-  <p id="followup-chip" class="mb-4 hidden rounded-xl border border-violet-400/30 bg-violet-400/10 px-4 py-2.5 text-sm text-violet-100"></p>
 
-  <p id="keyless" class="mb-4 hidden rounded-xl border border-sky-400/30 bg-sky-400/10 px-4 py-2.5 text-sm text-sky-200"></p>
+  <div class="chips">
+    <p id="keyless" class="chip hidden"></p>
+    <p id="mode-chip" class="chip chip-ink hidden">Scripted demo</p>
+    <p id="beta-note" class="chip hidden" data-i18n="beta"></p>
+    <p id="followup-chip" class="chip chip-teal hidden"></p>
+  </div>
 
-  <!-- card -->
-  <section class="rounded-[24px] border border-white/10 bg-white/[0.06] p-5 shadow-2xl shadow-black/40 backdrop-blur sm:p-7">
-
-    <!-- agent question -->
-    <div class="flex items-start gap-3">
-      <div class="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-indigo-500/25 text-indigo-200" aria-hidden="true">
-        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
-      </div>
-      <div class="min-w-0 flex-1" aria-live="polite">
-        <p class="text-sm font-semibold uppercase tracking-[0.1em] text-indigo-300">PagarSaathi <span id="speaking" class="ml-1 hidden normal-case tracking-normal text-indigo-200/80">· bol raha hai…</span></p>
-        <p id="agent-text" class="mt-1 text-[28px] font-bold leading-tight text-white">Namaste. Shuru karne ke liye neeche button dabaiye.</p>
-        <button id="replay" type="button" class="mt-3 hidden rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-slate-200 hover:bg-white/15">▶ Phir se suniye</button>
-      </div>
-    </div>
-
-    <!-- facts -->
-    <div class="mt-6 grid grid-cols-4 gap-2" aria-label="Collected facts">
-      <div class="fact min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] px-1 py-2.5 text-center" data-field="days"><span class="block text-sm font-semibold text-slate-300" data-i18n="f_days">Din</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
-      <div class="fact min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] px-1 py-2.5 text-center" data-field="rate"><span class="block text-sm font-semibold text-slate-300" data-i18n="f_rate">Roz</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
-      <div class="fact min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] px-1 py-2.5 text-center" data-field="advance"><span class="block text-sm font-semibold text-slate-300" data-i18n="f_advance">Advance</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
-      <div class="fact min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] px-1 py-2.5 text-center" data-field="payments"><span class="block text-sm font-semibold text-slate-300" data-i18n="f_payments">Mila</span><b class="mt-0.5 block text-base text-slate-500">—</b></div>
-    </div>
-
-    <!-- things the worker mentioned outside the four numbers (hospital, loan...), kept by the agent -->
-    <div id="notes-wrap" class="mt-3 hidden">
-      <p class="text-sm font-semibold text-slate-300" data-i18n="notes">Aapne bataya</p>
-      <ul id="notes" class="mt-1.5 flex flex-wrap gap-1.5"></ul>
-    </div>
-
-    <!-- start -->
-    <p id="wispr-hint" class="mt-6 flex items-center gap-2 text-sm text-slate-300">
-      <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white text-sm font-black text-indigo-950" aria-hidden="true">W</span>
-      <span>Jawab <b class="text-white">Wispr Flow</b> se boliye: Mac par Fn do baar dabaiye · iPhone par Wispr Flow keyboard</span>
+  <!-- the agent's current line: always on screen (sticky) -->
+  <section class="q" id="q" aria-label="PagarSaathi ka sawaal">
+    <p class="q-label">
+      <span>PagarSaathi</span>
+      <span id="speaking" class="speaking hidden">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+        bol raha hai
+      </span>
     </p>
-    <button id="start" type="button" class="mt-3 w-full rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-4 text-xl font-bold text-white shadow-lg shadow-indigo-500/30 transition hover:brightness-110 active:scale-[0.99]" data-i18n="start">Shuru karein</button>
-
-    <!-- Wispr Flow input -->
-    <form id="answer-form" class="mt-6 hidden" autocomplete="off">
-      <div class="flex items-center justify-between gap-3">
-        <label for="answer" class="flex items-center gap-2 text-lg font-semibold text-white">
-          <span class="grid h-7 w-7 place-items-center rounded-lg bg-white text-sm font-black text-indigo-950" title="Wispr Flow" aria-hidden="true">W</span>
-          Speak your answer
-        </label>
-        <span class="text-sm text-slate-400">via Wispr Flow</span>
-      </div>
-      <p class="mt-1 text-sm text-slate-400">Mac: double-tap Fn · iPhone: use the Wispr Flow keyboard</p>
-      <textarea id="answer" rows="3" class="mt-3 h-[120px] w-full resize-none rounded-2xl border border-white/15 bg-slate-950/60 px-4 py-3 text-[20px] leading-snug text-white placeholder-slate-500 outline-none ring-indigo-400/60 transition focus:border-indigo-400 focus:ring-4" placeholder="Jaise: chhe din"></textarea>
-      <div id="assist" class="mt-3 hidden rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">Madad chahiye? Kisi saathi se poochh kar sirf number boliye.</div>
-      <p id="status" role="status" class="mt-3 min-h-[1.5rem] text-base text-slate-400"></p>
-      <button id="continue" type="submit" class="mt-1 w-full rounded-2xl bg-indigo-500 px-6 py-4 text-xl font-bold text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-400 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60" data-i18n="continue">Continue</button>
-    </form>
-
-    <!-- result -->
-    <section id="result" class="mt-7 hidden">
-      <h2 class="text-sm font-semibold uppercase tracking-[0.1em] text-slate-300" data-i18n="hisaab">Hisaab</h2>
-      <div class="mt-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-5 py-4 text-center">
-        <p class="text-base font-semibold text-amber-100" data-i18n="baaki">Baaki</p>
-        <p id="outstanding" class="text-[64px] font-black leading-none tabular-nums text-amber-300">₹0</p>
-      </div>
-      <div id="calc" class="mt-3 divide-y divide-dashed divide-white/10 rounded-2xl border border-white/10 bg-slate-950/50 px-4"></div>
-      <div id="nodue" class="mt-3 hidden rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 font-semibold text-emerald-200" data-i18n="nodue">Hisaab ke hisaab se koi paisa baaki nahi hai.</div>
-
-      <!-- audit: the sealed case -->
-      <div id="audit" class="mt-4 hidden rounded-2xl border border-white/10 bg-slate-950/50 px-4 py-3">
-        <p class="text-base text-slate-200"><span data-i18n="case_id">Case ID</span>: <b id="hash" class="font-mono text-white tracking-wide"></b></p>
-        <p class="mt-1 text-[12px] leading-snug text-slate-400" data-i18n="hash_caption">Yeh hash case ka fingerprint hai. Case mein koi badlav hua to hash mel nahi khayega, isse badlav pakda ja sakta hai.</p>
-        <p id="sent-at" class="mt-2 hidden text-base font-semibold text-emerald-300"></p>
-        <p id="reminder" class="mt-2 hidden w-fit rounded-full border border-violet-400/40 bg-violet-400/15 px-3 py-1 text-sm font-semibold text-violet-100"></p>
-        <div class="mt-3 grid grid-cols-3 gap-2">
-          <button id="escalate" type="button" class="min-h-[48px] rounded-xl bg-rose-500/90 px-2 text-sm font-bold text-white hover:bg-rose-400" data-i18n="escalate">Escalate</button>
-          <a id="share" href="#" target="_blank" rel="noopener" class="grid min-h-[48px] place-items-center rounded-xl border border-white/20 px-2 text-center text-sm font-bold text-white hover:bg-white/5" data-i18n="share">Union / legal aid</a>
-          <button id="delete" type="button" class="min-h-[48px] rounded-xl border border-white/20 px-2 text-sm font-bold text-slate-200 hover:bg-white/5" data-i18n="delete">Case delete</button>
-        </div>
-      </div>
-      <div id="draft-wrap" class="mt-4 hidden">
-        <h3 class="text-sm font-semibold text-slate-300" data-i18n="draft">Shikayat ka draft (copy karke SAMADHAN par dijiye)</h3>
-        <pre id="draft" class="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded-2xl border border-rose-400/20 bg-rose-950/40 px-4 py-3 font-sans text-base leading-relaxed text-rose-50"></pre>
-        <button id="copy-draft" type="button" class="mt-2 min-h-[48px] w-full rounded-xl border border-white/20 text-base font-semibold text-white" data-i18n="copy">Copy karein</button>
-      </div>
-      <div class="mt-4 grid grid-cols-2 gap-2">
-        <a href="tel:18001800999" class="grid min-h-[48px] place-items-center rounded-xl border border-sky-400/30 bg-sky-400/10 px-2 text-center text-sm font-semibold text-sky-100">📞 India Labourline 1800 1800 999</a>
-        <a href="https://samadhan.labour.gov.in" target="_blank" rel="noopener" class="grid min-h-[48px] place-items-center rounded-xl border border-sky-400/30 bg-sky-400/10 px-2 text-center text-sm font-semibold text-sky-100">SAMADHAN portal ↗</a>
-      </div>
-    </section>
-
-    <section id="preview-wrap" class="mt-7 hidden">
-      <h2 class="text-sm font-semibold uppercase tracking-[0.1em] text-slate-300" data-i18n="msg">Thekedar ko message</h2>
-      <pre id="preview" class="mt-3 whitespace-pre-wrap rounded-2xl rounded-tl-md border border-emerald-400/20 bg-emerald-950/60 px-5 py-4 font-sans text-base leading-relaxed text-emerald-50"></pre>
-      <button id="send" type="button" class="mt-4 hidden w-full items-center justify-center gap-3 rounded-2xl bg-emerald-500 px-6 py-5 text-xl font-bold text-emerald-950 shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400 active:scale-[0.99]">
-        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3a2.6 2.6 0 0 0-.8 1.9 4.5 4.5 0 0 0 1 2.4 10.3 10.3 0 0 0 4 3.5c1.5.6 2 .7 2.8.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3Z"/></svg>
-        <span data-i18n="send">Send to contractor</span>
-      </button>
-    </section>
-
-    <button id="again" type="button" class="mt-6 hidden w-full rounded-2xl border border-white/15 px-6 py-3 text-base font-semibold text-slate-200 hover:bg-white/5" data-i18n="again">Naya hisaab</button>
+    <h1 id="agent-text">Namaste. Shuru karne ke liye neeche Bolo dabaiye.</h1>
+    <button id="replay" type="button" class="replay hidden">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      Phir se suniye
+    </button>
   </section>
 
-  <!-- turn log -->
-  <section class="mt-6">
-    <h2 class="px-1 text-sm font-semibold uppercase tracking-[0.1em] text-slate-300" data-i18n="log">Baatcheet</h2>
-    <ol id="log" class="mt-3 flex flex-col gap-1.5">
-      <li class="empty px-1 text-sm text-slate-500">Abhi koi baat nahi hui.</li>
+  <!-- Bolo: not a microphone. It focuses the answer box; Wispr Flow types the spoken words there. -->
+  <div class="bolo-wrap">
+    <button id="bolo" type="button" class="bolo" aria-label="Bolo" aria-describedby="bolo-caption" data-state="idle">
+      <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01" stroke-width="2.6"/></svg>
+      <span class="bolo-word" aria-hidden="true">Bolo</span>
+    </button>
+    <p id="bolo-caption" class="bolo-caption">Shuru karein</p>
+    <p id="wispr-hint" class="hint">
+      <span class="wbadge" aria-hidden="true">W</span>
+      <span>Jawab <b>Wispr Flow</b> se boliye: Mac par Fn do baar dabaiye · iPhone par Wispr Flow keyboard</span>
+    </p>
+  </div>
+
+  <form id="answer-form" class="answer-form hidden" autocomplete="off">
+    <label for="answer" class="answer-label">
+      <span>Aapka jawab</span>
+      <small>Wispr Flow / typed</small>
+    </label>
+    <textarea id="answer" rows="3" placeholder="Jaise: chhe din"></textarea>
+    <p id="assist" class="assist hidden">Madad chahiye? Kisi saathi se poochh kar sirf number boliye.</p>
+    <p id="error" class="err hidden" role="alert"></p>
+    <p id="status" class="status" role="status"></p>
+    <button id="continue" type="submit" class="btn btn-primary" data-i18n="continue">Continue</button>
+  </form>
+
+  <div class="facts" aria-label="Ab tak ke number">
+    <div class="fact" data-field="days"><span data-i18n="f_days">Din</span><b>—</b></div>
+    <div class="fact" data-field="rate"><span data-i18n="f_rate">Roz</span><b>—</b></div>
+    <div class="fact" data-field="advance"><span data-i18n="f_advance">Advance</span><b>—</b></div>
+    <div class="fact" data-field="payments"><span data-i18n="f_payments">Mila</span><b>—</b></div>
+  </div>
+
+  <div id="notes-wrap" class="hidden">
+    <p class="notes-title" data-i18n="notes">Aapne bataya</p>
+    <ul id="notes" class="notes"></ul>
+  </div>
+
+  <!-- the calculation: every number comes from the server (wage_math.py) -->
+  <section id="result" class="card hidden" aria-labelledby="hisaab-title">
+    <h2 id="hisaab-title" class="card-title" data-i18n="hisaab">Hisaab</h2>
+    <div class="card-head">
+      <div>
+        <p class="baaki-label" data-i18n="baaki">Baaki</p>
+        <p id="outstanding" class="amount">₹0</p>
+      </div>
+      <span class="confirmed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        <span data-i18n="confirmed">Confirmed</span>
+      </span>
+    </div>
+    <dl id="calc" class="calc"></dl>
+    <p id="nodue" class="nodue hidden" data-i18n="nodue">Hisaab ke hisaab se koi paisa baaki nahi hai.</p>
+
+    <div id="preview-wrap" class="hidden">
+      <h3 class="preview-title" data-i18n="msg">Thekedar ko message</h3>
+      <pre id="preview" class="preview"></pre>
+    </div>
+    <button id="send" type="button" class="btn btn-primary hidden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.2-4.4A9 9 0 1 1 21 12z"/><path d="M9 10.5c.5 2 2 3.5 4.5 4.5l1.3-1.2 2 .8"/></svg>
+      <span data-i18n="send">WhatsApp par bhejein</span>
+    </button>
+    <div id="popup-blocked" class="popup-blocked hidden">
+      <p class="err" role="alert">WhatsApp nahi khula. Neeche message copy karein.</p>
+      <button id="copy-msg" type="button" class="btn btn-ghost" data-i18n="copy">Copy karein</button>
+    </div>
+
+    <div id="audit" class="audit hidden">
+      <div class="actions">
+        <button id="escalate" type="button" class="btn btn-teal" data-i18n="escalate">Escalate: shikayat ka draft</button>
+        <div class="btn-row">
+          <a id="share" href="#" target="_blank" rel="noopener" class="btn btn-ghost" data-i18n="share">Union / legal aid</a>
+          <button id="delete" type="button" class="btn btn-ghost" data-i18n="delete">Case delete</button>
+        </div>
+      </div>
+      <p id="escalate-error" class="err hidden" role="alert"></p>
+      <p class="case-id"><span data-i18n="case_id">Case ID</span> <b id="hash"></b></p>
+      <p class="caption" data-i18n="hash_caption">Yeh hash case ka fingerprint hai. Case mein koi badlav hua to hash mel nahi khayega, isse badlav pakda ja sakta hai.</p>
+      <p id="sent-at" class="sent-at hidden"></p>
+      <p id="reminder" class="chip chip-teal reminder hidden"></p>
+    </div>
+
+    <div id="draft-wrap" class="hidden">
+      <h3 class="preview-title" data-i18n="draft">Shikayat ka draft (copy karke SAMADHAN par dijiye)</h3>
+      <pre id="draft" class="draft"></pre>
+      <button id="copy-draft" type="button" class="btn btn-ghost" style="margin-top:8px" data-i18n="copy">Copy karein</button>
+    </div>
+
+    <div class="help">
+      <a href="tel:18001800999" class="btn btn-ghost">India Labourline 1800 1800 999</a>
+      <a href="https://samadhan.labour.gov.in" target="_blank" rel="noopener" class="btn btn-ghost">SAMADHAN portal ↗</a>
+    </div>
+  </section>
+
+  <button id="again" type="button" class="btn btn-ghost hidden" data-i18n="again">Naya hisaab</button>
+
+  <section class="log-wrap" aria-labelledby="log-title">
+    <h2 id="log-title" class="log-title" data-i18n="log">Baatcheet</h2>
+    <ol id="log" aria-live="polite">
+      <li class="empty">
+        <!-- a phone with a speech bubble (inline, no image request) -->
+        <svg viewBox="0 0 160 110" aria-hidden="true">
+          <rect x="44" y="8" width="54" height="96" rx="12" fill="#ffffeb" stroke="#1a1a1a" stroke-width="3"/>
+          <rect x="62" y="15" width="18" height="4" rx="2" fill="#1a1a1a"/>
+          <text x="71" y="70" text-anchor="middle" font-family="EB Garamond, Georgia, serif" font-size="30" fill="#1a1a1a">₹</text>
+          <path d="M71 78h-14" stroke="#ffa946" stroke-width="4" stroke-linecap="round"/>
+          <path d="M98 22h46a10 10 0 0 1 10 10v20a10 10 0 0 1-10 10h-26l-12 10v-10h-8z" fill="#f0d7ff" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M112 37h28M112 47h18" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="28" cy="72" r="10" fill="none" stroke="#034f46" stroke-width="3"/>
+          <path d="m23 72 4 4 6-7" fill="none" stroke="#034f46" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Abhi koi baat nahi hui.</span>
+      </li>
     </ol>
   </section>
 
-  <pre id="debug" class="mt-6 hidden whitespace-pre-wrap break-all rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-sm text-lime-200"></pre>
+  <pre id="debug" class="debug hidden"></pre>
 
-  <footer class="mt-10 pb-4 text-center text-sm text-slate-500">
-    Built with Wispr Flow + Claude Code · Demo mode: <a class="underline decoration-slate-600 underline-offset-2 hover:text-slate-300" href="/?mode=scripted">?mode=scripted</a>
+  <footer class="foot">
+    Built with Wispr Flow + Claude Code · Demo mode: <a href="/?mode=scripted">?mode=scripted</a>
   </footer>
 </main>
+
+<p id="toast" class="toast hidden" role="status">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+  <span id="toast-text"></span>
+</p>
+
+<!-- Motion (motion.dev), vanilla build. If it fails to load, the page works without animation. -->
+<script src="https://cdn.jsdelivr.net/npm/motion@11.18.2/dist/motion.min.js"></script>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

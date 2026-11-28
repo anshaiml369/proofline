@@ -156,7 +156,7 @@ A finished case is a record that a union volunteer or a labour officer can check
 ## Privacy
 
 - **Local SQLite only.** Finished cases are in one SQLite file on the server (`pagarsaathi.db`). There are no accounts, no analytics, no tracking scripts and no third-party logging of cases.
-- **Outside calls, only with keys:** the worker's text goes to the LLM provider (OpenAI or OpenRouter) to decide the next line, and the agent's line goes to Sarvam to be spoken. The scripted demo makes no outside call.
+- **Outside calls, only with keys:** the worker's text goes to the LLM provider (OpenAI or OpenRouter) to decide the next line, and the agent's line goes to Sarvam to be spoken. The scripted demo sends no case data anywhere. The page itself loads two fonts from Google Fonts and the Motion animation library from jsDelivr; if either fails, it falls back to system fonts and no animation and still works.
 - **The worker can delete the case.** Say "mera case delete karo" (or tap "Case delete"). The agent asks "Pakka case delete karun? Yeh wapas nahi aayega." and deletes only after a spoken "haan". The row is removed from SQLite (a hard `DELETE`, not a flag).
 - On Railway the SQLite file lives on the service's disk. A redeploy without a volume starts a new file.
 
@@ -198,7 +198,7 @@ Everything in the core flow works:
 - `/`: normal use. Dictate with Wispr Flow, or type, then press **Continue**.
 - `/?mode=text`: the same flow, labelled "Text mode", for a judge who will type rather than dictate.
 - `?debug=1` (with any mode): shows the `node_path` (the states this conversation went through), the policy source, the language and the full hash under the card, and logs every audio event in the console.
-- `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself: the worker mentions three years at the site and an illness (the agent acknowledges it), then gives three facts in one sentence, and it ends at ₹700. It always uses the built-in rules and pre-recorded voice, so it calls no outside service and runs the same every time.
+- `/?mode=scripted`: the backup demo. It types each demo answer into the box as Wispr Flow would and presses Continue by itself: the worker mentions three years at the site and an illness (the agent acknowledges it), then gives three facts in one sentence, and it ends at ₹700. It always uses the built-in rules and pre-recorded voice, so it sends nothing to an LLM or voice service and runs the same every time (the page still loads its fonts and Motion from CDNs).
 
 ## API
 
@@ -248,7 +248,7 @@ There are 114 tests. They need no network or keys (the LLM is faked). They cover
 - **Sarvam Saaras v3**: used offline only, to check that every recorded clip and every language's voice says the right words. The app has no speech-to-text; Wispr Flow does that on the device.
 - **Railway**: hosting
 - **SQLite**: finished cases, in the `wage_cases` table, with the sealed JSON and its sha256
-- **Tailwind CSS**: compiled to a static file, so pages need no CDN
+- **The page**: one hand-written `static/style.css` (CSS custom properties, no framework), EB Garamond + Figtree from Google Fonts, and [Motion](https://motion.dev) from jsDelivr for the transitions. Design tokens, contrast table and accessibility checklist: [`DESIGN.md`](DESIGN.md). UI test matrix and its screenshots: `scripts/ui_matrix.py`, `scripts/contrast.py`, [`screenshots/`](screenshots/)
 - **Docker**
 - Built with **Wispr Flow + Claude Code**
 
