@@ -57,7 +57,8 @@ The browser tries these in order (`speak()` in `static/app.js`):
 
 ```
 $ curl -s https://pagarsaathi.up.railway.app/health
-LIVE_HEALTH_PLACEHOLDER
+{"key_set":false,"llm":false,"llm_provider":null,"missing":["OPENAI_API_KEY or OPENROUTER_API_KEY","SARVAM_API_KEY"],"mode":"keyless","status":"ok","stt":false,"voice":false}
+# captured 28 Nov 2026, build 7963633: no keys in Railway Variables yet
 ```
 
 ### To switch on the LLM and the Sarvam voice on Railway
